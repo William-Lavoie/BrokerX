@@ -1,0 +1,28 @@
+@startuml
+skinparam style strictuml
+skinparam ArrowThickness 2
+skinparam ArrowColor #gray
+hide empty members
+
+Class Universite {
+}
+
+Class Account <<Entity>>
+{
+  name: String
+  address: String
+  birthDate: Date
+  email: String
+  phoneNumber: String
+  password: String
+}
+
+enum  AccountState <<enumeration>> {
+    Active
+    Pending
+    Rejected
+    Suspended
+    Locked
+}
+
+@enduml

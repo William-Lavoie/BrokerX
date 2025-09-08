@@ -2,7 +2,8 @@
 
 | Term                   | Definition                                                                                           |
 |------------------------|----------------------------------------------------------------------------------------------------|
-| Client                 | An individual that uses the platform and any number of its functionalities.                         |
+| Client                 | An individual that uses the platform and any number of its functionalities.             |
+| Account   |  Registered profile associated with a client. |
 | (Digital) Wallet       | Capital that a client has available in their account to make transactions.                          |
 | Buy Order              | An instruction from a client to buy specified assets.                                              |
 | Sell Order             | An instruction from a client to sell specified assets.                                             |
