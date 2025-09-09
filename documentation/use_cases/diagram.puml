@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+skinparam style strictuml
+skinparam ActorStyle awesome
+
+actor Client
+rectangle  "Simulated Payment Service" as SPS
+rectangle  "Back-Office" as BO
+
+(Client Registration and Identity Validation) as UC1
+(Authentication and MFA) as UC2
+(Adding funds to the wallet) as UC3
+
+Client --> UC1
+Client --> UC2
+Client --> UC3
+UC3 <-- SPS
+UC3 <-- BO
+
+skinparam legendBackgroundColor #F9F9F9
+
+legend right
+  |= Symbol |= Meaning           |
+  | Rectangle | External System   |
+  | Person     | User or admin    |
+endlegend
+@enduml
