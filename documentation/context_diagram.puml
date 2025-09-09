@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+skinparam style strictuml
+skinparam ActorStyle awesome
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  RoundCorner 15
+}
+skinparam legendBackgroundColor #F9F9F9
+skinparam legendBorderColor #CCCCCC
+
+actor Client as "Client"
+rectangle "BrokerX+ System" as BrokerX
+rectangle "Simulated Payment Service" as SPS
+
+Client --> BrokerX : Uses Platform
+BrokerX --> SPS : Sends Deposit Requests
+
+legend right
+  |= Symbol |= Meaning           |
+  | Person        | User / Admin       |
+  | Rectangle        | System    |
+endlegend
+@enduml
