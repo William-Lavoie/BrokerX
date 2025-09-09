@@ -1,20 +1,17 @@
-@startuml
+@startuml Domain model diagram
 skinparam style strictuml
 skinparam ArrowThickness 2
 skinparam ArrowColor #gray
 hide empty members
 
-Class Universite {
-}
-
-Class Account <<Entity>>
-{
+Class Account <<Entity>> {
   name: String
   address: String
   birthDate: Date
   email: String
   phoneNumber: String
   password: String
+  state: AccountState
 }
 
 enum  AccountState <<enumeration>> {
@@ -24,5 +21,37 @@ enum  AccountState <<enumeration>> {
     Suspended
     Locked
 }
+
+Class Wallet <<Entity>> {
+    balance: double
+}
+
+class Deposit {
+    amount: double
+    timestamp: Date
+    minAllowed: double
+    maxAllowed: double
+}
+
+abstract class  Transaction <<abstract>> {
+    timestamp: Date
+    device: String
+    status: TransactionStatus
+    idempotencyKey: String
+}
+
+enum  TransactionStatus <<enumeration>> {
+    Pending
+    Rejected
+    Cancelled
+    Settled
+}
+
+Account ..> AccountState : << use >>
+Account --> Wallet : has
+Account --> Deposit : adds fund
+Deposit --> Wallet : concerns
+Deposit --|> Transaction
+Transaction ..> TransactionStatus : << use >>
 
 @enduml
