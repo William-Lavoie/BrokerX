@@ -11,8 +11,8 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 
 | Priority | Quality goal | Scenario |
 |----------|------------------|----------|
-| 1 | **Maintenability** | Separation of concerns through the use of TBD |
-| 2 | **Persistence** | Support of a backend database TBD |
+| 1 | **Maintenability** | Separation of concerns through the use of the hexagonal architecture |
+| 2 | **Persistence** | Support of a backend database with PostgreSQL |
 | 3 | **Latency** | P95: Less than 500 ms to place a buy order |
 | 4 | **Throughput** | More than 300 buy orders per second |
 | 5 | **Availability** | Greater or equal to 90% uptime |
@@ -25,13 +25,15 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 
 ---
 
-## 2. Architecture Constraints
-- [ ] Technical constraints (languages, frameworks, DBs)
-- [ ] Organizational constraints
-- [ ] Legal, regulatory, or compliance constraints
-- [ ] Deployment constraints (e.g., monolith only)
+## 2. Architectural Constraints
+| Constraint | Description | Justification |
+|----------|---------------|---------------|
+| **Technologies** | Use of Java, PostgreSQL, Docker| Well documented and lightweight tools |
+| **Testing** | JUnit (unit testing), Cypress (E2E) | Reliable testing frameworks that allow full coverage |
+| **CI/CD** | Continuous integration and deployment through GitHub Actions | Ease of use, tests and deployment automation |
+| **Deployment** | Deployment in Docker containers | Chosen for simplicity and portability |
+| **Educational** | Use of a monolithic architecture (Phase 1) | Must conform to course requirements |
 
----
 
 ## 3. System Scope and Context
 
