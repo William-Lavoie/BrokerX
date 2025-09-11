@@ -1,0 +1,26 @@
+@startuml
+start
+:See the main page of the application;
+
+if (User has an account?) then (yes)
+else (no)
+  :Create an account;
+  :Receive verification email;
+  :Click verification link;
+endif
+
+:Login;
+
+repeat
+  :Show main page;
+  if (User selects "Add funds") then (yes)
+    :Choose amount;
+    :Confirm deposit;
+  elseif (User selects "Place order") then (yes)
+  elseif (User selects "See portfolio") then (yes)
+  endif
+repeat while (User stays logged in?)
+:Logout;
+
+
+@enduml
