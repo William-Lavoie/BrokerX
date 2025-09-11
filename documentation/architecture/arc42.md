@@ -38,14 +38,15 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 ## 3. System Scope and Context
 
 ### 3.1 Business Context
-- [ ] Key users and use cases
-- [ ] External business actors
+![Activity Diagram](../images/activity.png)
 
+The system currently allows clients to add funds to their wallets. Additional functionalities (including placing order and seeing their portfolio) will be added during the following phases of the project.
 ### 3.2 Technical Context
-- [ ] Interfaces to external systems
-- [ ] Communication protocols
+- **Client**: `BrokerX.java`- Web-based java application
+- **Database Layer**: PostgreSQL database with DAO pattern.
+- **Simulated Payment Service**: JSON file that mocks a banking account for clients to withdraw money.
 
-> 📌 *Include a **Context Diagram** here showing system boundaries and external actors.*
+![Context Diagram](../images/context.png)
 
 ---
 
