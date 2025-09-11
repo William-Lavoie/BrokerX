@@ -11,7 +11,7 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 
 | Priority | Quality goal | Scenario |
 |----------|------------------|----------|
-| 1 | **Maintenability** | Separation of concerns through the use of the hexagonal architecture |
+| 1 | **Maintainability** | Separation of concerns through the use of the hexagonal architecture |
 | 2 | **Persistence** | Support of a backend database with PostgreSQL |
 | 3 | **Latency** | P95: Less than 500 ms to place a buy order |
 | 4 | **Throughput** | More than 300 buy orders per second |
@@ -51,10 +51,12 @@ The system currently allows clients to add funds to their wallets. Additional fu
 ---
 
 ## 4. Solution Strategy
-- [ ] High-level architectural style (Hexagonal, MVC, Layered)
-- [ ] Key patterns and tactics (e.g., CQRS, dependency inversion)
-- [ ] Design rationale and alternatives considered
-- [ ] Quality and risk mitigation strategies
+| Problem | Solution |
+|---------|----------|
+| **Separation of interfaces** | Hexagonal architecture with ports and adapter classes |
+| **Database abstraction** | Use of the DAO pattern |
+| **Testability** | Use of interfaces to simplify mocking of external sources |
+| **Maintainability** | Layered architecture with highly cohesive methods |
 
 ---
 
