@@ -61,9 +61,9 @@ The system currently allows clients to add funds to their wallets. Additional fu
 ---
 
 ## 5. Building Block View (Logical View – 4+1)
-- [ ] Description of main building blocks (modules, layers, components)
-- [ ] Interfaces and interactions between blocks
+![Component diagram](../images/component.png)
 
+Note that this represents only the logic for the user model, each entity has a similar structure. For simplicity, only one is represented here.
 > 📌 *Include a **Logical Component Diagram** here*
 
 ---
