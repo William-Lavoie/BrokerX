@@ -26,11 +26,27 @@ class AccountCreationForm(forms.Form):
     password = forms.CharField(label="Password",
                                max_length=100,
                                widget=PasswordInput(
-                                    render_value=True
+                                    render_value=True,
+                                    attrs={
+                                        'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                                        'title': 'Must be at least 8 characters, include one uppercase letter, one number, and one special character.',
+                                    }
                                ))
 
     confirm_password = forms.CharField(label="Confirm password",
                                max_length=100,
                                widget=PasswordInput(
-                                    render_value=True
+                                    render_value=True,
+                                    attrs={
+                                        'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                                        'title': 'Must be at least 8 characters, include one uppercase letter, one number, and one special character.',
+                                    }
                                ))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email", "")
+        confirm_email = cleaned_data.get("confirm_email", "")
+
+        if email != confirm_email:
+            raise forms.ValidationError("The emails must match")
