@@ -1,5 +1,5 @@
 from typing import Optional
-from ..domain.entities.ports.account_repository import AccountRepository
+from ..domain.ports.account_repository import AccountRepository
 from ..domain.entities.user import User
 
 

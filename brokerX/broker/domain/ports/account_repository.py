@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from ....domain.entities.user import User
+from ...domain.entities.user import User
 
 
 class AccountRepository():

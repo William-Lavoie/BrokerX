@@ -1,10 +1,12 @@
-from ..domain.entities.ports.account_repository import AccountRepository
+from ..domain.ports.otp_repository import OTPRepository
+from ..domain.ports.account_repository import AccountRepository
 from ..domain.entities.user import User
 from ..services.commands.create_account_command import CreateAccountCommand
 
 class CreateAccountUseCase:
-    def __init__(self,  account_repository: AccountRepository):
+    def __init__(self,  account_repository: AccountRepository, otp_repository: OTPRepository):
         self.account_repository = account_repository
+        self.otp_repository = otp_repository
 
     def execute(self, command: CreateAccountCommand):
 
@@ -20,3 +22,6 @@ class CreateAccountUseCase:
 
         # Save the new account
         self.account_repository.save(account)
+
+        # Send passcode
+        self.otp_repository.send_passcode(command.email)

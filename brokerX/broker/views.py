@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from broker.forms import AccountCreationForm
+from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.test_account_repository import TestAccountRepository
 from .services.commands.create_account_command import CreateAccountCommand
 from .services.create_account_use_case import CreateAccountUseCase
@@ -31,7 +32,7 @@ def create_account(request):
         )
 
         #TODO: add dependency injections to reduce coupling between view and repositories
-        use_case = CreateAccountUseCase(TestAccountRepository())
+        use_case = CreateAccountUseCase(TestAccountRepository(), EmailOTPRepository())
         use_case.execute(command)
       else:
          print(form.errors)
