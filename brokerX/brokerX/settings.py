@@ -54,7 +54,7 @@ ROOT_URLCONF = 'brokerX.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ["broker/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
