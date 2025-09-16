@@ -6,7 +6,6 @@ class AccountCreationForm(forms.Form):
     last_name = forms.CharField(label="Last name", max_length=100)
     birth_date = forms.DateField(
         label="Date of birth",
-        input_formats=["%d-%m-%y"],
         widget=forms.DateInput(attrs={'type': 'date'})
     )
     email = forms.EmailField(label="Email address")
@@ -18,6 +17,7 @@ class AccountCreationForm(forms.Form):
                 'pattern': '[0-9]{3}-[0-9]{3}-[0-9]{4}',
             })
         )
+    address = forms.CharField(label="Address", max_length=100)
     communication_method = forms.ChoiceField(
         label="Preferred communication method",
         choices=[("EM", "Email"),

@@ -51,6 +51,18 @@
 
         <div class="d-flex justify-content-evenly form-row">
             <div class="mb-3 w-100">
+                <label for="{{ form.address.id_for_label }}">Address</label>
+                {{ form.address }}
+            </div>
+
+            <div class="mb-3 ms-2 w-100">
+                <label for="{{ form.communication_method.id_for_label }}">Preferred communication</label>
+                {{ form.communication_method }}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-evenly form-row">
+            <div class="mb-3 w-100">
                 <label for="{{ form.password.id_for_label }}">Password</label>
                 {{ form.password }}
             </div>
@@ -61,10 +73,7 @@
             </div>
         </div>
 
-        <div class="mb-3 ms-2 w-100">
-            <label for="{{ form.communication_method.id_for_label }}">Preferred communication</label>
-            {{ form.communication_method }}
-        </div>
+
 
         <button type="submit" class="btn btn-secondary btn-lg">Submit</button>
     </form>
