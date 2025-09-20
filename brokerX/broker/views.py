@@ -1,4 +1,7 @@
+from http.client import HTTPResponse
+from django.http import HttpResponse
 from django.shortcuts import render
+import pyotp
 
 from broker.forms import AccountCreationForm
 from .adapters.email_otp_repository import EmailOTPRepository
@@ -34,9 +37,24 @@ def create_account(request):
         #TODO: add dependency injections to reduce coupling between view and repositories
         use_case = CreateAccountUseCase(TestAccountRepository(), EmailOTPRepository())
         use_case.execute(command)
+        return render(request, "otp_confirmation.html")
       else:
          print(form.errors)
     else:
       form = AccountCreationForm()
 
     return render(request, "account_creation.html", {"form": form})
+
+def confirm_passcode(request):
+  if request.method == "GET":
+    return HttpResponse("Error: You can only use a POST")
+
+  passcode = request.POST.get("passcode", "")
+  totp = pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz", interval=600, digits=6)
+  print(passcode)
+  print(totp.now())
+  print(totp.verify(passcode))
+
+  return render(request, "otp_confirmation.html")
+
+

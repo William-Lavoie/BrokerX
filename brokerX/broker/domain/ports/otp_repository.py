@@ -15,7 +15,7 @@ class OTPRepository():
 
     def generate_passcode(self) -> pyotp.TOTP:
         user_secret = pyotp.random_base32()
-        return pyotp.TOTP(s=user_secret,
+        return pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz",
                             interval=600,
                             digits=6)
 
