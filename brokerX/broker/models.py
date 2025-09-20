@@ -8,7 +8,7 @@ class User(models.Model):
     last_name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     birth_date = models.DateField()
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=100)
     status = models.CharField(max_length=20, choices=[("A", "Active"),
                                                       ("P", "Pending"),
