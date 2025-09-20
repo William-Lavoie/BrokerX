@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+import pyotp
+
 from ...domain.entities.user import User
 
 class OTPRepository():
@@ -10,3 +12,10 @@ class OTPRepository():
     @abstractmethod
     def verify_passcode(self, passcode: str, user: User) -> bool:
         pass
+
+    def generate_passcode(self) -> pyotp.TOTP:
+        user_secret = pyotp.random_base32()
+        return pyotp.TOTP(s=user_secret,
+                            interval=600,
+                            digits=6)
+

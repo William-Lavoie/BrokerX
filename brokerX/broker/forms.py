@@ -28,7 +28,7 @@ class AccountCreationForm(forms.Form):
                                widget=PasswordInput(
                                     render_value=True,
                                     attrs={
-                                        'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                                 #       'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
                                         'title': 'Must be at least 8 characters, include one uppercase letter, one number, and one special character.',
                                     }
                                ))
@@ -38,7 +38,7 @@ class AccountCreationForm(forms.Form):
                                widget=PasswordInput(
                                     render_value=True,
                                     attrs={
-                                        'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                                  #      'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
                                         'title': 'Must be at least 8 characters, include one uppercase letter, one number, and one special character.',
                                     }
                                ))
