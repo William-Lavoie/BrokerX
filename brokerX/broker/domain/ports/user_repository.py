@@ -1,12 +1,12 @@
 from abc import abstractmethod
 from typing import Optional
 
-from ...domain.entities.user import User
+from ..entities.user import User
 
 
-class AccountRepository():
+class UserRepository():
     @abstractmethod
-    def save(self, account: User) -> None:
+    def add_user(self, user: User) -> None:
         pass
 
     @abstractmethod

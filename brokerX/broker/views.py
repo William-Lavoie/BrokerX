@@ -3,18 +3,18 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import pyotp
 
-from broker.forms import AccountCreationForm
+from broker.forms import UserCreationForm
 from .adapters.email_otp_repository import EmailOTPRepository
-from .adapters.test_account_repository import TestAccountRepository
-from .services.commands.create_account_command import CreateAccountCommand
-from .services.create_account_use_case import CreateAccountUseCase
+from .adapters.django_user_repository import DjangoUserRepository
+from .services.commands.create_user_command import CreateUserCommand
+from .services.create_user_use_case import CreateUserUseCase
 
 def display_login(request):
    return render(request, "login.html")
 
-def create_account(request):
+def create_user(request):
     if request.method == "POST":
-      form = AccountCreationForm(request.POST)
+      form = UserCreationForm(request.POST)
       print("HAH")
       if form.is_valid():
         print("Great!")
@@ -25,7 +25,7 @@ def create_account(request):
         phone_number = form.cleaned_data["phone_number"]
         email = form.cleaned_data["email"]
 
-        command = CreateAccountCommand(
+        command = CreateUserCommand(
            first_name=first_name,
            last_name=last_name,
            address=address,
@@ -35,15 +35,15 @@ def create_account(request):
         )
 
         #TODO: add dependency injections to reduce coupling between view and repositories
-        use_case = CreateAccountUseCase(TestAccountRepository(), EmailOTPRepository())
+        use_case = CreateUserUseCase(DjangoUserRepository(), EmailOTPRepository())
         use_case.execute(command)
         return render(request, "otp_confirmation.html")
       else:
          print(form.errors)
     else:
-      form = AccountCreationForm()
+      form = UserCreationForm()
 
-    return render(request, "account_creation.html", {"form": form})
+    return render(request, "user_creation.html", {"form": form})
 
 def confirm_passcode(request):
   if request.method == "GET":

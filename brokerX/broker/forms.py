@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import TelInput, PasswordInput
 
-class AccountCreationForm(forms.Form):
+class UserCreationForm(forms.Form):
     first_name = forms.CharField(label="First name", max_length=100)
     last_name = forms.CharField(label="Last name", max_length=100)
     birth_date = forms.DateField(
