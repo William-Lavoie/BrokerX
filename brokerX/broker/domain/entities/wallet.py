@@ -1,4 +1,4 @@
-from brokerX.broker.domain.core.user import User
+from user import User
 
 
 class Wallet:

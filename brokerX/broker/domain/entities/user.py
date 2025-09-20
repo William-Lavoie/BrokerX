@@ -17,8 +17,8 @@ class User:
         return copy.copy(self.__dict__)
 
 class UserStatus(Enum):
-        ACTIVE = "active"
-        PENDING  = "pending"
-        REJECTED = "rejected"
+        ACTIVE = "Active"
+        PENDING  = "Pending"
+        REJECTED = "Rejected"
 
 
