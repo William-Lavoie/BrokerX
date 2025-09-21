@@ -27,4 +27,5 @@ replay_pid*
 */staticfiles/
 *.pyc
 __pycache__/
-
+.coverage
+.pytest_cache
