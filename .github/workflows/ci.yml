@@ -47,9 +47,10 @@ jobs:
           sleep 2
         done
 
-    - name: Grant test privileges to user
+    - name: Grant full privileges to user
       run: |
-        mysql -h 127.0.0.1 -u root -proot -e "GRANT CREATE, DROP ON *.* TO 'user'@'%'; FLUSH PRIVILEGES;"
+        mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'user'@'%' IDENTIFIED BY 'pass'; FLUSH PRIVILEGES;"
+
 
     - name: Run Tests
       env:
