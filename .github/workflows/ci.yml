@@ -49,8 +49,9 @@ jobs:
 
     - name: Grant full privileges to user
       run: |
-        mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'user'@'%' IDENTIFIED BY 'pass'; FLUSH PRIVILEGES;"
-
+        mysql -h 127.0.0.1 -u root -proot -e "CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'pass';"
+        mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'user'@'%';"
+        mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
 
     - name: Run Tests
       env:
