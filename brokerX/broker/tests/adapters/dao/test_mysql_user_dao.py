@@ -2,9 +2,9 @@ import pytest
 
 pytestmark = pytest.mark.django_db
 
-from broker.adapters.dao.mysql_user_dao import MySQLUserDAO
-from broker.domain.entities.user import User
-from broker.models import User
+from ....adapters.dao.mysql_user_dao import MySQLUserDAO
+from ....domain.entities.user import User
+from ....models import User
 
 
 @pytest.mark.django_db
