@@ -47,6 +47,10 @@ jobs:
           sleep 2
         done
 
+    - name: Grant test privileges to user
+      run: |
+        mysql -h 127.0.0.1 -u root -proot -e "GRANT CREATE, DROP ON *.* TO 'user'@'%'; FLUSH PRIVILEGES;"
+
     - name: Run Tests
       env:
         PYTHONPATH: ./brokerX
