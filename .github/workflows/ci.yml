@@ -23,5 +23,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        cd ~/BrokerX/brokerX
         pytest BrokerX/broker --cov=broker --cov-report=term-missing
