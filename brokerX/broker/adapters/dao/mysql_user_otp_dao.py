@@ -3,8 +3,8 @@ from ...models import User, UserOPT
 
 # TODO: error handling if user doesnt exist
 class MySQLUserOTPDAO:
-    def set_secret_key(self, user: User, secret: str) -> bool:
-        db_user = User.objects.get(email=user.email)
+    def set_secret_key(self, email: str, secret: str) -> bool:
+        db_user = User.objects.get(email=email)
         userOPT, created = UserOPT.objects.update_or_create(
             user=db_user, defaults={"secret": secret, "number_attempts": 0}
         )

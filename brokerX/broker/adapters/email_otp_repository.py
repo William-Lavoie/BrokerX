@@ -1,4 +1,6 @@
 import pyotp
+
+from ..models import User
 from ..adapters.dao.mysql_user_otp_dao import MySQLUserOTPDAO
 
 from django.core.mail import send_mail
@@ -34,5 +36,5 @@ class EmailOTPRepository(BaseOTPRepository):
                 return {False, "The maximum number of attempts has been reached"}
             return {False, "You have entered an incorrect passcode."}
 
-    def register_secret(self, user, secret):
-        self.dao.set_secret_key(user, secret)
+    def register_secret(self, user: User, secret: str):
+        self.dao.set_secret_key(user.email, secret)

@@ -5,7 +5,7 @@ from models import User
 class UserOTPDAO:
 
     @abstractmethod
-    def set_secret_key(self, user: User, secret: str):
+    def set_secret_key(self, email: str, secret: str):
         pass
 
     @abstractmethod
