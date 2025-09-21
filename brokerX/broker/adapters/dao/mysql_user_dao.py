@@ -21,5 +21,7 @@ class MySQLUserDAO:
 
         return True
 
-    def update_status(self, user: User):
-        pass
+    def update_status(self, email: str, new_status: str):
+        user = User.objects.get(email=email)
+        user.status = new_status
+        user.save()

@@ -51,7 +51,7 @@ def confirm_passcode(request):
         return HttpResponse("Error: You can only use a POST")
 
     passcode = request.POST.get("passcode", "")
-    use_case = VerifyPassCode(EmailOTPRepository())
+    use_case = VerifyPassCode(EmailOTPRepository(), DjangoUserRepository())
     use_case.execute("william569@hotmail.ca", passcode)
 
     return render(request, "otp_confirmation.html")

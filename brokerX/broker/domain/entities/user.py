@@ -2,6 +2,7 @@ import copy
 from enum import Enum
 
 # TODO: integrate with django user authentification class
+# TODO: cronjob to delete users after 24h
 class User:
     def __init__(
         self, first_name, last_name, address, birth_date, email, phone_number, status

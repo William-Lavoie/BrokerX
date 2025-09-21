@@ -13,5 +13,8 @@ class DjangoUserRepository(UserRepository):
     def add_user(self, user: User) -> bool:
         return self.dao.add_user(user)
 
+    def update_user_status(self, email: str, new_status: str):
+        self.dao.update_status(email, new_status)
+
     def find_by_email(self, email: str) -> Optional[User]:
         pass

@@ -4,9 +4,13 @@ from typing import Optional
 from ..entities.user import User
 
 
-class UserRepository():
+class UserRepository:
     @abstractmethod
     def add_user(self, user: User) -> None:
+        pass
+
+    @abstractmethod
+    def update_user_status(self, email: str, new_status: str):
         pass
 
     @abstractmethod
