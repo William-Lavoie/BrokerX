@@ -17,5 +17,5 @@ class OTPRepository(ABC):
         pass
 
     @abstractmethod
-    def register_secret(self, user: User, secret: str):
+    def register_secret(self, user_email: str, secret: str):
         pass

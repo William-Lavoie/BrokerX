@@ -9,15 +9,15 @@ class UserOTPDAO:
         pass
 
     @abstractmethod
-    def get_secret_key(self, user: User):
+    def get_secret_key(self, email: str):
         pass
 
     # TODO: use a database constraint instead?
     @abstractmethod
-    def expire_passcode(self, user: User):
-        """Expire a passcode after 3 attemps to prevent brute-forcing"""
+    def delete_passcode(self, email: str) -> bool:
+        """Expire a passcode after 3 attemps, 10 mins or upon validation to prevent brute-forcing"""
         pass
 
     @abstractmethod
-    def increment_attempts(self, user: User) -> bool:
+    def increment_attempts(self, email: str) -> bool:
         pass

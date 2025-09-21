@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from ...models import User, UserOPT
 
-
+# TODO: error handling if user doesnt exist
 class MySQLUserOTPDAO:
     def set_secret_key(self, user: User, secret: str) -> bool:
         db_user = User.objects.get(email=user.email)
@@ -10,14 +10,21 @@ class MySQLUserOTPDAO:
         )
         return True
 
-    def get_secret_key(self, user: User) -> str:
-        return UserOPT.objects.only("secret").get(user__email=user.email)
+    def get_secret_key(self, email: str) -> str:
+        return UserOPT.objects.only("secret").get(user__email=email).secret
 
-    def increment_attempts(self, user: User) -> bool:
-        pass
+    def increment_attempts(self, email: str) -> bool:
+        otp = UserOPT.objects.get(user__email=email)
 
-    # TODO: use a database constraint instead?
-    @abstractmethod
-    def expire_passcode(self, user: User):
-        """Expire a passcode after 3 attemps to prevent brute-forcing"""
-        pass
+        if otp.number_attempts >= 2:
+            otp.delete()
+            return False
+
+        else:
+            otp.number_attempts += 1
+            otp.save()
+            return True
+
+    def delete_passcode(self, email: str) -> bool:
+        UserOPT.objects.get(user__email=email).delete()
+        return True

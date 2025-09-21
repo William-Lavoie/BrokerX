@@ -3,10 +3,11 @@ from django.shortcuts import render
 import pyotp
 
 from broker.forms import UserCreationForm
+from .services.create_account_use_case.verify_passcode import VerifyPassCode
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_user_repository import DjangoUserRepository
 from .services.commands.create_user_command import CreateUserCommand
-from .services.create_account_use_case.create_user_use_case import CreateUserUseCase
+from .services.create_account_use_case.create_user import CreateUserUseCase
 
 
 def display_login(request):
@@ -16,9 +17,7 @@ def display_login(request):
 def create_user(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
-        print("HAH")
         if form.is_valid():
-            print("Great!")
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
             address = form.cleaned_data["address"]
@@ -52,9 +51,7 @@ def confirm_passcode(request):
         return HttpResponse("Error: You can only use a POST")
 
     passcode = request.POST.get("passcode", "")
-    totp = pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz", interval=600, digits=6)
-    print(passcode)
-    print(totp.now())
-    print(totp.verify(passcode))
+    use_case = VerifyPassCode(EmailOTPRepository())
+    use_case.execute("william569@hotmail.ca", passcode)
 
     return render(request, "otp_confirmation.html")

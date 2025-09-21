@@ -1,6 +1,6 @@
+import pyotp
 from ..adapters.dao.mysql_user_otp_dao import MySQLUserOTPDAO
 
-from ..domain.entities.user import User
 from django.core.mail import send_mail
 from ..adapters.base_otp_repository import BaseOTPRepository
 
@@ -22,8 +22,17 @@ class EmailOTPRepository(BaseOTPRepository):
             == 1
         )
 
-    def verify_passcode(self, passcode: str, user: User) -> bool:
-        raise NotImplementedError
+    def verify_passcode(self, user_email: str, passcode: str) -> {bool, str}:
+        secret = self.dao.get_secret_key(user_email)
+
+        if passcode == pyotp.TOTP(s=secret, interval=600, digits=6).now():
+            self.dao.delete_passcode(user_email)
+            return {True, "The passcode has been validated successfully."}
+
+        else:
+            if not self.dao.increment_attempts(user_email):
+                return {False, "The maximum number of attempts has been reached"}
+            return {False, "You have entered an incorrect passcode."}
 
     def register_secret(self, user, secret):
         self.dao.set_secret_key(user, secret)
