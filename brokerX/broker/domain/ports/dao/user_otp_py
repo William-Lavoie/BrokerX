@@ -1,0 +1,23 @@
+from abc import abstractmethod
+from models import User
+
+
+class UserOTPDAO:
+
+    @abstractmethod
+    def set_secret_key(self, user: User, secret: str):
+        pass
+
+    @abstractmethod
+    def get_secret_key(self, user: User):
+        pass
+
+    # TODO: use a database constraint instead?
+    @abstractmethod
+    def expire_passcode(self, user: User):
+        """Expire a passcode after 3 attemps to prevent brute-forcing"""
+        pass
+
+    @abstractmethod
+    def increment_attempts(self, user: User) -> bool:
+        pass

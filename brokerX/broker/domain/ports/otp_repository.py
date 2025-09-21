@@ -1,21 +1,21 @@
-from abc import abstractmethod
-
-import pyotp
+from abc import ABC, abstractmethod
 
 from ...domain.entities.user import User
 
-class OTPRepository():
+
+class OTPRepository(ABC):
     @abstractmethod
-    def send_passcode(self, email: str) -> None:
+    def create_passcode(self, user: User):
+        pass
+
+    @abstractmethod
+    def send_passcode(self, email: str, passcode: str) -> bool:
         pass
 
     @abstractmethod
     def verify_passcode(self, passcode: str, user: User) -> bool:
         pass
 
-    def generate_passcode(self) -> pyotp.TOTP:
-        user_secret = pyotp.random_base32()
-        return pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz",
-                            interval=600,
-                            digits=6)
-
+    @abstractmethod
+    def register_secret(self, user: User, secret: str):
+        pass

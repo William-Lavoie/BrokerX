@@ -1,4 +1,3 @@
-from http.client import HTTPResponse
 from django.http import HttpResponse
 from django.shortcuts import render
 import pyotp
@@ -7,54 +6,55 @@ from broker.forms import UserCreationForm
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_user_repository import DjangoUserRepository
 from .services.commands.create_user_command import CreateUserCommand
-from .services.create_user_use_case import CreateUserUseCase
+from .services.create_account_use_case.create_user_use_case import CreateUserUseCase
+
 
 def display_login(request):
-   return render(request, "login.html")
+    return render(request, "login.html")
+
 
 def create_user(request):
     if request.method == "POST":
-      form = UserCreationForm(request.POST)
-      print("HAH")
-      if form.is_valid():
-        print("Great!")
-        first_name = form.cleaned_data["first_name"]
-        last_name = form.cleaned_data["last_name"]
-        address = form.cleaned_data["address"]
-        birth_date = form.cleaned_data["birth_date"]
-        phone_number = form.cleaned_data["phone_number"]
-        email = form.cleaned_data["email"]
+        form = UserCreationForm(request.POST)
+        print("HAH")
+        if form.is_valid():
+            print("Great!")
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            address = form.cleaned_data["address"]
+            birth_date = form.cleaned_data["birth_date"]
+            phone_number = form.cleaned_data["phone_number"]
+            email = form.cleaned_data["email"]
 
-        command = CreateUserCommand(
-           first_name=first_name,
-           last_name=last_name,
-           address=address,
-           birth_date=birth_date,
-           email=email,
-           phone_number=phone_number
-        )
+            command = CreateUserCommand(
+                first_name=first_name,
+                last_name=last_name,
+                address=address,
+                birth_date=birth_date,
+                email=email,
+                phone_number=phone_number,
+            )
 
-        #TODO: add dependency injections to reduce coupling between view and repositories
-        use_case = CreateUserUseCase(DjangoUserRepository(), EmailOTPRepository())
-        use_case.execute(command)
-        return render(request, "otp_confirmation.html")
-      else:
-         print(form.errors)
+            # TODO: add dependency injections to reduce coupling between view and repositories
+            use_case = CreateUserUseCase(DjangoUserRepository(), EmailOTPRepository())
+            use_case.execute(command)
+            return render(request, "otp_confirmation.html")
+        else:
+            print(form.errors)
     else:
-      form = UserCreationForm()
+        form = UserCreationForm()
 
     return render(request, "user_creation.html", {"form": form})
 
+
 def confirm_passcode(request):
-  if request.method == "GET":
-    return HttpResponse("Error: You can only use a POST")
+    if request.method == "GET":
+        return HttpResponse("Error: You can only use a POST")
 
-  passcode = request.POST.get("passcode", "")
-  totp = pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz", interval=600, digits=6)
-  print(passcode)
-  print(totp.now())
-  print(totp.verify(passcode))
+    passcode = request.POST.get("passcode", "")
+    totp = pyotp.TOTP(s="abcdefghijklmnopqrstuvwxyz", interval=600, digits=6)
+    print(passcode)
+    print(totp.now())
+    print(totp.verify(passcode))
 
-  return render(request, "otp_confirmation.html")
-
-
+    return render(request, "otp_confirmation.html")

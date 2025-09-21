@@ -1,7 +1,7 @@
-from ..domain.ports.otp_repository import OTPRepository
-from ..domain.ports.user_repository import UserRepository
-from ..domain.entities.user import User
-from ..services.commands.create_user_command import CreateUserCommand
+from ...domain.ports.otp_repository import OTPRepository
+from ...domain.ports.user_repository import UserRepository
+from ...domain.entities.user import User
+from ..commands.create_user_command import CreateUserCommand
 
 
 class CreateUserUseCase:
@@ -27,4 +27,4 @@ class CreateUserUseCase:
             print("the user was added with success")
 
         # Send passcode
-        self.otp_repository.send_passcode(command.email)
+        self.otp_repository.create_passcode(user)
