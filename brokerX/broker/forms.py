@@ -50,3 +50,12 @@ class UserCreationForm(forms.Form):
 
         if email != confirm_email:
             raise forms.ValidationError("The emails must match")
+        
+
+
+
+class ClientLoginForm(forms.Form):
+    email = forms.EmailField(label="Email address")
+    password = forms.CharField(label="Password",
+                               max_length=100,
+                               )

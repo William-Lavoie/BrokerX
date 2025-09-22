@@ -1,17 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from broker.forms import UserCreationForm
+from broker.forms import UserCreationForm, ClientLoginForm
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_client_repository import DjangoClientRepository
 from .services.commands.create_client_command import CreateClientCommand
 from .services.create_account_use_case.create_client import CreateClientUseCase
+from django.contrib.auth import authenticate, login
 
 
 def display_login(request):
     return render(request, "login.html")
-
 
 def create_user(request):
     if request.method == "POST":
@@ -56,3 +56,26 @@ def confirm_passcode(request):
     use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
 
     return render(request, "otp_confirmation.html")
+
+
+
+def client_login(request):
+    if request.method == "POST":
+        form = ClientLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+
+            user = authenticate(request, username=email, password=password)
+            if user is not None:
+                print("login successfully")
+                login(request, user)
+                return render(request, "home_page.html", context={"name": user.first_name + " " + user.last_name, "email": user.email})
+            #TODO: implement full use case
+            return render(request, "otp_confirmation.html")
+        else:
+            print(form.errors)
+    else:
+        form = ClientLoginForm()
+
+    return render(request, "login.html", {"form": form})
