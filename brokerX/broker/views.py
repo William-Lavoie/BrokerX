@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from broker.forms import UserCreationForm, ClientLoginForm
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
@@ -7,11 +7,13 @@ from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_client_repository import DjangoClientRepository
 from .services.commands.create_client_command import CreateClientCommand
 from .services.create_account_use_case.create_client import CreateClientUseCase
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def display_homepage(request):
+    return render(request, "home_page.html", context={"name": request.user.first_name + " " + request.user.last_name, "email": request.user.email})
 
-def display_login(request):
-    return render(request, "login.html")
 
 def create_user(request):
     if request.method == "POST":
@@ -79,3 +81,9 @@ def client_login(request):
         form = ClientLoginForm()
 
     return render(request, "login.html", {"form": form})
+
+@login_required
+def client_logout(request):
+    logout(request)
+    redirect(login(request))
+    
