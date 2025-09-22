@@ -14,11 +14,12 @@ class MySQLClientDAO:
             print("The email or the phone number is already in use.")
             return False
 
-        user = User.objects.create(
+        user = User.objects.create_user(
             first_name=client.first_name,
             last_name=client.last_name,
             email=client.email,
-            username=client.email
+            username=client.email,
+            password=client.password,
         )
 
         Client.objects.create(user=user, phone_number=client.phone_number,

@@ -23,6 +23,7 @@ def create_user(request):
             birth_date = form.cleaned_data["birth_date"]
             phone_number = form.cleaned_data["phone_number"]
             email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
 
             command = CreateClientCommand(
                 first_name=first_name,
@@ -31,6 +32,7 @@ def create_user(request):
                 birth_date=birth_date,
                 email=email,
                 phone_number=phone_number,
+                password=password
             )
 
             # TODO: add dependency injections to reduce coupling between view and repositories

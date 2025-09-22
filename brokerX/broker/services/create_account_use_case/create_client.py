@@ -19,6 +19,7 @@ class CreateClientUseCase:
             birth_date=command.birth_date,
             email=command.email,
             phone_number=command.phone_number,
+            password=command.password,
             status="pending",
         )
 
