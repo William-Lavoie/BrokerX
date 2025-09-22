@@ -10,7 +10,6 @@ from broker.models import User, UserOPT
 @pytest.fixture(autouse=True)
 def setup_function(db):
     user = User.objects.create(
-        id=1,
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",

@@ -6,9 +6,9 @@ from ..domain.entities.user import User
 
 
 class DjangoUserRepository(UserRepository):
-    def __init__(self):
+    def __init__(self, dao=None):
         super().__init__()
-        self.dao = MySQLUserDAO()
+        self.dao = dao if dao is not None else MySQLUserDAO()
 
     def add_user(self, user: User) -> bool:
         return self.dao.add_user(user)

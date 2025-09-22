@@ -1,0 +1,46 @@
+from unittest.mock import ANY, MagicMock, patch
+import pytest
+
+pytestmark = pytest.mark.django_db
+
+from broker.adapters.base_otp_repository import BaseOTPRepository
+from broker.domain.entities.user import User
+from broker.models import User
+
+
+class DummyBaseOTPRepository(BaseOTPRepository):
+    def register_secret(self, user, email):
+        return "secret"
+
+    def send_passcode(self, email, passcode):
+        pass
+
+    def verify_passcode(self, email, passcode):
+        return True
+
+
+@patch.object(DummyBaseOTPRepository, "send_passcode")
+@patch.object(DummyBaseOTPRepository, "register_secret", return_value="secret")
+def test_create_passcode(mock_register, mock_send):
+    repo = DummyBaseOTPRepository()
+
+    user = User(
+        first_name="John",
+        last_name="Smith",
+        address="456 Privett Drive",
+        birth_date="1978-01-01",
+        email="john_smith@example.com",
+        phone_number="123-456-7890",
+        status="fictional",
+    )
+
+    repo.create_passcode(user)
+    mock_send.assert_called_once_with("john_smith@example.com", ANY)
+    mock_register.assert_called_once_with(user, ANY)
+
+
+def test_generate_passcode():
+    repo = DummyBaseOTPRepository()
+    secret = repo.generate_passcode()
+
+    assert len(secret) == 32
