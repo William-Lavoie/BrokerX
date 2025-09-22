@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
+from django.contrib.auth.models import User
 
 # The models will be accessed only through DAO, otherwise use entities
 # i.e the model is only used to define the DB
@@ -8,15 +9,14 @@ from django.core.validators import MaxValueValidator
 # TODO: add indexing to make faster queries
 
 
-class User(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+class Client(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=100)
     birth_date = models.DateField()
-    email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=100, unique=True)
+    phone_number = models.CharField(max_length=100, primary_key=True)
     status = models.CharField(
-        max_length=20, choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")]
+        max_length=20,
+        choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")]
     )
 
 
@@ -25,7 +25,7 @@ class Wallet(models.Model):
     balance = models.FloatField()
 
 
-class UserOPT(models.Model):
+class ClientOTP(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     secret = models.TextField(max_length=100)
     number_attempts = models.SmallIntegerField(

@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from ...domain.entities.user import User
+from ..entities.client import ClientProfile
 
 
 class OTPRepository(ABC):
     @abstractmethod
-    def create_passcode(self, user: User):
+    def create_passcode(self, client: ClientProfile):
         pass
 
     @abstractmethod
@@ -13,9 +13,9 @@ class OTPRepository(ABC):
         pass
 
     @abstractmethod
-    def verify_passcode(self, passcode: str, user: User) -> bool:
+    def verify_passcode(self, passcode: str, client: ClientProfile) -> bool:
         pass
 
     @abstractmethod
-    def register_secret(self, user_email: str, secret: str):
+    def register_secret(self, email: str, secret: str):
         pass

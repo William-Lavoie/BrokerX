@@ -1,5 +1,5 @@
-from ...domain.entities.user import UserStatus
-from ...domain.ports.user_repository import UserRepository
+from ...domain.entities.client import ClientStatus
+from ...domain.ports.client_repository import ClientRepository
 from ...domain.ports.otp_repository import OTPRepository
 
 
@@ -7,17 +7,17 @@ class VerifyPassCode:
     def __init__(
         self,
         otp_repository: OTPRepository,
-        user_repository: UserRepository,
+        client_repository: ClientRepository,
     ):
         self.otp_repository = otp_repository
-        self.user_repository = user_repository
+        self.client_repository = client_repository
 
-    def execute(self, user_email: str, passcode: str):
+    def execute(self, email: str, passcode: str):
 
-        validated, message = self.otp_repository.verify_passcode(user_email, passcode)
+        validated, message = self.otp_repository.verify_passcode(email, passcode)
         if not validated:
             print(message)
             return False
 
         print(message)
-        self.user_repository.update_user_status(user_email, UserStatus.ACTIVE.value)
+        self.client_repository.update_user_status(email, ClientStatus.ACTIVE.value)

@@ -3,7 +3,8 @@ from enum import Enum
 
 # TODO: integrate with django user authentification class
 # TODO: cronjob to delete users after 24h
-class User:
+# User refers strictly to django auth model
+class ClientProfile:
     def __init__(
         self, first_name, last_name, address, birth_date, email, phone_number, status
     ):
@@ -13,13 +14,13 @@ class User:
         self.birth_date: str = birth_date
         self.email: str = email
         self.phone_number: str = phone_number
-        self.status: UserStatus = status
+        self.status: ClientStatus = status
 
     def to_dict(self):
         return copy.copy(self.__dict__)
 
 
-class UserStatus(Enum):
+class ClientStatus(Enum):
     ACTIVE = "Active"
     PENDING = "Pending"
     REJECTED = "Rejected"

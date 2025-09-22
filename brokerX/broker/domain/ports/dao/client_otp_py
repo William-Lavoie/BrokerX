@@ -1,8 +1,7 @@
 from abc import abstractmethod
-from models import User
 
 
-class UserOTPDAO:
+class ClientOTPDAO:
 
     @abstractmethod
     def set_secret_key(self, email: str, secret: str):

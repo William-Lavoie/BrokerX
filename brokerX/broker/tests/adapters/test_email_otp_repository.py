@@ -1,13 +1,13 @@
 from unittest.mock import MagicMock, patch
 import pytest
-from django.core.mail import send_mail
+from django.contrib.auth.models import User
 
 from broker.adapters.email_otp_repository import EmailOTPRepository
 
 pytestmark = pytest.mark.django_db
 
-from broker.domain.entities.user import User
-from broker.models import User, UserOPT
+from broker.domain.entities.client import ClientProfile
+from broker.models import ClientOTP
 
 
 @pytest.fixture(autouse=True)
@@ -15,14 +15,10 @@ def setup_function(db):
     user = User.objects.create(
         first_name="John",
         last_name="Smith",
-        address="456 Privett Drive",
-        birth_date="1978-01-01",
         email="john_smith@example.com",
-        phone_number="123-456-7890",
-        status="fictional",
     )
 
-    UserOPT.objects.create(user=user, secret="123abc", number_attempts=0)
+    ClientOTP.objects.create(user=user, secret="123abc", number_attempts=0)
     yield
 
 
@@ -95,7 +91,7 @@ def test_invalid_passcode_wrong_passcode(mock_totp):
 def test_register_secret():
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
-    user = User(
+    user = ClientProfile(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",

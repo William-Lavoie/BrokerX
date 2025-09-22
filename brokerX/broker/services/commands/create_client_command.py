@@ -1,4 +1,4 @@
-class CreateUserCommand():
+class CreateClientCommand():
     def __init__(self, first_name, last_name, address, birth_date, email, phone_number):
         self.first_name : str = first_name
         self.last_name = last_name

@@ -1,13 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-import pyotp
 
 from broker.forms import UserCreationForm
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
 from .adapters.email_otp_repository import EmailOTPRepository
-from .adapters.django_user_repository import DjangoUserRepository
-from .services.commands.create_user_command import CreateUserCommand
-from .services.create_account_use_case.create_user import CreateUserUseCase
+from .adapters.django_client_repository import DjangoClientRepository
+from .services.commands.create_client_command import CreateClientCommand
+from .services.create_account_use_case.create_client import CreateClientUseCase
 
 
 def display_login(request):
@@ -25,7 +24,7 @@ def create_user(request):
             phone_number = form.cleaned_data["phone_number"]
             email = form.cleaned_data["email"]
 
-            command = CreateUserCommand(
+            command = CreateClientCommand(
                 first_name=first_name,
                 last_name=last_name,
                 address=address,
@@ -35,7 +34,7 @@ def create_user(request):
             )
 
             # TODO: add dependency injections to reduce coupling between view and repositories
-            use_case = CreateUserUseCase(DjangoUserRepository(), EmailOTPRepository())
+            use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
             use_case.execute(command)
             return render(request, "otp_confirmation.html")
         else:
@@ -51,7 +50,7 @@ def confirm_passcode(request):
         return HttpResponse("Error: You can only use a POST")
 
     passcode = request.POST.get("passcode", "")
-    use_case = VerifyPassCode(EmailOTPRepository(), DjangoUserRepository())
-    use_case.execute("william569@hotmail.ca", passcode)
+    use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
+    use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
 
     return render(request, "otp_confirmation.html")

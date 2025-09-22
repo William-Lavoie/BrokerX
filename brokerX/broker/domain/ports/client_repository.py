@@ -1,12 +1,12 @@
 from abc import abstractmethod
 from typing import Optional
 
-from ..entities.user import User
+from ..entities.client import ClientProfile
 
 
-class UserRepository:
+class ClientRepository:
     @abstractmethod
-    def add_user(self, user: User) -> None:
+    def add_user(self, client: ClientProfile) -> None:
         pass
 
     @abstractmethod
@@ -14,5 +14,5 @@ class UserRepository:
         pass
 
     @abstractmethod
-    def find_by_email(self, email: str) -> Optional[User]:
+    def find_by_email(self, email: str) -> Optional[ClientProfile]:
         pass
