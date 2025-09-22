@@ -87,3 +87,6 @@ def client_logout(request):
     logout(request)
     redirect(login(request))
     
+@login_required
+def display_wallet(request):
+    return render(request, "wallet.html", context={"amount": 100})

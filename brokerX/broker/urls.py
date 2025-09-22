@@ -7,4 +7,5 @@ urlpatterns = [
     path('confirm_passcode/', views.confirm_passcode, name="confirm_passcode"),
     path('login/', views.client_login, name="login"),
     path('client_logout/', views.client_logout, name="client_logout"),
+    path('wallet/', views.display_wallet, name="display_wallet"),
 ]
