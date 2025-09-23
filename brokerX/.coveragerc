@@ -1,0 +1,27 @@
+[run]
+source = broker
+branch = True
+
+omit =
+    */migrations/*
+    */tests/*
+    */admin.py
+    */apps.py
+    */wsgi.py
+    */asgi.py
+    */settings.py
+    */urls.py
+    */__init__.py
+    */manage.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    @abstractmethod
+
+show_missing = True
+skip_covered = True

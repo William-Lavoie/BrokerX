@@ -62,4 +62,4 @@ jobs:
         DB_HOST: 127.0.0.1
         DB_PORT: 3306
       run: |
-        pytest brokerX/broker/tests --cov=broker --cov-report=term-missing
+        pytest brokerX/broker/tests --cov=broker --cov-config=.coveragerc --cov-report=term-missing
