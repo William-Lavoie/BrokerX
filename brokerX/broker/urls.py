@@ -2,10 +2,11 @@ from broker import views
 from django.urls import path
 
 urlpatterns = [
-    path('', views.display_homepage, name="display_login"),
-    path('create_user/', views.create_user, name="create_user"),
-    path('confirm_passcode/', views.confirm_passcode, name="confirm_passcode"),
-    path('login/', views.client_login, name="login"),
-    path('client_logout/', views.client_logout, name="client_logout"),
-    path('wallet/', views.display_wallet, name="display_wallet"),
+    path("", views.display_homepage, name="display_login"),
+    path("create_user/", views.create_user, name="create_user"),
+    path("confirm_passcode/", views.confirm_passcode, name="confirm_passcode"),
+    path("login/", views.client_login, name="login"),
+    path("client_logout/", views.client_logout, name="client_logout"),
+    path("wallet/", views.display_wallet, name="display_wallet"),
+    path("add_funds_to_wallet/", views.add_funds_to_wallet, name="add_funds_to_wallet"),
 ]

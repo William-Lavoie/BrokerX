@@ -10,7 +10,15 @@
 </head>
 
 <body>
-    {% include "navbar.html" %}   
+    {% include "navbar.html" %}
     <div>You have {{ amount }}$ left</div>
+
+
+    <form method="POST" action="{% url 'add_funds_to_wallet' %}">
+        {% csrf_token %}
+        <input id="amount" name="amount" type="number" placeholder="0.00" step="any" required>
+        <button type="submit">Add funds</button>
+    </form>
+
 </body>
 </html>
