@@ -52,10 +52,7 @@ def test_valid_passcode(mock_totp):
     mock_dao.get_secret_key.return_value = "123abc"
     mock_totp.return_value.now.return_value = "123456"
 
-    assert repo.verify_passcode("john_smith@example.com", "123456") == (
-        True,
-        "The passcode has been validated successfully.",
-    )
+    assert repo.verify_passcode("john_smith@example.com", "123456")
 
     mock_dao.delete_passcode.assert_called_once_with("john_smith@example.com")
 
@@ -68,10 +65,7 @@ def test_invalid_passcode_max_attempts(mock_totp):
     mock_dao.increment_attempts.return_value = False
     mock_totp.return_value.now.return_value = "123456"
 
-    assert repo.verify_passcode("john_smith@example.com", "987654") == (
-        False,
-        "The maximum number of attempts has been reached",
-    )
+    assert not repo.verify_passcode("john_smith@example.com", "987654")
 
 
 @patch("broker.adapters.email_otp_repository.pyotp.TOTP")
@@ -82,10 +76,7 @@ def test_invalid_passcode_wrong_passcode(mock_totp):
     mock_dao.increment_attempts.return_value = True
     mock_totp.return_value.now.return_value = "123456"
 
-    assert repo.verify_passcode("john_smith@example.com", "987654") == (
-        False,
-        "You have entered an incorrect passcode.",
-    )
+    assert not repo.verify_passcode("john_smith@example.com", "987654")
 
 
 def test_register_secret():

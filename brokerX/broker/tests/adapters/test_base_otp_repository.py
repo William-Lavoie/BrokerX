@@ -36,7 +36,7 @@ def test_create_passcode(mock_register, mock_send):
 
     repo.create_passcode(client)
     mock_send.assert_called_once_with("john_smith@example.com", ANY)
-    mock_register.assert_called_once_with(client, ANY)
+    mock_register.assert_called_once_with(client.email, ANY)
 
 
 def test_generate_passcode():
