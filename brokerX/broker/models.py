@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 
@@ -23,7 +23,12 @@ class Client(models.Model):
 
 class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=5, decimal_places=2)
+    balance = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
+    )
 
 
 class ClientOTP(models.Model):

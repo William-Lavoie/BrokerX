@@ -2,7 +2,7 @@ from typing import Optional
 
 from .dao.mysql_client_dao import MySQLClientDAO
 from ..domain.ports.client_repository import ClientRepository
-from ..domain.entities.client import ClientProfile
+from ..domain.entities.client import ClientProfile, ClientStatus
 
 
 class DjangoClientRepository(ClientRepository):
@@ -15,6 +15,9 @@ class DjangoClientRepository(ClientRepository):
 
     def update_user_status(self, email: str, new_status: str):
         self.dao.update_status(email, new_status)
+
+    def client_is_active(self, email: str) -> bool:
+        return self.dao.get_status(email) == ClientStatus.ACTIVE.value
 
     def find_by_email(self, email: str) -> Optional[ClientProfile]:
         pass

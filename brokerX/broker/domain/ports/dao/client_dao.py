@@ -12,3 +12,7 @@ class ClientDAO:
     @abstractmethod
     def update_status(self, client: ClientProfile):
         pass
+
+    @abstractmethod
+    def get_status(self, email: str) -> str:
+        pass

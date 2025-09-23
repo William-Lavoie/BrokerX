@@ -22,10 +22,13 @@ class MySQLClientDAO:
             password=client.password,
         )
 
-        Client.objects.create(user=user, phone_number=client.phone_number,
+        Client.objects.create(
+            user=user,
+            phone_number=client.phone_number,
             birth_date=client.birth_date,
             address=client.address,
-            status=client.status,)
+            status=client.status,
+        )
 
         return True
 
@@ -33,3 +36,6 @@ class MySQLClientDAO:
         client = Client.objects.get(user__email=email)
         client.status = new_status
         client.save()
+
+    def get_status(self, email: str) -> str:
+        return Client.objects.only("status").get(user__email=email).status

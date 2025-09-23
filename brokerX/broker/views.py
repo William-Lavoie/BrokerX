@@ -1,8 +1,14 @@
+from decimal import ROUND_HALF_UP, Decimal
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from broker.forms import UserCreationForm, ClientLoginForm
 from brokerX import settings
+from .adapters.django_wallet_repository import DjangoWalletRepository
+from .adapters.mock_payment_service_repository import MockPaymentServiceRepository
+from .domain.ports.payment_service_repository import PaymentServiceRepository
+from .domain.ports.wallet_repository import WalletRepository
+from .services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_client_repository import DjangoClientRepository
@@ -51,6 +57,9 @@ def create_user(request):
                 DjangoClientRepository(), EmailOTPRepository()
             )
             use_case.execute(command)
+            user = authenticate(request, username=email, password=password)
+            login(request, user)
+
             return render(request, "otp_confirmation.html")
         else:
             print(form.errors)
@@ -66,9 +75,16 @@ def confirm_passcode(request):
 
     passcode = request.POST.get("passcode", "")
     use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
-    use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
+    use_case.execute(request.user.email, passcode)
 
-    return render(request, "otp_confirmation.html")
+    return render(
+        request,
+        "home_page.html",
+        context={
+            "name": request.user.first_name + " " + request.user.last_name,
+            "email": request.user.email,
+        },
+    )
 
 
 def client_login(request):
@@ -108,4 +124,26 @@ def client_logout(request):
 
 @login_required
 def display_wallet(request):
+    return render(request, "wallet.html", context={"amount": 100})
+
+
+@login_required
+def add_funds_to_wallet(request):
+    if request.method == "GET":
+        return HttpResponse("Error: You can only use a POST")
+
+    amount = request.POST.get("amount", 0.00)
+    amount = Decimal(amount).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )  # TODO: catch error
+    print(amount)
+    use_case = AddFundsToWalletUseCase(
+        DjangoClientRepository(),
+        MockPaymentServiceRepository(),
+        DjangoWalletRepository(),
+    )
+    response = use_case.execute(request.user.email, amount)
+    print(response.__dict__)
+    #  use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
+
     return render(request, "wallet.html", context={"amount": 100})
