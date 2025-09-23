@@ -14,10 +14,9 @@ class VerifyPassCode:
 
     def execute(self, email: str, passcode: str):
 
-        validated, message = self.otp_repository.verify_passcode(email, passcode)
+        validated: bool = self.otp_repository.verify_passcode(email, passcode)
         if not validated:
-            print(message)
             return False
 
-        print(message)
         self.client_repository.update_user_status(email, ClientStatus.ACTIVE.value)
+        return True

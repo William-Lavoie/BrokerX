@@ -1,7 +1,9 @@
-from ...domain.entities.client import ClientProfile
 from django.contrib.auth.models import User
-from ...models import Client
 from django.db.models import Q
+
+from ...domain.entities.client import ClientProfile
+from ...models import Client
+
 
 # TODO: add error handling in the case of a MySQL error
 class MySQLClientDAO:
@@ -14,7 +16,7 @@ class MySQLClientDAO:
             print("The email or the phone number is already in use.")
             return False
 
-        user = User.objects.create_user(
+        user = User.objects.create_user(  # type: ignore[attr-defined]
             first_name=client.first_name,
             last_name=client.last_name,
             email=client.email,

@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock, patch
-import pytest
-from django.contrib.auth.models import User
 
+import pytest
 from broker.adapters.email_otp_repository import EmailOTPRepository
+from django.contrib.auth.models import User
 
 pytestmark = pytest.mark.django_db
 
@@ -100,6 +100,6 @@ def test_register_secret():
         phone_number="123-456-7890",
         status="fictional",
     )
-    repo.register_secret(user, "123abc")
+    repo.register_secret(user.email, "123abc")
 
     mock_dao.set_secret_key.assert_called_once_with("john_smith@example.com", "123abc")

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from decimal import Decimal
 
-from ...models import Wallet
+from ...domain.entities.wallet import Wallet
 
 
 class WalletRepository:

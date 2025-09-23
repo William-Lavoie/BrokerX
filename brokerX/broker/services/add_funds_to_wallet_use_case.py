@@ -1,24 +1,23 @@
 from decimal import Decimal
 
-from ..models import Wallet
-
-from ..domain.ports.wallet_repository import WalletRepository
 from ..adapters.mock_payment_service_repository import PaymentServiceRepository
+from ..domain.entities.wallet import Wallet
 from ..domain.ports.client_repository import ClientRepository
+from ..domain.ports.wallet_repository import WalletRepository
 
 
 class AddFundsToWalletUseCaseResult:
     def __init__(
         self,
         success: bool,
-        message: str = None,
-        code: str = None,
-        new_balance: Decimal = None,
+        message: str = "",
+        code: int = 0,
+        new_balance: Decimal = Decimal("0.00"),
     ):
-        self.success = success
-        self.message = message
-        self.code = code
-        self.new_balance = new_balance
+        self.success: bool = success
+        self.message: str = message
+        self.code: int = code
+        self.new_balance: Decimal = new_balance
 
 
 class AddFundsToWalletUseCase:

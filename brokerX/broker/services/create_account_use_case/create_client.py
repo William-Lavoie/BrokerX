@@ -1,6 +1,6 @@
-from ...domain.ports.otp_repository import OTPRepository
-from ...domain.ports.client_repository import ClientRepository
 from ...domain.entities.client import ClientProfile, ClientStatus
+from ...domain.ports.client_repository import ClientRepository
+from ...domain.ports.otp_repository import OTPRepository
 from ..commands.create_client_command import CreateClientCommand
 
 

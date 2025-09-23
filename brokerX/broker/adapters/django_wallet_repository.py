@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from ..domain.entities.wallet import Wallet
 from ..adapters.dao.mysql_wallet_dao import MySQLWalletDAO
+from ..domain.entities.wallet import Wallet
 from ..domain.ports.dao.wallet_dao import WalletDTO
 from ..domain.ports.wallet_repository import WalletRepository
 

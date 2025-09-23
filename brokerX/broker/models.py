@@ -1,7 +1,9 @@
+# mypy: ignore-errors
 import uuid
-from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.forms import ValidationError
 
 # The models will be accessed only through DAO, otherwise use entities

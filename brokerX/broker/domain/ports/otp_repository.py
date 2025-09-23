@@ -13,7 +13,7 @@ class OTPRepository(ABC):
         pass
 
     @abstractmethod
-    def verify_passcode(self, passcode: str, client: ClientProfile) -> bool:
+    def verify_passcode(self, email: str, passcode: str) -> bool:
         pass
 
     @abstractmethod

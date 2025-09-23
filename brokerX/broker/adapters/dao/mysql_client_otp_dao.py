@@ -1,5 +1,7 @@
-from ...models import ClientOTP
 from django.contrib.auth.models import User
+
+from ...models import ClientOTP
+
 
 # TODO: error handling if user doesnt exist
 class MySQLClientOTPDAO:

@@ -1,8 +1,9 @@
 from decimal import Decimal
 
+from django.contrib.auth.models import User
+
 from ...domain.ports.dao.wallet_dao import WalletDAO, WalletDTO
 from ...models import Wallet
-from django.contrib.auth.models import User
 
 
 class MySQLWalletDAO(WalletDAO):

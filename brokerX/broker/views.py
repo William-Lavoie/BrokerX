@@ -1,21 +1,21 @@
 from decimal import ROUND_HALF_UP, Decimal
+
+from broker.forms import ClientLoginForm, UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from broker.forms import UserCreationForm, ClientLoginForm
 from brokerX import settings
-from .adapters.django_wallet_repository import DjangoWalletRepository
-from .adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from .domain.ports.payment_service_repository import PaymentServiceRepository
-from .domain.ports.wallet_repository import WalletRepository
-from .services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
-from .services.create_account_use_case.verify_passcode import VerifyPassCode
-from .adapters.email_otp_repository import EmailOTPRepository
+
 from .adapters.django_client_repository import DjangoClientRepository
+from .adapters.django_wallet_repository import DjangoWalletRepository
+from .adapters.email_otp_repository import EmailOTPRepository
+from .adapters.mock_payment_service_repository import MockPaymentServiceRepository
+from .services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 from .services.commands.create_client_command import CreateClientCommand
 from .services.create_account_use_case.create_client import CreateClientUseCase
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from .services.create_account_use_case.verify_passcode import VerifyPassCode
 
 
 @login_required

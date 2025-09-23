@@ -1,12 +1,13 @@
 from abc import abstractmethod
-from ....domain import ClientProfile
+
+from ....domain.entities.client import ClientProfile
 
 
 class ClientDAO:
 
     # TODO: decouple the entities from the DAO
     @abstractmethod
-    def add_user(self, client: ClientProfile):
+    def add_user(self, client: ClientProfile) -> bool:
         pass
 
     @abstractmethod

@@ -1,8 +1,6 @@
-from typing import Optional
-
-from .dao.mysql_client_dao import MySQLClientDAO
-from ..domain.ports.client_repository import ClientRepository
 from ..domain.entities.client import ClientProfile, ClientStatus
+from ..domain.ports.client_repository import ClientRepository
+from .dao.mysql_client_dao import MySQLClientDAO
 
 
 class DjangoClientRepository(ClientRepository):

@@ -5,7 +5,7 @@ from ..entities.client import ClientProfile
 
 class ClientRepository:
     @abstractmethod
-    def add_user(self, client: ClientProfile) -> None:
+    def add_user(self, client: ClientProfile) -> bool:
         pass
 
     @abstractmethod
@@ -13,5 +13,5 @@ class ClientRepository:
         pass
 
     @abstractmethod
-    def client_is_active(self, email: str) -> str:
+    def client_is_active(self, email: str) -> bool:
         pass

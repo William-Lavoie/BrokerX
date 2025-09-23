@@ -1,4 +1,5 @@
 from unittest.mock import ANY, MagicMock, patch
+
 import pytest
 
 pytestmark = pytest.mark.django_db
