@@ -5,13 +5,14 @@ from ..domain.ports.payment_service_repository import (
     PaymentServiceRepository,
     PaymentServiceRepositoryResponse,
 )
-from ..domain.entities.client import ClientProfile
 
 
 class MockPaymentServiceRepository(PaymentServiceRepository):
-    def __init__(self):
+    def __init__(self, payment_service=None):
         super().__init__()
-        self.payment_service = MockPaymentService()
+        self.payment_service = (
+            payment_service if payment_service is not None else MockPaymentService()
+        )
 
     def withdraw_funds(
         self, email: str, amount: Decimal

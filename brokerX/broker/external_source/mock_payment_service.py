@@ -3,7 +3,7 @@ import json
 
 
 class MockPaymentService:
-    def withdraw_funds(self, email: str, amount: Decimal) -> json:
+    def withdraw_funds(self, email: str, amount: Decimal) -> str:
         if not isinstance(amount, Decimal):
             raise TypeError("amount must be a Decimal")
 
@@ -24,11 +24,13 @@ class MockPaymentService:
             )
 
         elif amount == Decimal("40.00"):
-            return {
-                "success": False,
-                "balance": 1000.00,
-                "message": "Rate limit exceeded.",
-            }
+            return json.dumps(
+                {
+                    "success": False,
+                    "balance": 1000.00,
+                    "message": "Rate limit exceeded.",
+                }
+            )
 
         elif amount == Decimal("50.00"):
             return json.dumps(

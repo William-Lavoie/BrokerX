@@ -9,4 +9,4 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        args: [--config-file=./mypy.ini, broker]
+        additional_dependencies: ['django-stubs[compatible-mypy]']

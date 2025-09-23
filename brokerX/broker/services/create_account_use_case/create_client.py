@@ -1,11 +1,13 @@
 from ...domain.ports.otp_repository import OTPRepository
 from ...domain.ports.client_repository import ClientRepository
-from ...domain.entities.client import ClientProfile
+from ...domain.entities.client import ClientProfile, ClientStatus
 from ..commands.create_client_command import CreateClientCommand
 
 
 class CreateClientUseCase:
-    def __init__(self, client_repository: ClientRepository, otp_repository: OTPRepository):
+    def __init__(
+        self, client_repository: ClientRepository, otp_repository: OTPRepository
+    ):
         self.client_repository = client_repository
         self.otp_repository = otp_repository
 
@@ -20,7 +22,7 @@ class CreateClientUseCase:
             email=command.email,
             phone_number=command.phone_number,
             password=command.password,
-            status="pending",
+            status=ClientStatus.PENDING,
         )
 
         # Save the new user

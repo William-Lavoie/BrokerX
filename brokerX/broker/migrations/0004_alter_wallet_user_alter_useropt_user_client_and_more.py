@@ -8,32 +8,51 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('broker', '0003_alter_user_phone_number'),
+        ("broker", "0003_alter_user_phone_number"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='wallet',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="wallet",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='useropt',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="useropt",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.CreateModel(
-            name='Client',
+            name="Client",
             fields=[
-                ('address', models.CharField(max_length=100)),
-                ('birth_date', models.DateField()),
-                ('phone_number', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('A', 'Active'), ('P', 'Pending'), ('R', 'Rejected')], max_length=20)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("address", models.CharField(max_length=100)),
+                ("birth_date", models.DateField()),
+                (
+                    "phone_number",
+                    models.CharField(max_length=100, primary_key=True, serialize=False),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(
-            name='User',
+            name="User",
         ),
     ]

@@ -3,9 +3,9 @@ from decimal import Decimal
 
 
 class PaymentServiceRepositoryResponse:
-    def __init__(self, success: bool, message: str = None):
-        self.success = success
-        self.message = message
+    def __init__(self, success: bool, message: str = ""):
+        self.success: bool = success
+        self.message: str = message
 
 
 class PaymentServiceRepository:
