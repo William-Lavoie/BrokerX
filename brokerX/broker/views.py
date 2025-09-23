@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from broker.forms import UserCreationForm, ClientLoginForm
+from brokerX import settings
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.django_client_repository import DjangoClientRepository
@@ -10,9 +11,17 @@ from .services.create_account_use_case.create_client import CreateClientUseCase
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+
 @login_required
 def display_homepage(request):
-    return render(request, "home_page.html", context={"name": request.user.first_name + " " + request.user.last_name, "email": request.user.email})
+    return render(
+        request,
+        "home_page.html",
+        context={
+            "name": request.user.first_name + " " + request.user.last_name,
+            "email": request.user.email,
+        },
+    )
 
 
 def create_user(request):
@@ -34,11 +43,13 @@ def create_user(request):
                 birth_date=birth_date,
                 email=email,
                 phone_number=phone_number,
-                password=password
+                password=password,
             )
 
             # TODO: add dependency injections to reduce coupling between view and repositories
-            use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
+            use_case = CreateClientUseCase(
+                DjangoClientRepository(), EmailOTPRepository()
+            )
             use_case.execute(command)
             return render(request, "otp_confirmation.html")
         else:
@@ -60,7 +71,6 @@ def confirm_passcode(request):
     return render(request, "otp_confirmation.html")
 
 
-
 def client_login(request):
     if request.method == "POST":
         form = ClientLoginForm(request.POST)
@@ -72,8 +82,15 @@ def client_login(request):
             if user is not None:
                 print("login successfully")
                 login(request, user)
-                return render(request, "home_page.html", context={"name": user.first_name + " " + user.last_name, "email": user.email})
-            #TODO: implement full use case
+                return render(
+                    request,
+                    "home_page.html",
+                    context={
+                        "name": user.first_name + " " + user.last_name,
+                        "email": user.email,
+                    },
+                )
+            # TODO: implement full use case
             return render(request, "otp_confirmation.html")
         else:
             print(form.errors)
@@ -82,11 +99,13 @@ def client_login(request):
 
     return render(request, "login.html", {"form": form})
 
+
 @login_required
 def client_logout(request):
     logout(request)
-    redirect(login(request))
-    
+    return redirect(settings.LOGIN_URL)
+
+
 @login_required
 def display_wallet(request):
     return render(request, "wallet.html", context={"amount": 100})
