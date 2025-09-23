@@ -17,7 +17,7 @@ def setup_function(db):
     )
 
     Client.objects.create(
-        user = user,
+        user=user,
         address="456 Privett Drive",
         birth_date="1978-01-01",
         phone_number="123-456-7890",
@@ -91,3 +91,8 @@ def test_update_update_status():
 
     client = Client.objects.get(user__email="john_smith@example.com")
     assert client.status == "updated"
+
+
+def test_get_status():
+    dao = MySQLClientDAO()
+    assert dao.get_status("john_smith@example.com") == "fictional"

@@ -4,7 +4,7 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 from broker.adapters.django_client_repository import DjangoClientRepository
-from broker.domain.entities.client import ClientProfile
+from broker.domain.entities.client import ClientProfile, ClientStatus
 
 
 def test_add_user():
@@ -35,3 +35,21 @@ def test_update_user_status():
 
     repo.update_user_status("john_smith@example.com", "updated")
     mock_dao.update_status.assert_called_once_with("john_smith@example.com", "updated")
+
+
+def test_client_is_active():
+    mock_dao = MagicMock()
+    mock_dao.get_status.return_value = ClientStatus.ACTIVE.value
+    repo = DjangoClientRepository(dao=mock_dao)
+
+    assert repo.client_is_active("john_smith@example.com")
+    mock_dao.get_status.assert_called_once_with("john_smith@example.com")
+
+
+def test_client_is_not_active():
+    mock_dao = MagicMock()
+    mock_dao.get_status.return_value = ClientStatus.REJECTED.value
+    repo = DjangoClientRepository(dao=mock_dao)
+
+    assert not repo.client_is_active("john_smith@example.com")
+    mock_dao.get_status.assert_called_once_with("john_smith@example.com")

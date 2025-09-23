@@ -6,7 +6,15 @@ from enum import Enum
 # User refers strictly to django auth model
 class ClientProfile:
     def __init__(
-        self, first_name, last_name, address, birth_date, email, phone_number, status, password = None
+        self,
+        first_name,
+        last_name,
+        address,
+        birth_date,
+        email,
+        phone_number,
+        status,
+        password=None,
     ):
         self.first_name: str = first_name
         self.last_name = last_name
@@ -16,9 +24,6 @@ class ClientProfile:
         self.phone_number: str = phone_number
         self.status: ClientStatus = status
         self.password: str = password
-
-    def to_dict(self):
-        return copy.copy(self.__dict__)
 
 
 class ClientStatus(Enum):

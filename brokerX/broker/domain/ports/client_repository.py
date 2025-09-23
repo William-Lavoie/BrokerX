@@ -14,9 +14,5 @@ class ClientRepository:
         pass
 
     @abstractmethod
-    def find_by_email(self, email: str) -> Optional[ClientProfile]:
-        pass
-
-    @abstractmethod
     def client_is_active(self, email: str) -> str:
         pass

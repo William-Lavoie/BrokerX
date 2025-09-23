@@ -18,6 +18,3 @@ class DjangoClientRepository(ClientRepository):
 
     def client_is_active(self, email: str) -> bool:
         return self.dao.get_status(email) == ClientStatus.ACTIVE.value
-
-    def find_by_email(self, email: str) -> Optional[ClientProfile]:
-        pass
