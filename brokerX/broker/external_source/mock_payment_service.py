@@ -4,11 +4,9 @@ from decimal import Decimal
 
 class MockPaymentService:
     def withdraw_funds(self, email: str, amount: Decimal) -> str:
-        if not isinstance(amount, Decimal):
-            raise TypeError("amount must be a Decimal")
 
         # Simulate different errors based on the exact amount requested
-        elif amount == Decimal("10.00"):
+        if amount == Decimal("10.00"):
             raise TimeoutError("Request timed out while withdrawing funds.")
 
         elif amount == Decimal("20.00"):

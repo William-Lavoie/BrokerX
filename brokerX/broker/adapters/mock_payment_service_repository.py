@@ -18,9 +18,14 @@ class MockPaymentServiceRepository(PaymentServiceRepository):
     def withdraw_funds(
         self, email: str, amount: Decimal
     ) -> PaymentServiceRepositoryResponse:
-        response = self.payment_service.withdraw_funds(email, amount)
-        response = json.loads(response)
+        try:
+            response = self.payment_service.withdraw_funds(email, amount)
+            response = json.loads(response)
 
-        return PaymentServiceRepositoryResponse(
-            success=response.get("success", False), message=response.get("message", "")
-        )
+            return PaymentServiceRepositoryResponse(
+                success=response.get("success", False),
+                message=response.get("message", ""),
+            )
+
+        except Exception as error:
+            return PaymentServiceRepositoryResponse(success=False, message=str(error))

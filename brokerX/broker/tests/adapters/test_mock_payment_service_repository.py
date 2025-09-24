@@ -1,25 +1,29 @@
-import json
 from decimal import Decimal
-from unittest.mock import MagicMock
 
 import pytest
 from broker.adapters.mock_payment_service_repository import MockPaymentServiceRepository
+from broker.external_source.mock_payment_service import MockPaymentService
 
 pytestmark = pytest.mark.django_db
 
 
-def test_withdraw_funds():
-    mock_service = MagicMock()
-    mock_service.withdraw_funds.return_value = json.dumps(
-        {"success": True, "message": "This is not a drill"}
-    )
-
-    repo = MockPaymentServiceRepository(payment_service=mock_service)
-
-    response = repo.withdraw_funds("john_smith@example.com", Decimal("10.00"))
-
-    assert response.success
-    assert response.message == "This is not a drill"
-    mock_service.withdraw_funds.assert_called_once_with(
-        "john_smith@example.com", Decimal("10.00")
-    )
+@pytest.mark.parametrize(
+    "amount,expected",
+    [
+        ("10.00", "Request timed out while withdrawing funds."),
+        ("20.00", "Network connection error occurred."),
+        ("30.00", "Unauthorized access."),
+        ("40.00", "Rate limit exceeded."),
+        ("50.00", "Internal server error."),
+        ("60.00", "Invalid withdrawal amount."),
+        ("70.00", "Account is locked."),
+        ("0.00", "Cannot withdraw zero amount."),
+        ("-1.00", "The amount to withdraw must be positive."),
+        ("1000.01", "Insufficient funds."),
+        ("100.00", "Withdrawal of 100.00 successful."),
+    ],
+)
+def test_various_withdrawal_scenarios(amount, expected):
+    repo = MockPaymentServiceRepository(payment_service=MockPaymentService())
+    response = repo.withdraw_funds("john_smith@example.com", Decimal(amount))
+    assert response.message == expected
