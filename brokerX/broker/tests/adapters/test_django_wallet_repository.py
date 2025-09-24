@@ -23,14 +23,13 @@ def test_add_funds():
     )
 
 
-def test_get_wallet():
+def test_get_balance():
     mock_dao = MagicMock()
-    mock_dao.get_wallet.return_value = WalletDTO(balance=Decimal("24.56"))
+    mock_dao.get_balance.return_value = WalletDTO(balance=Decimal("24.56"))
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
-    wallet = repo.get_wallet("john_smith@example.com")
+    balance = repo.get_balance("john_smith@example.com")
 
-    assert type(wallet) == Wallet
-    assert wallet.balance == Decimal("24.56")
-    mock_dao.get_wallet.assert_called_once_with("john_smith@example.com")
+    assert balance == Decimal("24.56")
+    mock_dao.get_balance.assert_called_once_with("john_smith@example.com")

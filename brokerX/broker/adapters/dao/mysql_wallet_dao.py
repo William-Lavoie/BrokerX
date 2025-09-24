@@ -7,7 +7,7 @@ from ...models import Wallet
 
 
 class MySQLWalletDAO(WalletDAO):
-    def get_wallet(self, email: str) -> WalletDTO:
+    def get_balance(self, email: str) -> WalletDTO:
         user = User.objects.get(email=email)
         wallet, created = Wallet.objects.get_or_create(user=user)
         return WalletDTO(wallet.balance)

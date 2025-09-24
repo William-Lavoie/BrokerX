@@ -22,15 +22,15 @@ def setup_function(db):
     yield
 
 
-def test_get_wallet():
+def test_get_balance():
     dao = MySQLWalletDAO()
 
-    wallet_dto: WalletDTO = dao.get_wallet("john_smith@example.com")
+    wallet_dto: WalletDTO = dao.get_balance("john_smith@example.com")
 
     assert wallet_dto.balance == Decimal("12.87")
 
 
-def test_get_wallet_not_existing():
+def test_get_balance_not_existing():
     dao = MySQLWalletDAO()
     user = User.objects.create(
         username="mark_dow",
@@ -38,7 +38,7 @@ def test_get_wallet_not_existing():
         last_name="Dow",
         email="mike_dow@example.com",
     )
-    wallet_dto: WalletDTO = dao.get_wallet("mike_dow@example.com")
+    wallet_dto: WalletDTO = dao.get_balance("mike_dow@example.com")
 
     assert wallet_dto.balance == Decimal("0.00")
 

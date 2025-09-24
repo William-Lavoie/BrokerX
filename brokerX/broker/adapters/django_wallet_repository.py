@@ -14,6 +14,6 @@ class DjangoWalletRepository(WalletRepository):
     def add_funds(self, email: str, amount: Decimal) -> Decimal:
         return self.dao.add_funds(email, amount)
 
-    def get_wallet(self, email: str) -> Wallet:
-        wallet_dto: WalletDTO = self.dao.get_wallet(email)
-        return Wallet(balance=Decimal(wallet_dto.balance))
+    def get_balance(self, email: str) -> Decimal:
+        wallet_dto: WalletDTO = self.dao.get_balance(email)
+        return Decimal(wallet_dto.balance)

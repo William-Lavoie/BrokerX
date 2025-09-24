@@ -10,5 +10,5 @@ class WalletRepository:
         pass
 
     @abstractmethod
-    def get_wallet(self, email: str) -> Wallet:
+    def get_balance(self, email: str) -> Decimal:
         pass

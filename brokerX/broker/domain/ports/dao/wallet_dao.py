@@ -9,7 +9,7 @@ class WalletDTO:
 
 class WalletDAO:
     @abstractmethod
-    def get_wallet(self, email: str) -> WalletDTO:
+    def get_balance(self, email: str) -> WalletDTO:
         pass
 
     @abstractmethod

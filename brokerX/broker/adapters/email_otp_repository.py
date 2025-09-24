@@ -2,7 +2,6 @@ import pyotp
 from django.core.mail import send_mail
 
 from ..adapters.base_otp_repository import BaseOTPRepository
-from ..domain.entities.client import ClientProfile
 from .dao.mysql_client_otp_dao import MySQLClientOTPDAO
 
 
