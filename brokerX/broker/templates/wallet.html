@@ -14,11 +14,23 @@
     <div>You have {{ amount }}$ left</div>
 
 
-    <form method="POST" action="{% url 'add_funds_to_wallet' %}">
+    <form id="add-funds-form" method="POST" action="{% url 'add_funds_to_wallet' %}">
         {% csrf_token %}
         <input id="amount" name="amount" type="number" placeholder="0.00" step="any" required>
+        <input type="hidden" name="idempotency_key" id="idempotency_key">
         <button type="submit">Add funds</button>
     </form>
 
 </body>
 </html>
+
+<script>
+    const form = document.getElementById('add-funds-form');
+
+    form.addEventListener('submit', function (e) {
+        const keyInput = document.getElementById('idempotency_key');
+        if (!keyInput.value) {
+            keyInput.value = crypto.randomUUID();
+        }
+    });
+</script>

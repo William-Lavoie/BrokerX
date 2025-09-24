@@ -1,9 +1,13 @@
+import uuid
 from decimal import Decimal
 
 from ..adapters.mock_payment_service_repository import PaymentServiceRepository
+from ..domain.entities.transaction import TransactionType
 from ..domain.entities.wallet import Wallet
 from ..domain.ports.client_repository import ClientRepository
+from ..domain.ports.transaction_repository import TransactionDTO, TransactionRepository
 from ..domain.ports.wallet_repository import WalletRepository
+from ..models import Transaction
 
 
 class AddFundsToWalletUseCaseResult:
@@ -26,12 +30,14 @@ class AddFundsToWalletUseCase:
         client_repository: ClientRepository,
         payment_service_repository: PaymentServiceRepository,
         wallet_repository: WalletRepository,
+        transaction_repository: TransactionRepository,
     ):
         self.client_repository = client_repository
         self.payment_service_repository = payment_service_repository
         self.wallet_repository = wallet_repository
+        self.transaction_repository = transaction_repository
 
-    def execute(self, email: str, amount: Decimal):
+    def execute(self, email: str, amount: Decimal, idempotency_key: uuid.UUID):
 
         if not self.client_repository.client_is_active(email):
             return AddFundsToWalletUseCaseResult(
@@ -40,6 +46,29 @@ class AddFundsToWalletUseCase:
                 code=403,
             )
 
+        transaction_dto: TransactionDTO = self.transaction_repository.write_transaction(
+            email=email,
+            amount=amount,
+            type=str(TransactionType.DEPOSIT.value),
+            idempotency_key=idempotency_key,
+        )
+
+        transaction = Transaction(
+            amount=transaction_dto.amount,
+            created_at=transaction_dto.created_at,
+            status=transaction_dto.status,
+            type=transaction_dto.type,
+            message=transaction_dto.message,
+        )
+
+        if not transaction_dto.new:
+            return AddFundsToWalletUseCaseResult(
+                success=True,
+                message="This transaction has already been processed",
+                code=200,
+            )
+
+        # TODO: update transaction
         payment_service_response = self.payment_service_repository.withdraw_funds(
             email, amount
         )
@@ -51,11 +80,13 @@ class AddFundsToWalletUseCase:
                 code=500,
             )
 
-        wallet: Wallet = self.wallet_repository.get_wallet(email)
+        current_balance: Decimal = self.wallet_repository.get_balance(email)
+        wallet = Wallet(balance=current_balance)
+
         if not wallet.can_add_funds(amount):
             return AddFundsToWalletUseCaseResult(
                 success=False,
-                message="You cannot have more than 10 000.00$ in your wallet.",
+                message="You cannot have more than 10,000.00$ in your wallet.",
                 code=400,
             )
 

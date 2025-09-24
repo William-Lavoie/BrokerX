@@ -47,7 +47,7 @@ class Transaction(models.Model):
         max_digits=8, decimal_places=2, validators=[MaxValueValidator(0)]
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    idempotency_key = models.UUIDField(default=uuid.uuid4, editable=False)
+    idempotency_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     status = (
         models.CharField(
             max_length=20,
@@ -57,13 +57,17 @@ class Transaction(models.Model):
                 ("R", "Rejected"),
                 ("F", "Failed"),
             ],
+            default="Pending",
         ),
     )
     type = (
-        models.CharField(
-            max_length=20, choices=[("D", "Deposit"), ("S", "Sale"), ("B", "Buy")]
+        (
+            models.CharField(
+                max_length=20, choices=[("D", "Deposit"), ("S", "Sale"), ("B", "Buy")]
+            ),
         ),
     )
+    message = models.CharField(max_length=300, blank=True)
 
     def save(self, *args, **kwargs):
         if self.pk:

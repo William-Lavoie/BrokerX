@@ -12,7 +12,10 @@ from .adapters.django_client_repository import DjangoClientRepository
 from .adapters.django_wallet_repository import DjangoWalletRepository
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from .services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
+from .services.add_funds_to_wallet_use_case import (
+    AddFundsToWalletUseCase,
+    AddFundsToWalletUseCaseResult,
+)
 from .services.commands.create_client_command import CreateClientCommand
 from .services.create_account_use_case.create_client import CreateClientUseCase
 from .services.create_account_use_case.verify_passcode import VerifyPassCode
@@ -133,6 +136,11 @@ def add_funds_to_wallet(request):
         return HttpResponse("Error: You can only use a POST")
 
     amount = request.POST.get("amount", 0.00)
+    idempotency_key = request.POST.get("idempotency_key")
+
+    if not idempotency_key:
+        return render(request, "wallet.html", context={"amount": 100})
+
     amount = Decimal(amount).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )  # TODO: catch error
@@ -142,7 +150,9 @@ def add_funds_to_wallet(request):
         MockPaymentServiceRepository(),
         DjangoWalletRepository(),
     )
-    response = use_case.execute(request.user.email, amount)
+    response: AddFundsToWalletUseCaseResult = use_case.execute(
+        request.user.email, amount, idempotency_key
+    )
     print(response.__dict__)
     #  use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
 
