@@ -1,13 +1,15 @@
 import uuid
 from decimal import Decimal
 
-from ..adapters.mock_payment_service_repository import PaymentServiceRepository
-from ..domain.entities.transaction import TransactionType
+from ..adapters.mock_payment_service_repository import (
+    PaymentServiceRepository,
+    PaymentServiceRepositoryResponse,
+)
+from ..domain.entities.transaction import Transaction, TransactionType
 from ..domain.entities.wallet import Wallet
 from ..domain.ports.client_repository import ClientRepository
 from ..domain.ports.transaction_repository import TransactionDTO, TransactionRepository
 from ..domain.ports.wallet_repository import WalletRepository
-from ..models import Transaction
 
 
 class AddFundsToWalletUseCaseResult:
@@ -61,16 +63,16 @@ class AddFundsToWalletUseCase:
             message=transaction_dto.message,
         )
 
-        if not transaction_dto.new:
+        print(transaction.status)
+        if transaction.has_been_processed():
             return AddFundsToWalletUseCaseResult(
                 success=True,
                 message="This transaction has already been processed",
                 code=200,
             )
 
-        # TODO: update transaction
-        payment_service_response = self.payment_service_repository.withdraw_funds(
-            email, amount
+        payment_service_response: PaymentServiceRepositoryResponse = (
+            self.payment_service_repository.withdraw_funds(email, amount)
         )
 
         if not payment_service_response.success:
@@ -93,10 +95,19 @@ class AddFundsToWalletUseCase:
         new_balance = self.wallet_repository.add_funds(email, amount)
         wallet.balance = new_balance
 
-        # TODO: log transaction
-        return AddFundsToWalletUseCaseResult(
-            success=True,
-            message="The money has been successfully deposited into your account",
-            code=200,
-            new_balance=new_balance,
-        )
+        if self.transaction_repository.validate_transaction(idempotency_key):
+            return AddFundsToWalletUseCaseResult(
+                success=True,
+                message="The money has been successfully deposited into your account",
+                code=200,
+                new_balance=new_balance,
+            )
+
+        else:
+            self.transaction_repository.fail_transaction(idempotency_key)
+            return AddFundsToWalletUseCaseResult(
+                success=False,
+                message="There was an error while trying to process your deposit. Please try again.",
+                code=500,
+                new_balance=new_balance,
+            )

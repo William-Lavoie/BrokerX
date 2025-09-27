@@ -48,30 +48,17 @@ class Transaction(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     idempotency_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    status = (
-        models.CharField(
-            max_length=20,
-            choices=[
-                ("C", "Completed"),
-                ("P", "Pending"),
-                ("R", "Rejected"),
-                ("F", "Failed"),
-            ],
-            default="Pending",
-        ),
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("C", "Completed"),
+            ("P", "Pending"),
+            ("R", "Rejected"),
+            ("F", "Failed"),
+        ],
+        default="P",
     )
-    type = (
-        (
-            models.CharField(
-                max_length=20, choices=[("D", "Deposit"), ("S", "Sale"), ("B", "Buy")]
-            ),
-        ),
+    transaction_type = models.CharField(
+        max_length=20, choices=[("D", "Deposit"), ("S", "Sale"), ("B", "Buy")]
     )
     message = models.CharField(max_length=300, blank=True)
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            raise ValidationError(
-                "Transactions cannot be edited. Please make a new one"
-            )
-        super().save(*args, **kwargs)

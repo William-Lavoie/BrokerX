@@ -1,8 +1,6 @@
 from abc import abstractmethod
 from decimal import Decimal
 
-from ...domain.entities.wallet import Wallet
-
 
 class WalletRepository:
     @abstractmethod

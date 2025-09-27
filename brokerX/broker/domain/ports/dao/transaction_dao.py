@@ -11,3 +11,11 @@ class TransactionDAO:
         self, email: str, amount: Decimal, type: str, idempotency_key: uuid.UUID
     ) -> TransactionDTO:
         pass
+
+    @abstractmethod
+    def validate_transaction(self, idempotency_key: uuid.UUID) -> bool:
+        pass
+
+    @abstractmethod
+    def fail_transaction(self, idempotency_key: uuid.UUID) -> bool:
+        pass

@@ -33,3 +33,11 @@ class TransactionRepository:
     ) -> TransactionDTO:
         """By default a transaction is set to pending"""
         pass
+
+    @abstractmethod
+    def validate_transaction(self, idempotency_key: uuid.UUID) -> bool:
+        pass
+
+    @abstractmethod
+    def fail_transaction(self, idempotency_key: uuid.UUID) -> bool:
+        pass

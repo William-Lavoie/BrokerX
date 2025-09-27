@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from brokerX import settings
 
 from .adapters.django_client_repository import DjangoClientRepository
+from .adapters.django_transaction_repository import DjangoTransactionRepository
 from .adapters.django_wallet_repository import DjangoWalletRepository
 from .adapters.email_otp_repository import EmailOTPRepository
 from .adapters.mock_payment_service_repository import MockPaymentServiceRepository
@@ -149,6 +150,7 @@ def add_funds_to_wallet(request):
         DjangoClientRepository(),
         MockPaymentServiceRepository(),
         DjangoWalletRepository(),
+        DjangoTransactionRepository(),
     )
     response: AddFundsToWalletUseCaseResult = use_case.execute(
         request.user.email, amount, idempotency_key

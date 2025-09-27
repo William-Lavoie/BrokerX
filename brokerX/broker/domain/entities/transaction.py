@@ -7,10 +7,10 @@ from ...domain.entities.client import ClientProfile
 
 
 class TransactionStatus(Enum):
-    Completed = "Completed"
-    PENDING = "Pending"
-    REJECTED = "Rejected"
-    FAILED = "Failed"
+    COMPLETED = "C"
+    PENDING = "P"
+    REJECTED = "R"
+    FAILED = "F"
 
 
 class TransactionType(Enum):
@@ -21,8 +21,8 @@ class Transaction:
     def __init__(
         self,
         amount: Decimal,
-        status: TransactionStatus,
-        type: TransactionType,
+        status: str,
+        type: str,
         message: str,
         client: Optional[ClientProfile] = None,
         created_at=None,
@@ -30,6 +30,9 @@ class Transaction:
         self.client: Optional[ClientProfile] = client
         self.amount: Decimal = amount
         self.created_at: DateTime = created_at
-        self.status: TransactionStatus = status
-        self.type: TransactionType = type
+        self.status: str = status
+        self.type: str = type
         self.message: str = message
+
+    def has_been_processed(self) -> bool:
+        return self.status != TransactionStatus.PENDING.value
