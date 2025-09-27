@@ -1,6 +1,8 @@
+from ...adapters.result import Result
 from ...domain.entities.client import ClientProfile, ClientStatus
 from ...domain.ports.client_repository import ClientRepository
 from ...domain.ports.otp_repository import OTPRepository
+from ...services.use_case_result import UseCaseResult
 from ..commands.create_client_command import CreateClientCommand
 
 
@@ -11,7 +13,7 @@ class CreateClientUseCase:
         self.client_repository = client_repository
         self.otp_repository = otp_repository
 
-    def execute(self, command: CreateClientCommand):
+    def execute(self, command: CreateClientCommand) -> UseCaseResult:
 
         # Create new ClientProfile entity
         client = ClientProfile(
@@ -26,8 +28,20 @@ class CreateClientUseCase:
         )
 
         # Save the new user
-        if self.client_repository.add_user(client):
-            print("the user was added with success")
+        result: Result = self.client_repository.add_user(client)
 
-        # Send passcode
+        if not result.success:
+            if result.code == 409:
+                return UseCaseResult(
+                    success=False,
+                    message="There is already a user with the same email and/or phone number",
+                )
+            elif result.code == 500:
+                return UseCaseResult(
+                    success=False,
+                    message="There was an unexpected error. Please try again or contact customer support.",
+                )
+
         self.otp_repository.create_passcode(client)
+
+        return UseCaseResult(success=True, message="The user was succesfully created")

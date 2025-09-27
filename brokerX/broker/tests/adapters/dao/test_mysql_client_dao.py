@@ -37,7 +37,9 @@ def test_add_user():
         phone_number="514-872-1231",
         status="fictional",
     )
-    assert dao.add_user(mock_client)
+    result = dao.add_user(mock_client)
+    assert result.success
+    assert result.code == 201
 
     saved_client = Client.objects.filter(user__email="tom_hanks@example.com")
     saved_user = User.objects.get(email="tom_hanks@example.com")
@@ -67,7 +69,9 @@ def test_add_user_email_already_used():
         status="pending",
     )
 
-    assert not dao.add_user(mock_client)
+    result = dao.add_user(mock_client)
+    assert not result.success
+    assert result.code == 409
 
 
 def test_add_user_phone_already_used():
@@ -82,17 +86,43 @@ def test_add_user_phone_already_used():
         status="pending",
     )
 
-    assert not dao.add_user(mock_client)
+    result = dao.add_user(mock_client)
+    assert not result.success
+    assert result.code == 409
 
 
-def test_update_update_status():
+def test_update_status():
     dao = MySQLClientDAO()
-    dao.update_status("john_smith@example.com", "updated")
+    result = dao.update_status("john_smith@example.com", "updated")
+
+    assert result.success
+    assert result.code == 200
 
     client = Client.objects.get(user__email="john_smith@example.com")
     assert client.status == "updated"
 
 
+def test_update_status_no_user():
+    dao = MySQLClientDAO()
+    result = dao.update_status("test@user.com", "updated")
+
+    assert not result.success
+    assert result.code == 404
+
+
 def test_get_status():
     dao = MySQLClientDAO()
-    assert dao.get_status("john_smith@example.com") == "fictional"
+    result = dao.get_status("john_smith@example.com")
+
+    assert result.success
+    assert result.code == 200
+    assert result.data == "fictional"
+
+
+def test_get_status_no_user():
+    dao = MySQLClientDAO()
+    result = dao.get_status("test@user.com")
+
+    assert not result.success
+    assert result.code == 404
+    assert result.data is None
