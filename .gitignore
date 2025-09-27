@@ -29,3 +29,5 @@ replay_pid*
 __pycache__/
 .coverage
 .pytest_cache
+django.error_logs
+django.access_logs
