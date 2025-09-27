@@ -27,6 +27,8 @@ def test_get_balance():
 
     wallet_dto: WalletDTO = dao.get_balance("john_smith@example.com")
 
+    assert wallet_dto.success
+    assert wallet_dto.code == 200
     assert wallet_dto.balance == Decimal("12.87")
 
 
@@ -40,12 +42,34 @@ def test_get_balance_not_existing():
     )
     wallet_dto: WalletDTO = dao.get_balance("mike_dow@example.com")
 
+    assert wallet_dto.success
+    assert wallet_dto.code == 200
     assert wallet_dto.balance == Decimal("0.00")
+
+
+def test_get_balance_no_user():
+    dao = MySQLWalletDAO()
+
+    wallet_dto: WalletDTO = dao.get_balance("test@example.com")
+
+    assert not wallet_dto.success
+    assert wallet_dto.code == 404
 
 
 def test_add_funds():
     dao = MySQLWalletDAO()
 
-    balance: Decimal = dao.add_funds("john_smith@example.com", Decimal("20.50"))
+    wallet_dto: WalletDTO = dao.add_funds("john_smith@example.com", Decimal("20.50"))
 
-    assert balance == Decimal("33.37")
+    assert wallet_dto.success
+    assert wallet_dto.code == 200
+    assert wallet_dto.balance == Decimal("33.37")
+
+
+def test_add_funds_no_user():
+    dao = MySQLWalletDAO()
+
+    wallet_dto: WalletDTO = dao.add_funds("test@example.com", Decimal("20.50"))
+
+    assert not wallet_dto.success
+    assert wallet_dto.code == 404

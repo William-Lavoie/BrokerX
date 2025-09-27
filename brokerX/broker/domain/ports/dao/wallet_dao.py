@@ -1,10 +1,13 @@
 from abc import abstractmethod
+from dataclasses import dataclass
 from decimal import Decimal
 
+from ....adapters.result import Result
 
-class WalletDTO:
-    def __init__(self, balance: Decimal):
-        self.balance = balance
+
+@dataclass
+class WalletDTO(Result):
+    balance: Decimal = Decimal("0.0")
 
 
 class WalletDAO:
@@ -13,5 +16,5 @@ class WalletDAO:
         pass
 
     @abstractmethod
-    def add_funds(self, email: str, amount: Decimal) -> Decimal:
+    def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
         pass

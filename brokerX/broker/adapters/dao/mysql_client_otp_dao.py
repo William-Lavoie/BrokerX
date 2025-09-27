@@ -36,8 +36,9 @@ class MySQLClientOTPDAO(ClientOTPDAO):
 
     def delete_passcode(self, email: str) -> Result:
         try:
-            ClientOTP.objects.get(user__email=email).delete()
-            return Result(success=True, code=200)
+            with transaction.atomic():
+                ClientOTP.objects.get(user__email=email).delete()
+                return Result(success=True, code=200)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
@@ -45,17 +46,18 @@ class MySQLClientOTPDAO(ClientOTPDAO):
 
     def increment_attempts(self, email: str) -> Result:
         try:
-            otp = ClientOTP.objects.get(user__email=email)
-            otp.number_attempts += 1
-            attempts: int = otp.number_attempts
+            with transaction.atomic():
+                otp = ClientOTP.objects.get(user__email=email)
+                otp.number_attempts += 1
+                attempts: int = otp.number_attempts
 
-            if attempts >= 2:
-                otp.delete()
-                return Result(success=True, code=200, data=attempts)
+                if attempts >= 2:
+                    otp.delete()
+                    return Result(success=True, code=200, data=attempts)
 
-            else:
-                otp.save()
-                return Result(success=True, code=200, data=attempts)
+                else:
+                    otp.save()
+                    return Result(success=True, code=200, data=attempts)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
