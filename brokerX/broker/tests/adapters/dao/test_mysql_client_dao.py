@@ -133,7 +133,7 @@ def test_get_status():
 
     assert result.success
     assert result.code == 200
-    assert result.data == "fictional"
+    assert result.status == "fictional"
 
 
 def test_get_status_no_user():
@@ -142,4 +142,3 @@ def test_get_status_no_user():
 
     assert not result.success
     assert result.code == 404
-    assert result.data is None

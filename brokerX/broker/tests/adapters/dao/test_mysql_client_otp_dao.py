@@ -60,7 +60,7 @@ def test_get_secret_key():
     result = dao.get_secret_key("john_smith@example.com")
     assert result.success
     assert result.code == 200
-    assert result.data == "123abc"
+    assert result.secret == "123abc"
 
 
 def test_get_secret_key_no_user():
@@ -95,7 +95,7 @@ def test_increment_attempts():
 
     assert result.success
     assert result.code == 200
-    assert result.data == 1
+    assert result.attempts == 1
 
     client_otp = ClientOTP.objects.get(user__email="john_smith@example.com")
     assert client_otp.number_attempts == 1
@@ -110,7 +110,7 @@ def test_increment_attempts_maximum():
     result = dao.increment_attempts("john_smith@example.com")
     assert result.success
     assert result.code == 200
-    assert result.data == 3
+    assert result.attempts == 3
 
     assert not ClientOTP.objects.filter(user__email="john_smith@example.com")
 

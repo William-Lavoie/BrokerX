@@ -2,18 +2,18 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.db.models import Q
 
-from ...adapters.result import Result
 from ...domain.entities.client import ClientProfile
+from ...domain.ports.dao.client_dao import ClientDAO, ClientDTO
 from ...models import Client
 
 logger = logging.getLogger(__name__)
 
 
-class MySQLClientDAO:
-    def add_user(self, client: ClientProfile) -> Result:
+class MySQLClientDAO(ClientDAO):
+    def add_user(self, client: ClientProfile) -> ClientDTO:
         try:
             existing_user = Client.objects.filter(
                 Q(user__email=client.email) | Q(phone_number=client.phone_number)
@@ -23,7 +23,7 @@ class MySQLClientDAO:
                 logger.warning(
                     f"There is already a user with the same email address ({client.email}) or phone number ({client.phone_number})"
                 )
-                return Result(success=False, code=409)
+                return ClientDTO(success=False, code=409)
 
             with transaction.atomic():
                 user = User.objects.create_user(  # type: ignore[attr-defined]
@@ -42,29 +42,29 @@ class MySQLClientDAO:
                     status=client.status,
                 )
 
-            return Result(success=True, code=201)
+            return ClientDTO(success=True, code=201)
 
         except AttributeError as e:
             logger.error(f"The request is invalid: {e}")
-            return Result(success=False, code=400)
+            return ClientDTO(success=False, code=400)
 
-    def update_status(self, email: str, new_status: str) -> Result:
+    def update_status(self, email: str, new_status: str) -> ClientDTO:
         try:
             client = Client.objects.get(user__email=email)
             client.status = new_status
             client.save()
 
-            return Result(success=True, code=200)
+            return ClientDTO(success=True, code=200)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
-            return Result(success=False, code=404)
+            return ClientDTO(success=False, code=404)
 
-    def get_status(self, email: str) -> Result:
+    def get_status(self, email: str) -> ClientDTO:
         try:
             status = Client.objects.only("status").get(user__email=email).status
-            return Result(success=True, code=200, data=status)
+            return ClientDTO(success=True, code=200, status=status)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
-            return Result(success=False, code=404, data=None)
+            return ClientDTO(success=False, code=404)
