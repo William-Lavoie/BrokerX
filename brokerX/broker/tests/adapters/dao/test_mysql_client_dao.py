@@ -91,6 +91,23 @@ def test_add_user_phone_already_used():
     assert result.code == 409
 
 
+def test_add_user_invalid_data():
+    dao = MySQLClientDAO()
+    mock_client = ClientProfile(
+        first_name="Mike",
+        last_name="Collin",
+        address="876 New York",
+        birth_date="2001-01-01",
+        email=12,
+        phone_number="123-456-7840",
+        status="pending",
+    )
+    result = dao.add_user(mock_client)
+
+    assert not result.success
+    assert result.code == 400
+
+
 def test_update_status():
     dao = MySQLClientDAO()
     result = dao.update_status("john_smith@example.com", "updated")

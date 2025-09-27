@@ -2,7 +2,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
+from django.db import DatabaseError, transaction
 from django.db.models import Q
 
 from ...adapters.result import Result
@@ -44,9 +44,9 @@ class MySQLClientDAO:
 
             return Result(success=True, code=201)
 
-        except Exception as e:
-            logger.error(f"MySQL raised the following error: {e}")
-            return Result(success=False, code=500)
+        except AttributeError as e:
+            logger.error(f"The request is invalid: {e}")
+            return Result(success=False, code=400)
 
     def update_status(self, email: str, new_status: str) -> Result:
         try:
