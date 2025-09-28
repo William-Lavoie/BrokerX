@@ -1,10 +1,10 @@
 name: CD
 
 on:
-    workflow_run:
-        workflows: ["CI"]
-        types:
-            - completed
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -12,7 +12,7 @@ jobs:
     runs-on: self-hosted
 
     env:
-        REPO_NAME: ${{ github.repository_name }}
+      REPO_DIR: BrokerX
 
     steps:
       - name: Clone repository
@@ -22,14 +22,16 @@ jobs:
         run: |
           set -euo pipefail
           cd ~
-          if [ ! -d "$REPO_NAME" ]; then
-            git clone https://github.com/${GITHUB_REPOSITORY}.git "${{ env.REPO_NAME }}"
+          if [ ! -d "$REPO_DIR" ]; then
+            git clone https://github.com/$GITHUB_REPOSITORY.git "$REPO_DIR"
+          else
+            cd "$REPO_DIR"
+            git fetch origin
+            git reset --hard origin/main
           fi
 
-      - name: Give permission
-        working-directory: ~/${{ env.REPO_NAME }}
-        run: chmod +x brokerX/deploy.sh
+      - name: Make deploy script executable
+        run: chmod +x "$HOME/$REPO_DIR/brokerX/deploy.sh"
 
-      - name: Deploy
-        working-directory: ~/${{ env.REPO_NAME }}
-        run: ./deploy.sh
+      - name: Deploy application
+        run: "$HOME/$REPO_DIR/brokerX/deploy.sh"
