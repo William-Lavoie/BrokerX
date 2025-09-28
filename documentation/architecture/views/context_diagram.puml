@@ -13,7 +13,7 @@ skinparam legendBorderColor #CCCCCC
 actor Client as "Client"
 rectangle "BrokerX System" as BrokerX
 rectangle "Simulated Payment Service" as SPS
-database "PostgreSQL Database" as DB
+database "MySQL Database" as DB
 
 Client --> BrokerX : Uses Platform
 BrokerX --> SPS : Sends Deposit Requests

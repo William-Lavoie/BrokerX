@@ -1,3 +1,4 @@
+
 @startuml
 start
 :See the main page of the application;
@@ -13,12 +14,10 @@ endif
 
 repeat
   :Show main page;
-  if (User selects "Add funds") then (yes)
-    :Choose amount;
-    :Confirm deposit;
-  elseif (User selects "Place order") then (yes)
-  elseif (User selects "See portfolio") then (yes)
-  endif
+  :User selects "Add funds";
+  :Choose amount;
+  :Confirm deposit;
+
 repeat while (User stays logged in?)
 :Logout;
 

@@ -1,0 +1,64 @@
+
+
+@startuml Component diagram
+
+package "Domain (Core)" {
+    [Client]
+}
+
+package "Ports (Interfaces)" {
+    interface ClientRepository
+    interface OTPRepository
+
+    package "Dao" {
+        interface ClientDAO
+        interface ClientOTPDAO
+    }
+}
+
+
+
+package "View" {
+    [views.py]
+}
+
+package "Adapters" {
+    [DjangoClientRepository]
+    [EmailOTPRepository]
+
+    package "Dao Adapters" {
+        [MySQLClientDAO]
+        [MySQLClientOTPDAO]
+    }
+}
+
+package "Services" {
+    [CreateClientUseCase]
+}
+
+[views.py] --> [CreateClientUseCase] : Send create client request
+[views.py] <-- [CreateClientUseCase] : Update the view
+
+[CreateClientUseCase] --> [DjangoClientRepository] : Send create client request
+[CreateClientUseCase] <-- [DjangoClientRepository] : Result
+
+[CreateClientUseCase] --> [EmailOTPRepository] : Send a generate passcode request
+[CreateClientUseCase] <-- [EmailOTPRepository] : Result
+
+[DjangoClientRepository] --|> [ClientRepository]
+[EmailOTPRepository] --|> [OTPRepository]
+
+[DjangoClientRepository] --> [MySQLClientDAO] : Send create client request
+[DjangoClientRepository] <-- [MySQLClientDAO] : Result
+
+[EmailOTPRepository] --> [MySQLClientOTPDAO] : Send create passcode request
+[EmailOTPRepository] <-- [MySQLClientOTPDAO] : Result
+
+
+[MySQLClientDAO] --> [ClientDAO]
+[MySQLClientOTPDAO] --> [ClientOTPDAO]
+
+[CreateClientUseCase] --> [Client] : Create a client entity
+
+
+@enduml
