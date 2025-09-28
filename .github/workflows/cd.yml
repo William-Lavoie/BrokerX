@@ -24,9 +24,6 @@ jobs:
           cd ~
           if [ ! -d "$REPO_DIR" ]; then
             git clone https://github.com/$GITHUB_REPOSITORY.git "$REPO_DIR"
-          else
-            git fetch origin
-            git reset --hard origin/main
           fi
           cd "$REPO_DIR"
 
