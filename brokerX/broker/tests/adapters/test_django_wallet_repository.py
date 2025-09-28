@@ -11,13 +11,18 @@ pytestmark = pytest.mark.django_db
 
 def test_add_funds():
     mock_dao = MagicMock()
-    mock_dao.add_funds.return_value = Decimal("10.00")
+    mock_dao.add_funds.return_value = WalletDTO(
+        success=True, code=200, balance=Decimal("34.56")
+    )
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
-    assert repo.add_funds("john_smith@example.com", Decimal("24.56")) == Decimal(
-        "10.00"
-    )
+    wallet_dto = repo.add_funds("john_smith@example.com", Decimal("24.56"))
+
+    assert wallet_dto.success
+    assert wallet_dto.code == 200
+    assert wallet_dto.balance == Decimal("34.56")
+
     mock_dao.add_funds.assert_called_once_with(
         "john_smith@example.com", Decimal("24.56")
     )
@@ -25,11 +30,27 @@ def test_add_funds():
 
 def test_get_balance():
     mock_dao = MagicMock()
-    mock_dao.get_balance.return_value = WalletDTO(balance=Decimal("24.56"))
+    mock_dao.get_balance.return_value = WalletDTO(
+        success=True, code=200, balance=Decimal("24.56")
+    )
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
     balance = repo.get_balance("john_smith@example.com")
 
     assert balance == Decimal("24.56")
+    mock_dao.get_balance.assert_called_once_with("john_smith@example.com")
+
+
+def test_get_balance_error():
+    mock_dao = MagicMock()
+    mock_dao.get_balance.return_value = WalletDTO(
+        success=False, code=500, balance=Decimal("10.00")
+    )
+
+    repo = DjangoWalletRepository(dao=mock_dao)
+
+    balance = repo.get_balance("john_smith@example.com")
+
+    assert balance == Decimal("0.0")
     mock_dao.get_balance.assert_called_once_with("john_smith@example.com")

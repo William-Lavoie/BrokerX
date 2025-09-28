@@ -77,6 +77,7 @@ def test_delete_passcode():
 
     assert result.success
     assert result.code == 200
+    assert result.validated
     assert not ClientOTP.objects.filter(user__email="john_smith@example.com")
 
 
@@ -86,6 +87,7 @@ def test_delete_passcode_no_user():
 
     assert not result.success
     assert result.code == 404
+    assert not result.validated
 
 
 def test_increment_attempts():
@@ -96,6 +98,7 @@ def test_increment_attempts():
     assert result.success
     assert result.code == 200
     assert result.attempts == 1
+    assert not result.validated
 
     client_otp = ClientOTP.objects.get(user__email="john_smith@example.com")
     assert client_otp.number_attempts == 1
@@ -111,6 +114,7 @@ def test_increment_attempts_maximum():
     assert result.success
     assert result.code == 200
     assert result.attempts == 3
+    assert not result.validated
 
     assert not ClientOTP.objects.filter(user__email="john_smith@example.com")
 
@@ -122,3 +126,4 @@ def test_increment_attempts_no_user():
 
     assert not result.success
     assert result.code == 404
+    assert not result.validated

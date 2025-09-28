@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from broker.domain.ports.dao.client_dao import ClientDTO
 
 pytestmark = pytest.mark.django_db
 
@@ -10,7 +11,7 @@ from broker.domain.entities.client import ClientProfile, ClientStatus
 
 def test_add_user():
     mock_dao = MagicMock()
-    mock_dao.add_user.return_value = True
+    mock_dao.add_user.return_value = ClientDTO(success=True, code=201)
 
     repo = DjangoClientRepository(dao=mock_dao)
     client = ClientProfile(
@@ -23,11 +24,11 @@ def test_add_user():
         status="fictional",
     )
 
-    assert repo.add_user(client)
-    mock_dao.add_user.assert_called_once_with(client)
+    client_dto: ClientDTO = repo.add_user(client)
 
-    mock_dao.add_user.return_value = False
-    assert not repo.add_user(client)
+    assert client_dto.success
+    assert client_dto.code == 201
+    mock_dao.add_user.assert_called_once_with(client)
 
 
 def test_update_user_status():
@@ -40,7 +41,9 @@ def test_update_user_status():
 
 def test_client_is_active():
     mock_dao = MagicMock()
-    mock_dao.get_status.return_value = ClientStatus.ACTIVE.value
+    mock_dao.get_status.return_value = ClientDTO(
+        success=True, code=200, status=ClientStatus.ACTIVE.value
+    )
     repo = DjangoClientRepository(dao=mock_dao)
 
     assert repo.client_is_active("john_smith@example.com")
@@ -49,7 +52,9 @@ def test_client_is_active():
 
 def test_client_is_not_active():
     mock_dao = MagicMock()
-    mock_dao.get_status.return_value = ClientStatus.REJECTED.value
+    mock_dao.get_status.return_value = ClientDTO(
+        success=True, code=200, status=ClientStatus.REJECTED.value
+    )
     repo = DjangoClientRepository(dao=mock_dao)
 
     assert not repo.client_is_active("john_smith@example.com")

@@ -9,11 +9,12 @@ from ..entities.client import ClientProfile
 class OTPDTO(Result):
     secret: str = ""
     attempts: int = 0
+    validated: bool = False
 
 
 class OTPRepository(ABC):
     @abstractmethod
-    def create_passcode(self, client: ClientProfile):
+    def create_passcode(self, client: ClientProfile) -> OTPDTO:
         pass
 
     @abstractmethod
@@ -21,9 +22,9 @@ class OTPRepository(ABC):
         pass
 
     @abstractmethod
-    def verify_passcode(self, email: str, passcode: str) -> bool:
+    def verify_passcode(self, email: str, passcode: str) -> OTPDTO:
         pass
 
     @abstractmethod
-    def register_secret(self, email: str, secret: str):
+    def register_secret(self, email: str, secret: str) -> bool:
         pass

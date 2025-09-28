@@ -39,7 +39,7 @@ class MySQLClientOTPDAO(ClientOTPDAO):
         try:
             with transaction.atomic():
                 ClientOTP.objects.get(user__email=email).delete()
-                return OTPDTO(success=True, code=200)
+                return OTPDTO(success=True, code=200, validated=True)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")

@@ -16,4 +16,5 @@ class DjangoClientRepository(ClientRepository):
         return self.dao.update_status(email, new_status)
 
     def client_is_active(self, email: str) -> bool:
-        return self.dao.get_status(email).data == ClientStatus.ACTIVE.value
+        client_dto = self.dao.get_status(email)
+        return client_dto.status == ClientStatus.ACTIVE.value
