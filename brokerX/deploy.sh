@@ -4,6 +4,7 @@ set -euo pipefail
 # Pull code
 git reset --hard
 git pull origin main
+git clean -fd
 
 # Start Docker containers
 docker compose stop
