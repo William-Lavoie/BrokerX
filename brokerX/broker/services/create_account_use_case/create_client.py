@@ -1,7 +1,7 @@
 from ...adapters.result import Result
 from ...domain.entities.client import ClientProfile, ClientStatus
 from ...domain.ports.client_repository import ClientRepository
-from ...domain.ports.otp_repository import OTPRepository
+from ...domain.ports.otp_repository import OTPDTO, OTPRepository
 from ...services.use_case_result import UseCaseResult
 from ..commands.create_client_command import CreateClientCommand
 
@@ -42,6 +42,12 @@ class CreateClientUseCase:
                     message="There was an unexpected error. Please try again or contact customer support.",
                 )
 
-        self.otp_repository.create_passcode(client)
+        otp_result: OTPDTO = self.otp_repository.create_passcode(client)
 
-        return UseCaseResult(success=True, message="The user was succesfully created")
+        if not otp_result.success:
+            return UseCaseResult(
+                success=False,
+                message="There was an error creating your passcode.",
+            )
+
+        return UseCaseResult(success=True, message="The user was successfully created")
