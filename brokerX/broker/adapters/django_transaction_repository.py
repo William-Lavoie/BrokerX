@@ -17,8 +17,8 @@ class DjangoTransactionRepository(TransactionRepository):
             email=email, amount=amount, idempotency_key=idempotency_key, type=type
         )
 
-    def validate_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def validate_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         return self.dao.validate_transaction(idempotency_key)
 
-    def fail_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def fail_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         return self.dao.fail_transaction(idempotency_key)

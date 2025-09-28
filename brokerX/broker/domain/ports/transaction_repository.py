@@ -1,25 +1,20 @@
 import uuid
 from abc import abstractmethod
+from dataclasses import dataclass, field
+from datetime import datetime
 from decimal import Decimal
-from xmlrpc.client import DateTime
+
+from ...adapters.result import Result
 
 
-class TransactionDTO:
-    def __init__(
-        self,
-        amount: Decimal,
-        status: str,
-        type: str,
-        message: str,
-        new: bool,
-        created_at=None,
-    ):
-        self.amount: Decimal = amount
-        self.created_at: DateTime = created_at
-        self.status: str = status
-        self.type: str = type
-        self.message: str = message
-        self.new: bool = new
+@dataclass
+class TransactionDTO(Result):
+    status: str = ""
+    type: str = ""
+    amount: Decimal = Decimal(0.0)
+    created_at: datetime = field(default_factory=datetime.now)
+    message: str = ""
+    new: bool = False
 
 
 class TransactionRepository:
@@ -35,9 +30,9 @@ class TransactionRepository:
         pass
 
     @abstractmethod
-    def validate_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def validate_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         pass
 
     @abstractmethod
-    def fail_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def fail_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         pass

@@ -13,9 +13,9 @@ class TransactionDAO:
         pass
 
     @abstractmethod
-    def validate_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def validate_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         pass
 
     @abstractmethod
-    def fail_transaction(self, idempotency_key: uuid.UUID) -> bool:
+    def fail_transaction(self, idempotency_key: uuid.UUID) -> TransactionDTO:
         pass
