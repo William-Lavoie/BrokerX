@@ -31,4 +31,6 @@ jobs:
         run: chmod +x "$HOME/$REPO_DIR/brokerX/deploy.sh"
 
       - name: Deploy application
-        run: "$HOME/$REPO_DIR/brokerX/deploy.sh"
+        run: |
+            cd "$HOME/$REPO_DIR/brokerX"
+            ./deploy.sh
