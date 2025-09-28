@@ -48,9 +48,17 @@ jobs:
           DB_PORT: 3306
         working-directory: brokerX
         run: |
-          docker compose exec -T broker_app python -m pytest --cov=broker --cov-config=.coveragerc --cov-report=term-missing
+          docker compose exec -T broker_app python -m pytest --cov=broker --cov-config=.coveragerc --cov-report=xml:coverage.xml
+          docker cp $(docker ps -qf "name=broker_app"):/app/coverage.xml ./coverage.xml
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
 
       - name: Close docker
+        if: always()
         working-directory: brokerX
         run: |
           docker compose down -v
