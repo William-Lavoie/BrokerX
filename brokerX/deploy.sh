@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # Pull code
+git reset --hard
 git pull origin main
 
 # Start Docker containers
