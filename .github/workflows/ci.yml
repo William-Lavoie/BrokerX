@@ -20,11 +20,13 @@ jobs:
           python-version: 3.11
 
       - name: Create Docker image
+        working-directory: brokerX
         run: |
           docker compose down -v
           docker compose build
 
       - name: Start docker containers
+        working-directory: brokerX
         run: docker compose up -d
 
       - name: Linting
@@ -39,10 +41,12 @@ jobs:
           DB_PASSWORD: pass
           DB_HOST: mysql
           DB_PORT: 3306
+        working-directory: brokerX
         run: |
           docker compose exec -T broker_app python -m pytest --cov=broker --cov-config=.coveragerc --cov-report=term-missing
 
       - name: Close docker
+        working-directory: brokerX
         run: |
           docker compose down -v
           docker system prune -af --volumes

@@ -11,6 +11,7 @@ from ...models import ClientOTP
 
 logger = logging.getLogger(__name__)
 
+
 # TODO: handle connection errors
 class MySQLClientOTPDAO(ClientOTPDAO):
     def set_secret_key(self, email: str, secret: str) -> OTPDTO:
