@@ -1,11 +1,13 @@
 from abc import abstractmethod
+from dataclasses import dataclass
 from decimal import Decimal
 
+from ...adapters.result import Result
 
-class PaymentServiceRepositoryResponse:
-    def __init__(self, success: bool, message: str = ""):
-        self.success: bool = success
-        self.message: str = message
+
+@dataclass
+class PaymentServiceRepositoryResponse(Result):
+    message: str = ""
 
 
 class PaymentServiceRepository:

@@ -24,8 +24,11 @@ class MockPaymentServiceRepository(PaymentServiceRepository):
 
             return PaymentServiceRepositoryResponse(
                 success=response.get("success", False),
+                code=response.get("code", 0),
                 message=response.get("message", ""),
             )
 
         except Exception as error:
-            return PaymentServiceRepositoryResponse(success=False, message=str(error))
+            return PaymentServiceRepositoryResponse(
+                success=False, code=500, message=str(error)
+            )

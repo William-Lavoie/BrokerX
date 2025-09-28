@@ -17,6 +17,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 503,
                     "message": "Unauthorized access.",
                 }
             )
@@ -35,6 +36,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 500,
                     "message": "Internal server error.",
                 }
             )
@@ -53,6 +55,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 503,
                     "message": "Account is locked.",
                 }
             )
@@ -63,6 +66,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 400,
                     "message": "The amount to withdraw must be positive.",
                 }
             )
@@ -72,6 +76,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 400,
                     "message": "Cannot withdraw zero amount.",
                 }
             )
@@ -81,6 +86,7 @@ class MockPaymentService:
                 {
                     "success": False,
                     "balance": 1000.00,
+                    "code": 400,
                     "message": "Insufficient funds.",
                 }
             )
@@ -89,6 +95,7 @@ class MockPaymentService:
             {
                 "success": True,
                 "balance": 1000.00,
+                "code": 200,
                 "message": f"Withdrawal of {float(amount):.2f} successful.",
             }
         )
