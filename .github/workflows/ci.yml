@@ -10,56 +10,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: brokerX_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: pass
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Create Docker image
+        run: |
+          docker compose down -v
+          docker compose build
 
-    - name: Wait for MySQL
-      run: |
-        for i in {1..30}; do
-          nc -z 127.0.0.1 3306 && break
-          echo "Waiting for MySQL..."
-          sleep 2
-        done
+      - name: Start docker containers
+        run: docker compose up -d
 
-    - name: Grant full privileges to user
-      run: |
-        mysql -h 127.0.0.1 -u root -proot -e "CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'pass';"
-        mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'user'@'%';"
-        mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
+      - name: Linting
+        run: |
+          black --check .
 
-    - name: Run Tests
-      env:
-        PYTHONPATH: ./brokerX
-        DB_NAME: brokerX_db
-        DB_USER: user
-        DB_PASSWORD: pass
-        DB_HOST: 127.0.0.1
-        DB_PORT: 3306
-      run: |
-        pytest brokerX/broker/tests --cov=broker --cov-config=.coveragerc --cov-report=term-missing
+      - name: Run Tests
+        env:
+          PYTHONPATH: ./brokerX
+          DB_NAME: brokerX_db
+          DB_USER: user
+          DB_PASSWORD: pass
+          DB_HOST: mysql
+          DB_PORT: 3306
+        run: |
+          docker compose exec -T broker_app python -m pytest --cov=broker --cov-config=.coveragerc --cov-report=term-missing
+
+      - name: Close docker
+        run: |
+          docker compose down -v
+          docker system prune -af --volumes
