@@ -1,7 +1,26 @@
 services:
+  broker_app:
+    container_name: broker_app
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: pass
+      DB_NAME: brokerX_db
+      DJANGO_SETTINGS_MODULE: brokerX.settings
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    entrypoint: ["python", "entrypoint.py"]
+
   mysql:
     image: mysql:8
-    container_name: mysql
+    container_name: broker_mysql
     restart: unless-stopped
     ports:
       - "3306:3306"
@@ -12,7 +31,11 @@ services:
       MYSQL_PASSWORD: pass
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-# Volumes allow data to persists when the Docker is down
 volumes:
   mysql_data:
