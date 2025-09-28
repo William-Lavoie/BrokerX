@@ -11,10 +11,25 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: self-hosted
 
+    env:
+        REPO_NAME: ${{ github.repository_name }}
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Clone repository
+        shell: bash
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cd ~
+          if [ ! -d "$REPO_NAME" ]; then
+            git clone https://github.com/${GITHUB_REPOSITORY}.git "${{ env.REPO_NAME }}"
+          fi
+
+      - name: Give permission
+        working-directory: ~/${{ env.REPO_NAME }}
+        run: chmod +x brokerX/deploy.sh
 
       - name: Deploy
-        working-directory: brokerX
+        working-directory: ~/${{ env.REPO_NAME }}
         run: ./deploy.sh
