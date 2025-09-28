@@ -5,6 +5,7 @@ set -euo pipefail
 git pull origin main
 
 # Start Docker containers
+docker compose stop
 docker compose down -v
 docker compose build --no-cache
 docker compose up -d --remove-orphans
