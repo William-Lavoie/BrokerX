@@ -201,7 +201,7 @@ This runbook provides operational procedures and troubleshooting steps for manag
 #### Starting with `deploy.sh` script
 1. To start the service, begin by cloning the Github repository.
 2. Run `BrokerX/brokerX/deploy.sh`
-3. The application should now be running on port 8000
+3. The application should now be running on port 8000 (`http://localhost:8000/`)
 
 #### Starting manually
 If you prefer not to use the script or it does not work, you can follow these steps.
