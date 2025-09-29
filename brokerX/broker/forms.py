@@ -13,12 +13,8 @@ class UserCreationForm(forms.Form):
     phone_number = forms.CharField(
         label="Phone number",
         max_length=20,
-        widget=forms.TextInput(
-            attrs={
-                "pattern": "[0-9]{3}-[0-9]{3}-[0-9]{4}",
-            }
-        ),
     )
+
     address = forms.CharField(label="Address", max_length=100)
     communication_method = forms.ChoiceField(
         label="Preferred communication method",
@@ -30,7 +26,7 @@ class UserCreationForm(forms.Form):
         widget=PasswordInput(
             render_value=True,
             attrs={
-                #       'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                "pattern": "^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
                 "title": "Must be at least 8 characters, include one uppercase letter, one number, and one special character.",
             },
         ),
@@ -42,7 +38,7 @@ class UserCreationForm(forms.Form):
         widget=PasswordInput(
             render_value=True,
             attrs={
-                #      'pattern': '^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+                "pattern": "^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
                 "title": "Must be at least 8 characters, include one uppercase letter, one number, and one special character.",
             },
         ),

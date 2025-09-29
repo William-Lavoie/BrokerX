@@ -60,7 +60,10 @@ def create_user(request):
             use_case = CreateClientUseCase(
                 DjangoClientRepository(), EmailOTPRepository()
             )
-            use_case.execute(command)
+            result = use_case.execute(command)
+            if not result.success:
+                return render(request, "user_creation.html", {"form": form})
+
             user = authenticate(request, username=email, password=password)
             login(request, user)
 
@@ -111,7 +114,7 @@ def client_login(request):
                     },
                 )
             # TODO: implement full use case
-            return render(request, "otp_confirmation.html")
+            return display_homepage(request)
         else:
             print(form.errors)
     else:
@@ -128,7 +131,14 @@ def client_logout(request):
 
 @login_required
 def display_wallet(request):
-    return render(request, "wallet.html", context={"amount": 100})
+    use_case = AddFundsToWalletUseCase(
+        DjangoClientRepository(),
+        MockPaymentServiceRepository(),
+        DjangoWalletRepository(),
+        DjangoTransactionRepository(),
+    )
+    balance = use_case.get_balance(request.user.email)
+    return render(request, "wallet.html", context={"amount": balance})
 
 
 @login_required
@@ -145,7 +155,7 @@ def add_funds_to_wallet(request):
     amount = Decimal(amount).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )  # TODO: catch error
-    print(amount)
+
     use_case = AddFundsToWalletUseCase(
         DjangoClientRepository(),
         MockPaymentServiceRepository(),
@@ -155,7 +165,6 @@ def add_funds_to_wallet(request):
     response: AddFundsToWalletUseCaseResult = use_case.execute(
         request.user.email, amount, idempotency_key
     )
-    print(response.__dict__)
     #  use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
 
-    return render(request, "wallet.html", context={"amount": 100})
+    return render(request, "wallet.html", context={"amount": response.new_balance})

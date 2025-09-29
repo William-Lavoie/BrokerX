@@ -16,6 +16,7 @@ class EmailOTPRepository(BaseOTPRepository):
         self.dao = dao if dao is not None else MySQLClientOTPDAO()
 
     def send_passcode(self, email: str, passcode: str) -> bool:
+        logger.error(f"Your passcode is: {passcode}")
         try:
             return (
                 send_mail(

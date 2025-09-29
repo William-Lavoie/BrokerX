@@ -9,7 +9,7 @@
     <title>Create Account</title>
 </head>
 <body>
-    <form method="post" class="d-flex flex-column bg-primary w-50 h-50 position-absolute top-50 start-50 translate-middle justify-content-evenly p-4">
+    <form method="post" class="d-flex flex-column bg-info w-50 h-50 position-absolute top-50 start-50 translate-middle justify-content-evenly p-4">
         {% csrf_token %}
 
        <div class="d-flex justify-content-evenly form-row">
@@ -76,6 +76,7 @@
 
 
         <button type="submit" class="btn btn-secondary btn-lg">Submit</button>
+        <a href="/login">I already have an account</a>
     </form>
 </body>
 </html>

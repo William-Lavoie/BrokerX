@@ -1,11 +1,11 @@
-# BrokerX
+# Runbook for BrokerX
 
-[![CI](https://github.com/William-Lavoie/BrokerX/actions/workflows/ci.yml/badge.svg)](https://github.com/William-Lavoie/BrokerX/actions/workflows/ci.yml)
-
+## Overview
+This runbook provides operational procedures and troubleshooting steps for managing BrokerX.
 
 ##  Starting with Docker
 ### Starting with `deploy.sh` script
-1. To start the service, begin by cloning the Github repository.
+1. To start the service, begin by cloning the Github repository `https://github.com/William-Lavoie/BrokerX` or downloading the source code.
 2. Run `BrokerX/brokerX/deploy.sh`
 3. The application should now be running on port 8000
 

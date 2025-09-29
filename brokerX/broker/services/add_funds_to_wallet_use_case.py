@@ -40,7 +40,9 @@ class AddFundsToWalletUseCase:
         self.wallet_repository = wallet_repository
         self.transaction_repository = transaction_repository
 
-    def execute(self, email: str, amount: Decimal, idempotency_key: uuid.UUID):
+    def execute(
+        self, email: str, amount: Decimal, idempotency_key: uuid.UUID
+    ) -> AddFundsToWalletUseCaseResult:
 
         if not self.client_repository.client_is_active(email):
             return AddFundsToWalletUseCaseResult(
@@ -118,3 +120,6 @@ class AddFundsToWalletUseCase:
                 code=500,
                 new_balance=wallet.balance,
             )
+
+    def get_balance(self, email: str) -> Decimal:
+        return self.wallet_repository.get_balance(email)
