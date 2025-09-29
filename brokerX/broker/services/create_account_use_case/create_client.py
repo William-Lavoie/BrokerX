@@ -14,7 +14,7 @@ class CreateClientUseCase:
         self.otp_repository = otp_repository
 
     def execute(self, command: CreateClientCommand) -> UseCaseResult:
-        print("TEST")
+
         # Create new ClientProfile entity
         client = ClientProfile(
             first_name=command.first_name,

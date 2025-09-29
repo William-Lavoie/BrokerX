@@ -23,6 +23,7 @@ and there are no transactions between users.
 3. Enter the amount you wish to add.
 4. Click on "submit"
 5. The amount is automatically increased. Note that there is a 10,000$ limit on wallets.
+Please note that since the payment system is simulated, you can always withdraw at most 1000$ at a time, however specific value (10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0) trigger errors as a way to tests potential errors coming from the external payment service.
 
 ## **Additional Notes**
 - Your session will remain active until you log out manually or the session expires.
