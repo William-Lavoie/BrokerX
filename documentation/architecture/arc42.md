@@ -1,10 +1,11 @@
-# BrokerX -  Architecture Documentation
-This document is based on the arc42 model and describes the BrokerX platform, an web-based simulated stock broking platform made for LOG430, Fall 2025, ÉTS, Montréal.
+# BrokerX -  Architecture Documentation Version 1.0
+
+This document is based on the arc42 model and describes the BrokerX platform, a web-based simulated stock broking platform made for LOG430, Fall 2025, ÉTS, Montréal.
 
 
 ## 1. Introduction and Goals
 ### Requirements overview
-The BrokerX application is a web-based  client-server system for simulated stock broking. It is an educational project that aims to replicate in a simulated environment online broking applications such as Wealthsimple. No real money or personal information will be collected, exchanged, and/or used in the making, deployment and/or use of this application.
+The BrokerX application is a web-based client-server system for simulated stock broking. It is an educational project that aims to replicate in a simulated environment online broking applications such as WealthSimple. No real money or personal information will be collected, exchanged, and/or used in the making, deployment and/or use of this application.
 
 ### Quality goals
 Note that quality requirements refer strictly to Phase 1 of the project and will be updated in later phases to reflect the current expectations.
@@ -22,7 +23,6 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 - Clients : Exchange financial assets through a web-based interface.
 - Professor/Lab assistants : Assess learning progress and competency.
 
----
 
 ## 2. Architectural Constraints
 | Constraint | Description | Justification |
@@ -39,15 +39,14 @@ Note that quality requirements refer strictly to Phase 1 of the project and will
 ### 3.1 Business Context
 ![Activity Diagram](../images/activity.png)
 
-The system currently allows clients to add funds to their wallets. Additional functionalities (including placing order and seeing their portfolio) will be added during the following phases of the project.
+The system currently allows clients to add funds to their wallets. Additional functionalities (including placing order and viewing their portfolio) will be added during the following phases of the project.
 ### 3.2 Technical Context
 - **Interface** - Web-based Django application
 - **Persistence Layer**: MySQL database with DAO pattern.
-- **Simulated Payment Service**: Python class that mocks a banking account for clients to withdraw money.
+- **Simulated Payment Service**: Python module that mocks a banking account for clients to simulate withdrawing money from an external bank.
 
 ![Context Diagram](../images/context.png)
 
----
 
 ## 4. Solution Strategy
 | Problem | Solution |
@@ -56,45 +55,40 @@ The system currently allows clients to add funds to their wallets. Additional fu
 | **Persistence of data** | Use of the DAO pattern with Django ORM and the Data Transfer Object (DTO) pattern to communicate between the persistence layer and the service layer |
 | **Testability** | Use of interfaces to simplify mocking of external sources and generation of coverage reports integrated into the CI pipeline |
 | **Maintainability** | Layered architecture with DTOs to pass data between layers |
-
----
+|**Integrity**| Every operation that deals money (for now only deposits) generate transactions used for auditing |
 
 ## 5. Building Block View
 ### Component Diagram (UC01)
 ![Component diagram](../images/component.png)
 
-Note that this represents only the logic for UC01 (Create user) for simplicity. In this architecture, the view represent an inbound adapter that directly receives requests from the user interface.
+Note that this represents only the logic for UC01 (Create user) for simplicity. In this architecture, the view represents an inbound adapter that directly receives requests from the user interface.
 
 Services implement uses cases and serve to coordinate the different systems, as well as to update the view once an operation is completed.
 
 Ports represent a contract with an external entity, whether it be part of the app, such as the DAO classes, or an external API, for example. It defines what methods and returns are expected from external entities.
 
-Adapters implement ports and communicate with external entities through DTOs. Adapters of DAO ports are responsible for communicating with the database, while generic adapters such as `DjangoClientRepository` coordinates between multiple entities, though in this case each adapters is linked to only one other. In general, `DjangoClientRepository` can be thought of as an intermediary between the service layer and sources of clients, in this case the MySQL database.
+Adapters implement ports and communicate with external entities through DTOs. Adapters of DAO ports are responsible for communicating with the database, while generic adapters such as `DjangoClientRepository` coordinates between multiple entities, though in this case each adapter is linked to only one other. In general, `DjangoClientRepository` can be thought of as an intermediary between the service layer and sources of clients, in this case the MySQL database.
 
 ### Class Diagram (UC01)
 ![Class diagram](../images/class.png)
 
----
 
 ## 6. Runtime View
+The following diagram shows the uses cases and the actors who can trigger them.
 ![Use cases diagram](../images/use_cases.png)
 
 
 ## 7. Deployment View
 ![Deployment diagram](../images/deployment.png)
 
----
 
 ## 8. Cross-cutting Concepts
 - DTO (Data Transfer Object) and DAO (Data Access Object) patterns
 - Error and exception handling
 - Logging and monitoring
-- [ ] Configuration
-- [ ] API versioning
-- [ ] Performance optimizations
-- [ ] Internationalization/localization (if applicable)
+- Transactions
+- Clients
 
----
 
 ## 9. Design Decisions
 ### ADR 001 – Separation of concerns with the hexagonal architecture
@@ -143,11 +137,11 @@ Accepted
 
 ### Context
 
-The application needs a platform to be developped on. After initial brainstorming, two otpions were left, Django or Java with SpringBoot. Considerations were made for performance, level of previous knowledge, ease of use, and more. This is a major decision that will impact the application for the rest of its life cycle, and is something that impacts how the application is conceived, tested, maintained and deployed.
+The application needs a platform to be developed on. After initial brainstorming, two options were left, Django or Java with SpringBoot. Considerations were made for performance, level of previous knowledge, ease of use, and more. This is a major decision that will impact the application for the rest of its life cycle, and is something that impacts how the application is conceived, tested, maintained and deployed.
 
 ### Decision
 
-The Django framework has been chosen has the basis of this project.
+The Django framework has been chosen as the basis of this project.
 
 Django is a popular and very well-documented framework, which played a part in this decision. Moreover, it offers various services such as an authentication system, an ORM, a logging system, and more. The convenience of having such features bundled in a single framework made this an attractive option. Furthermore, Django allows easy and traceable database migrations, which factored in the benefits of using it. Additionally, the fact that I am familiar with Django and have no experience with SpringBoot had a role in this decision.
 
@@ -155,7 +149,6 @@ Django is a popular and very well-documented framework, which played a part in t
 
 The choice of framework will impact how the application is designed. The main drawback of Django is its inferior performances when compared to Java, however I believe that with smart caching and other techniques, the quality requirements for the project will be able to be met and even exceeded with Django.
 
----
 
 ## 10. Quality Requirements
 
@@ -172,26 +165,34 @@ The choice of framework will impact how the application is designed. The main dr
 - No failure in case of a system error
 - Logging of errors
 
----
 
 ## 11. Risks and Technical Debt
-- [ ] Known technical risks
-- [ ] Potential architectural trade-offs
-- [ ] Mitigation strategies
-- [ ] Assumptions and limitations
+- The choice of using a monolithic architecture might complicate the switch to a micro-services architecture in phase 2.
+- Using Django might lead to performance issues.
+- MySQL with the Django ORM might struggle under a high load.
 
----
+### Mitigation Strategies
+- High coverage testing to detect bug as they are created.
+- In phase 2 strategies will be put in place to optimize performance, including caching, asynchronous task queues and multi-threading
 
 ## 12. Glossary
-- [ ] List of domain-specific terms
-- [ ] Acronyms and abbreviations
-- [ ] Links to external references
+| Term                   | Definition                                                                                           |
+|------------------------|----------------------------------------------------------------------------------------------------|
+| Hexagonal Architecture | An architecture model that isolates the core business logic from external entities |
+| Client                 | An individual that uses the platform and any number of its functionalities.             |
+| User   |  Used strictly for Django authentication. Not to confuse with Client, which is a part of the DDD. The user is simply the default Django model to authenticate clients |
+| (Digital) Wallet       | Capital that a client has available in their account to make transactions.                          |
+| Deposit                | Adding funds to a client's wallet.                                                                  |
+| Auditing               | Examination of financial assets and operations of an entity for legal and management purposes.     |
+| Simulated Payment System | Represents an external source from which clients can withdraw money (e.g., a bank).               |
+| Transaction            | Operation in which financial assets or funds are exchanged.                                        |
+| Liquidity     |  The amount of funds available to complete transactions |
+| DAO (Data Access Object) | Pattern that aims to isolate database queries |
+| DTO (Data Transfer Object) | Pattern that allows passing data between layers |
 
----
+#  Appendices
 
-# 📎 Appendices
-
-## Runbook
+## A. Runbook
 
 ### Overview
 This runbook provides operational procedures and troubleshooting steps for managing BrokerX.
@@ -215,7 +216,7 @@ If you prefer not to use the script or it does not work, you can follow these st
 Note that the `deploy.sh` script is automatically called on the VM in the CD script. You can access
 the application at `http://10.194.32.208:8000/`.
 
-### Diagnosticating errors
+### Diagnosing errors
 Errors are automatically logged in the `django.error_logs` file, alternatively you can use the command
 `docker logs -f broker_app` or `docker logs -f broker_mysql` to access the docker logs.
 
@@ -228,13 +229,46 @@ You can run the tests by running the command
 `docker exec broker_app python -m pytest`, or if you wish to get the coverage
 `docker exec broker_app python -m pytest --cov=broker --cov-config=.coveragerc --cov-report=term-missing`
 
-## B. References
-- This project has been made in collaboration with chatGPT for the purposes listed below. Note that uses of artifical intelligence in this project is limited to strictly those listed below. In particular, it has **not** be used to generate artefacts.
-  - Creation of templates for use cases, glossary, MoSCoW priorization table and arc42.
-  - Asking if the artefacts satisfy the requirements.
+
+## B. Phase 1 retrospective
+
+<span style="color:green;">&#9679;</span> Well implemented
+- Unit tests are complete
+- Test coverage is satisfactory
+- CI script generates coverage report, has healthchecks, and a badge on the README
+- Hexagonal architecture is followed
+- Error handling in the backend and logging
+- Reproductible migrations
+- Functional and easy script to quickly deploy
+- CD script deploys automatically on VM
+- Domain well defined
+- Pre-commit hook with linters (black, mypy and isort)
+
+<span style="color:orange;">&#9679;</span> Needs Improvement
+- Improve UI styling and reactivity, especially on mobile
+- Show error messages in the UI
+- View is not tidy
+- Add indexing on the database
+- Minimal coupling between adapters and entities need to be removed
+- Add additional security between the view and service layers
+
+<span style="color:red;">&#9679;</span> Missing
+- E2E testing
+- Sending emails (no SMTP server)
+- Allow SMS messages
+- Rollback script
+- Performance metrics tests
+
+## C. References
+- This project has been made in collaboration with chatGPT for the purposes listed below. Note that uses of artificial intelligence in this project is limited to strictly those listed below. In particular, it has **not** been used to generate artifacts.
+  - Creation of templates for use cases, glossary, MoSCoW prioritization table and arc42.
+  - Asking if the artifacts satisfy the requirements.
   - Used as a search engine.
-  - Improve readibility (phrasing, grammar, spelling, etc)
+  - Improve readability (phrasing, grammar, spelling, etc)
+  - Debugging
+
 - Petrillo, F. (2025, Fall). Class notes [pdf]. LOG430, École de Technologie Supérieure.
 - Ullman, G. (2025, Fall). Github labs. LOG430, École de Technologie Supérieure.
+- Documentation for all the dependencies listed in requirements.txt
 
 
