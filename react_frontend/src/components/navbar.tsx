@@ -9,7 +9,7 @@ export function Navbar() {
         <nav className="h-[10vh] flex gap-x-[3%] sticky top-0">
             <NavbarButton text="Home" route="/"></NavbarButton>
             <NavbarButton text="Wallet" route="/wallet"></NavbarButton>
-            <NavbarButton text="Placer Order" route="/orders"></NavbarButton>
+            <NavbarButton text="Place Order" route="/create_account"></NavbarButton>
             <NavbarButton text="Logout" route="/login"></NavbarButton>
         </nav>
     )
