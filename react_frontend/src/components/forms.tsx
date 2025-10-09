@@ -2,42 +2,34 @@
 
 import { useState } from "react"
 
-export function TextInput({label}: {label: string}) {
+type TextInputProps = {
+  label: string;
+  id?: string;
+  name?: string;
+  type?: string;
+  handler?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export function TextInput({ label, id, name, type = "text", handler }: TextInputProps) {    
     const [value, setValue] = useState("")
 
-    return (
-        <div className="flex flex-col w-100">
-            <label id={value}>{label}</label>
-                <input 
-                    id={value}
-                    className="bg-gray-200 p-2"
-                    name={value}
-                    type="email"
-                    value={value}
-                    onChange={(e) => {setValue(e.target.value)}}
-                />
-        </div>
-        
-        
-    )
-}
-
-export function PasswordInput({label}: {label: string}) {
-    const [value, setValue] = useState("")
-
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        if (handler) {
+            handler(e);
+        }
+    };
     return (
         <div className="flex flex-col">
-            <label id={value}>{label}</label>
+            <label htmlFor={id ?? label}>{label}</label>
                 <input 
-                    id={value}
-                    className="bg-gray-200 p-2"
-                    name={value}
-                    type="password"
+                    id={id ?? label}
+                    className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none"
+                    name={name ?? label}
+                    type={type ?? "text"}
                     value={value}
-                    onChange={(e) => {setValue(e.target.value)}}
+                    onChange={handleChange}
                 />
         </div>
-        
-        
     )
 }

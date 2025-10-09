@@ -3,7 +3,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from broker.forms import ClientLoginForm, PlaceOrderForm, UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 
 from brokerX import settings
@@ -180,3 +180,6 @@ def display_orders(request):
         form = PlaceOrderForm()
 
     return render(request, "orders.html", {"form": form})
+
+def get_name(request):
+    return JsonResponse(data={"name": "William Lavoie"})
