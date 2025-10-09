@@ -183,3 +183,6 @@ def display_orders(request):
 
 def get_name(request):
     return JsonResponse(data={"name": "William Lavoie"})
+
+def get_funds(request):
+    return JsonResponse(data={"balance": 123.45})
