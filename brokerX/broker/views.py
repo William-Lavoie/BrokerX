@@ -1,6 +1,6 @@
 from decimal import ROUND_HALF_UP, Decimal
 
-from broker.forms import ClientLoginForm, UserCreationForm
+from broker.forms import ClientLoginForm, PlaceOrderForm, UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -168,3 +168,15 @@ def add_funds_to_wallet(request):
     #  use_case.execute("william.lavoie.3@ens.etsmtl.ca", passcode)
 
     return render(request, "wallet.html", context={"amount": response.new_balance})
+
+
+@login_required
+def display_orders(request):
+    if request.method == "POST":
+        form = PlaceOrderForm(request.POST)
+
+        return render(request, "orders.html", {"form": form})
+    else:
+        form = PlaceOrderForm()
+
+    return render(request, "orders.html", {"form": form})

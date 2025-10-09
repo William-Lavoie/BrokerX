@@ -59,3 +59,15 @@ class ClientLoginForm(forms.Form):
         label="Password",
         max_length=100,
     )
+
+
+class PlaceOrderForm(forms.Form):
+    symbol = forms.ChoiceField(
+        label="Symbol", choices=[("AAPL", "AAPL"), ("NVDA", "NVDA"), ("XEQT", "XEQT")]
+    )
+    type = forms.ChoiceField(
+        label="Transaction type", choices=[("Buy", "Buy"), ("Sell", "Sell")]
+    )
+    quantity = forms.IntegerField(min_value=1)
+    limit_price = forms.DecimalField(decimal_places=2)
+    duration = forms.DurationField(required=False)
