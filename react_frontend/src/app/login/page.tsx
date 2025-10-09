@@ -6,7 +6,7 @@ export default function Login() {
     
     return (
         <div className="flex justify-center items-center h-full">
-            <div className="border rounded-xl w-[60%] h-[60%] p-4">
+            <div className="md:border md:rounded-xl w-[60%] h-[60%] p-4">
                 <form className="flex flex-col gap-y-8 items-center">
                     <TextInput label="Email"></TextInput>     
                     <TextInput label="Password"></TextInput>
