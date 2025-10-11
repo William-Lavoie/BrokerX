@@ -181,8 +181,10 @@ def display_orders(request):
 
     return render(request, "orders.html", {"form": form})
 
+
 def get_name(request):
     return JsonResponse(data={"name": "William Lavoie"})
+
 
 def get_funds(request):
     return JsonResponse(data={"balance": 123.45})
