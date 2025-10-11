@@ -62,3 +62,36 @@ class Transaction(models.Model):
         max_length=20, choices=[("D", "Deposit"), ("S", "Sale"), ("B", "Buy")]
     )
     message = models.CharField(max_length=300, blank=True)
+
+
+class Stock(models.Model):
+    symbol = models.CharField(max_length=10, db_index=True)
+    volume = models.IntegerField(validators=[MinValueValidator(1)])
+    previous_close = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
+    )
+    last_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
+    )
+
+
+class Order(models.Model):
+    direction = models.CharField(max_length=100, choices=[("B", "Buy"), ("S", "Sell")])
+    type = models.CharField(max_length=100, choices=[("M", "Market"), ("L", "Limit")])
+    stock = models.ForeignKey(Stock, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    limit = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
+        null=True,
+    )
+    duration = models.DateTimeField()
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+    related_orders = models.ManyToManyField("self")
