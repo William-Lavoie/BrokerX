@@ -65,7 +65,7 @@ class Transaction(models.Model):
 
 
 class Stock(models.Model):
-    symbol = models.CharField(max_length=10, db_index=True)
+    symbol = models.CharField(max_length=10, db_index=True, unique=True)
     volume = models.IntegerField(validators=[MinValueValidator(1)])
     previous_close = models.DecimalField(
         max_digits=7,

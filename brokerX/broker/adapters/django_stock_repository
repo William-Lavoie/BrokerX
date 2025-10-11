@@ -1,0 +1,14 @@
+from ..adapters.dao.mysql_stock_dao import MySQLStockDAO
+from ..domain.entities.stock import Stock
+from ..domain.ports.stock_repository import StockDTO, StockRepository
+
+
+class DjangoStockRepository(StockRepository):
+    def __init__(self, dao=None):
+        super().__init__()
+        self.dao = dao if dao is not None else MySQLStockDAO()
+
+    def get_stock_by_symbol(self, symbol: str) -> Stock:
+        stock_dto : StockDTO = self.dao.get_stock_by_symbol(symbol)
+        return Stock.get_from_dto(stock_dto)
+
