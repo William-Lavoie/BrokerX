@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 
-from ...domain.entities.client import ClientProfile
+from ...domain.entities.client import ClientProfile, ClientStatus
 from ...domain.ports.dao.client_dao import ClientDAO, ClientDTO
 from ...models import Client
 
@@ -13,6 +13,24 @@ logger = logging.getLogger(__name__)
 
 
 class MySQLClientDAO(ClientDAO):
+    def get_client_by_email(self, email: str) -> ClientDTO:
+        try:
+            client = Client.objects.get(email=email)
+            return ClientDTO(
+                success=True,
+                code=200,
+                address=client.address,
+                birth_date=client.birth_date,
+                phone_number=client.phone_number,
+                status=client.status,
+            )
+        except ObjectDoesNotExist:
+            logger.error(
+                f"ObjectDoesNotExist exception : There is no client with the email {email}",
+                exc_info=True,
+            )
+            return ClientDTO(success=False, code=404)
+
     def add_user(self, client: ClientProfile) -> ClientDTO:
         try:
             existing_user = Client.objects.filter(

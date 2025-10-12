@@ -5,6 +5,19 @@ from enum import Enum
 # User refers strictly to django auth model
 
 
+class ClientInvalidException(Exception):
+    def __init__(
+        self,
+        user_message: str = "Your account has been deactivated or could not be found.",
+        log_message: str = "Client instance was not found",
+        error_code: int = 400,
+    ):
+        super().__init__(user_message)
+        self.user_message = user_message
+        self.log_message = log_message
+        self.error_code = error_code
+
+
 class ClientStatus(Enum):
     ACTIVE = "Active"
     PENDING = "Pending"
@@ -20,7 +33,7 @@ class ClientProfile:
         birth_date: str,
         email: str,
         phone_number: str,
-        status: ClientStatus,
+        status: str,
         password: str = "",
     ):
         self.first_name: str = first_name
@@ -29,5 +42,8 @@ class ClientProfile:
         self.birth_date: str = birth_date
         self.email: str = email
         self.phone_number: str = phone_number
-        self.status: ClientStatus = status
+        self.status: str = status
         self.password: str = password
+
+    def is_active(self) -> bool:
+        return self.status == ClientStatus.ACTIVE.value
