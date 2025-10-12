@@ -85,7 +85,8 @@ class Order(models.Model):
     direction = models.CharField(max_length=100, choices=[("B", "Buy"), ("S", "Sell")])
     type = models.CharField(max_length=100, choices=[("M", "Market"), ("L", "Limit")])
     stock = models.ForeignKey(Stock, on_delete=models.SET_NULL, null=True)
-    quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    initial_quantity = models.IntegerField(validators=[MinValueValidator(1)])
+    remaining_quantity = models.IntegerField(validators=[MinValueValidator(0)])
     limit = models.DecimalField(
         max_digits=7,
         decimal_places=2,
@@ -94,4 +95,14 @@ class Order(models.Model):
     )
     duration = models.DateTimeField()
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("C", "Completed"),
+            ("P", "Pending"),
+            ("R", "Rejected"),
+            ("F", "Failed"),
+        ],
+        default="P",
+    )
     related_orders = models.ManyToManyField("self")
