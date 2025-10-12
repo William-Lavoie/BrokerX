@@ -4,7 +4,6 @@ import uuid
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.forms import ValidationError
 
 # The models will be accessed only through DAO, otherwise use entities
 # i.e the model is only used to define the DB
@@ -14,17 +13,22 @@ from django.forms import ValidationError
 
 
 class Client(models.Model):
+    email = models.EmailField(max_length=100, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     birth_date = models.DateField()
-    phone_number = models.CharField(max_length=100, primary_key=True)
+    phone_number = models.CharField(max_length=100, unique=True)
     status = models.CharField(
         max_length=20, choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")]
     )
 
 
 class Wallet(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, related_name="wallets", null=True
+    )
     balance = models.DecimalField(
         max_digits=7,
         decimal_places=2,
@@ -106,3 +110,9 @@ class Order(models.Model):
         default="P",
     )
     related_orders = models.ManyToManyField("self")
+
+
+class Shares(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="shares")
+    stock_symbol = models.CharField(max_length=50)
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])

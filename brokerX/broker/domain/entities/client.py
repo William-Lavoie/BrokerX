@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Optional
+
+from ...domain.entities.wallet import Wallet
 
 # TODO: integrate with django user authentification class
 # TODO: cronjob to delete users after 24h
@@ -35,6 +38,8 @@ class ClientProfile:
         phone_number: str,
         status: str,
         password: str = "",
+        wallet: Optional[Wallet] = None,
+        shares: dict[str, int] = {},
     ):
         self.first_name: str = first_name
         self.last_name = last_name
@@ -44,6 +49,11 @@ class ClientProfile:
         self.phone_number: str = phone_number
         self.status: str = status
         self.password: str = password
+        self.wallet: Optional[Wallet] = wallet
+        self.shares: dict[str, int] = shares
 
     def is_active(self) -> bool:
         return self.status == ClientStatus.ACTIVE.value
+
+    def get_shares_owned(self, symbol: str) -> int:
+        return self.shares.get(symbol, 0)

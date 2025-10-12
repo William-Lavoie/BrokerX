@@ -1,7 +1,4 @@
 from decimal import Decimal
-from typing import Optional
-
-from ...domain.entities.client import ClientProfile
 
 
 class Wallet:
@@ -10,9 +7,7 @@ class Wallet:
     def __init__(
         self,
         balance: Decimal,
-        client: Optional[ClientProfile] = None,
     ):
-        self.client: ClientProfile | None = client
         self.balance: Decimal = balance
 
     def can_add_funds(self, amount: Decimal):
