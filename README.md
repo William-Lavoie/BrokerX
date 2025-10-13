@@ -1,7 +1,7 @@
 # BrokerX
 
 [![CI](https://github.com/William-Lavoie/BrokerX/actions/workflows/ci.yml/badge.svg)](https://github.com/William-Lavoie/BrokerX/actions/workflows/ci.yml)
-
+[![CD](https://github.com/William-Lavoie/BrokerX/actions/workflows/cd.yml/badge.svg)](https://github.com/William-Lavoie/BrokerX/actions/workflows/cd.yml)
 
 ##  Starting with Docker
 ### Starting with `deploy.sh` script
