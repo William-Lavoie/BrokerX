@@ -15,7 +15,7 @@ class DjangoClientRepository(ClientRepository):
         if not client_dto.success:
             if client_dto.code == 404:
                 raise ClientInvalidException(error_code=404)
-            elif client_dto.code == 500:
+            else:
                 raise DataAccessException(
                     user_message=f"An unexpected error occurred when trying to access client {email}"
                 )

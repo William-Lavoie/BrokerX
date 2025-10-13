@@ -27,7 +27,7 @@ class Order:
         remaining_quantity: int = 0,
     ):
 
-        if initial_quantity < 1 or not initial_quantity.is_integer():
+        if initial_quantity < 1:
             raise OrderInvalidException(
                 user_message="You must choose a quantity of at least 1 share.",
                 log_message=f"User tried placing an order with quantity = {initial_quantity}",
