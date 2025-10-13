@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,6 +14,38 @@ logger = logging.getLogger(__name__)
 
 
 class MySQLClientDAO(ClientDAO):
+    def get_client_by_email(self, email: str) -> ClientDTO:
+        try:
+            client = Client.objects.prefetch_related("wallets", "shares").get(
+                email=email
+            )
+
+            wallet: dict = {}
+            wallet_instance = client.wallets.first()
+            if wallet_instance:
+                wallet = {"balance": Decimal(wallet_instance.balance)}
+            shares: dict[str, int] = {}
+
+            for share in client.shares.all():
+                shares[share.stock_symbol] = share.quantity
+
+            return ClientDTO(
+                success=True,
+                code=200,
+                address=client.address,
+                birth_date=client.birth_date,
+                phone_number=client.phone_number,
+                status=client.status,
+                wallet=wallet,
+                shares=shares,
+            )
+        except ObjectDoesNotExist:
+            logger.error(
+                f"ObjectDoesNotExist exception : There is no client with the email {email}",
+                exc_info=True,
+            )
+            return ClientDTO(success=False, code=404)
+
     def add_user(self, client: ClientProfile) -> ClientDTO:
         try:
             existing_user = Client.objects.filter(
@@ -36,6 +69,9 @@ class MySQLClientDAO(ClientDAO):
 
                 Client.objects.create(
                     user=user,
+                    first_name=client.first_name,
+                    last_name=client.last_name,
+                    email=client.email,
                     phone_number=client.phone_number,
                     birth_date=client.birth_date,
                     address=client.address,

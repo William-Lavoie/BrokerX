@@ -1,16 +1,14 @@
 from abc import abstractmethod
-from dataclasses import dataclass
 
 from ....adapters.result import Result
-from ....domain.entities.client import ClientProfile
-
-
-@dataclass
-class ClientDTO(Result):
-    status: str = ""
+from ....domain.entities.client import ClientProfile, ClientStatus
+from ....domain.ports.client_repository import ClientDTO
 
 
 class ClientDAO:
+    @abstractmethod
+    def get_client_by_email(self, email: str) -> ClientDTO:
+        pass
 
     # TODO: decouple the entities from the DAO
     @abstractmethod
