@@ -21,7 +21,7 @@ class Order:
     def __init__(
         self,
         stock: Optional[Stock],
-        type: str = "",
+        direction: str = "",
         limit: Optional[Decimal] = Decimal("0.00"),
         initial_quantity: int = 0,
         remaining_quantity: int = 0,
@@ -34,7 +34,7 @@ class Order:
             )
 
         self.stock: Optional[Stock] = stock
-        self.type: str = type
+        self.direction: str = direction
         self.limit: Optional[Decimal] = limit
         self.initial_quantity: int = initial_quantity
         self.remaining_quantity: int = remaining_quantity

@@ -13,7 +13,7 @@ from ...domain.entities.stock import Stock
 @dataclass
 class OrderDTO(Result):
     stock: Optional[Stock] = None
-    type: str = ""
+    direction: str = ""
     limit: Optional[Decimal] = Decimal("0.00")
     initial_quantity: int = 0
     remaining_quantity: int = 0
@@ -25,7 +25,7 @@ class OrderRepository:
         self,
         client: ClientProfile,
         stock: Stock,
-        type: str,
+        direction: str,
         initial_quantity: int,
         idempotency_key: UUID,
         limit: Optional[Decimal] = None,
@@ -36,7 +36,7 @@ class OrderRepository:
     def get_order_from_dto(cls, dto: OrderDTO) -> Order:
         return Order(
             stock=dto.stock,
-            type=dto.type,
+            direction=dto.direction,
             limit=dto.limit,
             initial_quantity=dto.initial_quantity,
             remaining_quantity=dto.remaining_quantity,
