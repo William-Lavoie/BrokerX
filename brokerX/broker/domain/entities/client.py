@@ -1,6 +1,9 @@
+from decimal import Decimal
 from enum import Enum
 from typing import Optional
 
+from ...domain.entities.order import Order
+from ...domain.entities.stock import Stock
 from ...domain.entities.wallet import Wallet
 
 # TODO: integrate with django user authentification class
@@ -40,6 +43,7 @@ class ClientProfile:
         password: str = "",
         wallet: Optional[Wallet] = None,
         shares: dict[str, int] = {},
+        orders: list[Order] = [],
     ):
         self.first_name: str = first_name
         self.last_name = last_name
@@ -51,9 +55,21 @@ class ClientProfile:
         self.password: str = password
         self.wallet: Optional[Wallet] = wallet
         self.shares: dict[str, int] = shares
+        self.orders: list[Order] = orders
 
     def is_active(self) -> bool:
         return self.status == ClientStatus.ACTIVE.value
 
-    def get_shares_owned(self, symbol: str) -> int:
-        return self.shares.get(symbol, 0)
+    def can_sell_shares(self, symbol: str, quantity: int) -> bool:
+        return self.shares.get(symbol, 0) == quantity
+
+    def can_buy_shares(
+        self, stock: Stock, quantity: int, limit: Optional[Decimal]
+    ) -> bool:
+        if self.wallet is None:
+            return False
+
+        if limit is not None:
+            return self.wallet.balance >= limit * quantity
+
+        return self.wallet.balance >= stock.last_price * Decimal(quantity)

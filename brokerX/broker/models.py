@@ -97,7 +97,7 @@ class Order(models.Model):
         validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
         null=True,
     )
-    duration = models.DateTimeField()
+    duration = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
     status = models.CharField(
         max_length=20,
@@ -110,6 +110,7 @@ class Order(models.Model):
         default="P",
     )
     related_orders = models.ManyToManyField("self")
+    order_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
 
 class Shares(models.Model):

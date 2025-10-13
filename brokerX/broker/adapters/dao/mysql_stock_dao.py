@@ -19,6 +19,7 @@ class MySQLStockDAO:
                 previous_close=stock.previous_close,
                 volume=stock.volume,
                 last_price=stock.last_price,
+                active=True,
             )
         except ObjectDoesNotExist:
             logger.error(

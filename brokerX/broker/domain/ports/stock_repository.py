@@ -19,3 +19,8 @@ class StockRepository:
     @abstractmethod
     def get_stock_by_symbol(self, symbol) -> Stock:
         pass
+
+    def get_from_dto(cls, dto: StockDTO) -> "Stock":
+        return Stock(
+            dto.symbol, dto.previous_close, dto.volume, dto.last_price, dto.active
+        )

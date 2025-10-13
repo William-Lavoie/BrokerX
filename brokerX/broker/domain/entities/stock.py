@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-from ...domain.ports.stock_repository import StockDTO
-
 
 class StockInvalidException(Exception):
     def __init__(
@@ -33,9 +31,3 @@ class Stock:
         self.volume = volume
         self.last_price = last_price
         self.active = True
-
-    @classmethod
-    def get_from_dto(cls, dto: StockDTO) -> "Stock":
-        return cls(
-            dto.symbol, dto.previous_close, dto.volume, dto.last_price, dto.active
-        )
