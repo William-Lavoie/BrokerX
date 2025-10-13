@@ -6,7 +6,7 @@ from broker.domain.ports.dao.wallet_dao import WalletDTO
 
 pytestmark = pytest.mark.django_db
 
-from broker.models import Wallet
+from broker.models import Client, Wallet
 from django.contrib.auth.models import User
 
 
@@ -18,7 +18,18 @@ def setup_function(db):
         email="john_smith@example.com",
     )
 
-    Wallet.objects.create(user=user, balance=Decimal(12.87))
+    client = Client.objects.create(
+        user=user,
+        first_name="John",
+        last_name="Smith",
+        email="john_smith@example.com",
+        address="456 Privett Drive",
+        birth_date="1978-01-01",
+        phone_number="123-456-7890",
+        status="fictional",
+    )
+
+    Wallet.objects.create(client=client, balance=Decimal(12.87))
     yield
 
 
@@ -34,16 +45,11 @@ def test_get_balance():
 
 def test_get_balance_not_existing():
     dao = MySQLWalletDAO()
-    user = User.objects.create(
-        username="mark_dow",
-        first_name="Mark",
-        last_name="Dow",
-        email="mike_dow@example.com",
-    )
+
     wallet_dto: WalletDTO = dao.get_balance("mike_dow@example.com")
 
-    assert wallet_dto.success
-    assert wallet_dto.code == 200
+    assert not wallet_dto.success
+    assert wallet_dto.code == 404
     assert wallet_dto.balance == Decimal("0.00")
 
 

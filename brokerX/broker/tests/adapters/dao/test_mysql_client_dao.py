@@ -18,6 +18,9 @@ def setup_function(db):
 
     Client.objects.create(
         user=user,
+        first_name="John",
+        last_name="Smith",
+        email="john_smith@example.com",
         address="456 Privett Drive",
         birth_date="1978-01-01",
         phone_number="123-456-7890",
@@ -41,7 +44,7 @@ def test_add_user():
     assert result.success
     assert result.code == 201
 
-    saved_client = Client.objects.filter(user__email="tom_hanks@example.com")
+    saved_client = Client.objects.filter(email="tom_hanks@example.com")
     saved_user = User.objects.get(email="tom_hanks@example.com")
 
     assert saved_client.count() == 1
