@@ -36,7 +36,7 @@ class ClientProfile:
         first_name: str,
         last_name: str,
         address: str,
-        birth_date: str,
+        birth_date: str,  # TODO: refactor to datetime
         email: str,
         phone_number: str,
         status: str,
