@@ -1,10 +1,13 @@
+import datetime
+from decimal import Decimal
+
 import pytest
 
 pytestmark = pytest.mark.django_db
 
 from broker.adapters.dao.mysql_client_dao import MySQLClientDAO
 from broker.domain.entities.client import ClientProfile
-from broker.models import Client
+from broker.models import Client, Shares, Wallet
 from django.contrib.auth.models import User
 
 
@@ -16,7 +19,7 @@ def setup_function(db):
         email="john_smith@example.com",
     )
 
-    Client.objects.create(
+    client = Client.objects.create(
         user=user,
         first_name="John",
         last_name="Smith",
@@ -27,6 +30,64 @@ def setup_function(db):
         status="fictional",
     )
     yield
+
+
+def test_get_client_by_email():
+    dao = MySQLClientDAO()
+
+    Wallet.objects.create(
+        client=Client.objects.get(email="john_smith@example.com"),
+        balance=Decimal("999.99"),
+    )
+    Shares.objects.create(
+        client=Client.objects.get(email="john_smith@example.com"),
+        stock_symbol="AAPL",
+        quantity=25,
+    )
+    Shares.objects.create(
+        client=Client.objects.get(email="john_smith@example.com"),
+        stock_symbol="XEQT",
+        quantity=10,
+    )
+
+    client_dto = dao.get_client_by_email("john_smith@example.com")
+
+    assert client_dto.success
+    assert client_dto.code == 200
+    assert client_dto.address == "456 Privett Drive"
+    assert client_dto.first_name == "John"
+    assert client_dto.last_name == "Smith"
+    assert client_dto.birth_date == datetime.date(1978, 1, 1)
+    assert client_dto.phone_number == "123-456-7890"
+    assert client_dto.status == "fictional"
+    assert client_dto.wallet == {"balance": Decimal("999.99")}
+    assert client_dto.shares == {"AAPL": 25, "XEQT": 10}
+
+
+def test_get_client_by_email_not_existing():
+    dao = MySQLClientDAO()
+
+    client_dto = dao.get_client_by_email("joe@example.com")
+
+    assert not client_dto.success
+    assert client_dto.code == 404
+
+
+def test_get_client_by_email_no_wallet_or_shares():
+    dao = MySQLClientDAO()
+
+    client_dto = dao.get_client_by_email("john_smith@example.com")
+
+    assert client_dto.success
+    assert client_dto.code == 200
+    assert client_dto.address == "456 Privett Drive"
+    assert client_dto.first_name == "John"
+    assert client_dto.last_name == "Smith"
+    assert client_dto.birth_date == datetime.date(1978, 1, 1)
+    assert client_dto.phone_number == "123-456-7890"
+    assert client_dto.status == "fictional"
+    assert client_dto.wallet == {}
+    assert client_dto.shares == {}
 
 
 def test_add_user():

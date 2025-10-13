@@ -32,6 +32,8 @@ class MySQLClientDAO(ClientDAO):
             return ClientDTO(
                 success=True,
                 code=200,
+                first_name=client.first_name,
+                last_name=client.last_name,
                 address=client.address,
                 birth_date=client.birth_date,
                 phone_number=client.phone_number,
