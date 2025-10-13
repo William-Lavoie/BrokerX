@@ -11,19 +11,19 @@ from ..domain.ports.order_repository import OrderRepository
 from ..domain.ports.stock_repository import StockRepository
 from ..domain.ports.wallet_repository import WalletRepository
 from ..exceptions import DataAccessException
+from ..services.use_case_result import UseCaseResult
 
 logger = logging.getLogger(__name__)
 
 
-class PlaceOrderUseCaseResult:
+class PlaceOrderUseCaseResult(UseCaseResult):
     def __init__(
         self,
         success: bool,
         message: str = "",
         code: int = 0,
     ):
-        self.success: bool = success
-        self.message: str = message
+        super().__init__(success=success, message=message)
         self.code: int = code
 
 
@@ -33,31 +33,29 @@ class PlaceOrderUseCase:
         client_repository: ClientRepository,
         stock_repository: StockRepository,
         order_repository: OrderRepository,
-        wallet_repository: WalletRepository,
     ):
         self.client_repository = client_repository
         self.stock_repository = stock_repository
         self.order_repository = order_repository
-        self.wallet_repository = wallet_repository
 
     def execute(
         self,
         email: str,
-        type: str,
-        limit: Optional[Decimal],
+        direction: str,
         quantity: int,
         symbol: str,
         idempotency_key: uuid.UUID,
+        limit: Optional[Decimal] = None,
     ) -> PlaceOrderUseCaseResult:
 
         if (
             quantity < 1
             or (limit and limit < Decimal("0.01"))
-            or type not in ["Buy", "Sell"]
+            or direction not in ["B", "S"]
         ):
             return PlaceOrderUseCaseResult(
                 success=False,
-                message="You have entered invalid data",
+                message="You have entered invalid data.",
                 code=403,
             )
         try:
@@ -74,7 +72,7 @@ class PlaceOrderUseCase:
 
             stock: Stock = self.stock_repository.get_stock_by_symbol(symbol)
 
-            if type == "sell":
+            if direction == "S":
 
                 if not client.can_sell_shares(symbol=symbol, quantity=quantity):
                     logger.warning(
@@ -86,7 +84,7 @@ class PlaceOrderUseCase:
                         code=400,
                     )
 
-            elif type == "buy":
+            else:
                 if not client.can_buy_shares(
                     stock=stock, quantity=quantity, limit=limit
                 ):
@@ -102,7 +100,7 @@ class PlaceOrderUseCase:
             order: Order = self.order_repository.add_order(
                 client=client,
                 stock=stock,
-                type=type,
+                direction=direction,
                 limit=limit,
                 initial_quantity=quantity,
                 idempotency_key=idempotency_key,
@@ -110,7 +108,7 @@ class PlaceOrderUseCase:
             client.orders.append(order)
 
             logger.info(
-                f"Client {email} placed a {type} order with {quantity} shares of {symbol}."
+                f"Client {email} placed a {direction} order with {quantity} shares of {symbol}."
             )
             return PlaceOrderUseCaseResult(
                 success=True,
@@ -131,7 +129,7 @@ class PlaceOrderUseCase:
 
         except OrderInvalidException as order_exception:
             logger.error(
-                f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, type {type}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
+                f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, direction {direction}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
                 exc_info=True,
             )
             return PlaceOrderUseCaseResult(

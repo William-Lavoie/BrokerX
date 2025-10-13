@@ -61,7 +61,7 @@ class ClientProfile:
         return self.status == ClientStatus.ACTIVE.value
 
     def can_sell_shares(self, symbol: str, quantity: int) -> bool:
-        return self.shares.get(symbol, 0) == quantity
+        return self.shares.get(symbol, 0) >= quantity
 
     def can_buy_shares(
         self, stock: Stock, quantity: int, limit: Optional[Decimal]
