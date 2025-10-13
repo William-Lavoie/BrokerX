@@ -69,6 +69,9 @@ class MySQLClientDAO(ClientDAO):
 
                 Client.objects.create(
                     user=user,
+                    first_name=client.first_name,
+                    last_name=client.last_name,
+                    email=client.email,
                     phone_number=client.phone_number,
                     birth_date=client.birth_date,
                     address=client.address,
