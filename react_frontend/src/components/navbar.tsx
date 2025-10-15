@@ -1,16 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 function NavbarButton({text, route}: {text: string, route: string}) {
     return (
-        <a href={route} className="w-1/10 flex justify-center items-center hover:bg-blue-500 cursor-pointer">
-            {text}
-        </a>
+        <div className="w-1/10  flex justify-center items-end">
+            <a href={route} className="h-1/3 w-full  bg-white cursor-pointer text-black hover:!bg-blue-500 border-1 flex justify-center items-center rounded-t-md">
+                {text}
+            </a>
+        </div>
+
     );
 }
 
 export function Navbar() {
     return (
         <>
-            <nav className="hidden md:flex bg-blue-300 h-[10vh] gap-x-[3%] sticky top-0">
+            <nav className="hidden md:flex bg-blue-300 h-[10vh] sticky top-0">
                 <img src="/images/default.png"></img>
                 <NavbarButton text="Home" route="/" />
                 <NavbarButton text="Wallet" route="/wallet" />

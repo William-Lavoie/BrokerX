@@ -12,8 +12,8 @@ export default function Wallet() {
         .then(response => response.json())
         .then(json => setFunds(json["balance"]))
         .catch(error => console.error(error));
-    }, []);    
-    
+    }, []);
+
     return (
         <>
             <div>Funds available: {funds}$</div>
