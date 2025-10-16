@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from ...adapters.result import Result
-from ..entities.client import ClientProfile
+from ..entities.client import Client
 
 
 @dataclass
@@ -14,7 +14,7 @@ class OTPDTO(Result):
 
 class OTPRepository(ABC):
     @abstractmethod
-    def create_passcode(self, client: ClientProfile) -> OTPDTO:
+    def create_passcode(self, client: Client) -> OTPDTO:
         pass
 
     @abstractmethod

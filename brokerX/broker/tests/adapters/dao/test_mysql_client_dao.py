@@ -6,7 +6,7 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 from broker.adapters.dao.mysql_client_dao import MySQLClientDAO
-from broker.domain.entities.client import ClientProfile
+from broker.domain.entities.client import Client
 from broker.models import Client, Shares, Wallet
 from django.contrib.auth.models import User
 
@@ -92,7 +92,7 @@ def test_get_client_by_email_no_wallet_or_shares():
 
 def test_add_user():
     dao = MySQLClientDAO()
-    mock_client = ClientProfile(
+    mock_client = Client(
         first_name="Tom",
         last_name="Hanks",
         address="398 Sherbrooke",
@@ -123,7 +123,7 @@ def test_add_user():
 
 def test_add_user_email_already_used():
     dao = MySQLClientDAO()
-    mock_client = ClientProfile(
+    mock_client = Client(
         first_name="Mike",
         last_name="Collin",
         address="876 New York",
@@ -140,7 +140,7 @@ def test_add_user_email_already_used():
 
 def test_add_user_phone_already_used():
     dao = MySQLClientDAO()
-    mock_client = ClientProfile(
+    mock_client = Client(
         first_name="Mike",
         last_name="Collin",
         address="876 New York",
@@ -157,7 +157,7 @@ def test_add_user_phone_already_used():
 
 def test_add_user_invalid_data():
     dao = MySQLClientDAO()
-    mock_client = ClientProfile(
+    mock_client = Client(
         first_name="Mike",
         last_name="Collin",
         address="876 New York",

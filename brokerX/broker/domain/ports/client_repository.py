@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from ...adapters.result import Result
 from ...domain.entities.wallet import Wallet
-from ..entities.client import ClientProfile
+from ..entities.client import Client
 
 
 @dataclass
@@ -22,11 +22,11 @@ class ClientDTO(Result):
 
 class ClientRepository:
     @abstractmethod
-    def get_user(self, email: str) -> ClientProfile:
+    def get_user(self, email: str) -> Client:
         pass
 
     @abstractmethod
-    def add_user(self, client: ClientProfile) -> Result:
+    def add_user(self, client: Client) -> Result:
         pass
 
     @abstractmethod
@@ -37,8 +37,8 @@ class ClientRepository:
     def client_is_active(self, email: str) -> bool:
         pass
 
-    def get_client_from_dto(self, dto: ClientDTO) -> "ClientProfile":
-        return ClientProfile(
+    def get_client_from_dto(self, dto: ClientDTO) -> "Client":
+        return Client(
             first_name=dto.first_name,
             last_name=dto.last_name,
             address=dto.address,

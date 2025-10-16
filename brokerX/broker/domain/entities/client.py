@@ -30,7 +30,7 @@ class ClientStatus(Enum):
     REJECTED = "Rejected"
 
 
-class ClientProfile:
+class Client:
     def __init__(
         self,
         first_name: str,

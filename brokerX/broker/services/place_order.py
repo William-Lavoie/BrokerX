@@ -3,7 +3,7 @@ import uuid
 from decimal import Decimal
 from typing import Optional
 
-from ..domain.entities.client import ClientProfile
+from ..domain.entities.client import Client
 from ..domain.entities.order import Order, OrderInvalidException
 from ..domain.entities.stock import Stock, StockInvalidException
 from ..domain.ports.client_repository import ClientRepository
@@ -61,7 +61,7 @@ class PlaceOrderUseCase:
                 code=403,
             )
         try:
-            client: ClientProfile = self.client_repository.get_user(email)
+            client: Client = self.client_repository.get_user(email)
 
             # Pre-trade control is embedded within the entities
             if not client.is_active():

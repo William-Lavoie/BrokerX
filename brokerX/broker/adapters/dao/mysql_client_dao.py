@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 
-from ...domain.entities.client import ClientProfile
+from ...domain.entities.client import Client
 from ...domain.ports.dao.client_dao import ClientDAO, ClientDTO
 from ...models import Client
 
@@ -48,7 +48,7 @@ class MySQLClientDAO(ClientDAO):
             )
             return ClientDTO(success=False, code=404)
 
-    def add_user(self, client: ClientProfile) -> ClientDTO:
+    def add_user(self, client: Client) -> ClientDTO:
         try:
             existing_user = Client.objects.filter(
                 Q(user__email=client.email) | Q(phone_number=client.phone_number)
@@ -66,7 +66,7 @@ class MySQLClientDAO(ClientDAO):
                     last_name=client.last_name,
                     email=client.email,
                     username=client.email,
-                    password=client.password,
+                    password="TBD",
                 )
 
                 Client.objects.create(

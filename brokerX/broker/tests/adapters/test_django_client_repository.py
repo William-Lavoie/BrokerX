@@ -6,7 +6,7 @@ from broker.domain.ports.dao.client_dao import ClientDTO
 pytestmark = pytest.mark.django_db
 
 from broker.adapters.django_client_repository import DjangoClientRepository
-from broker.domain.entities.client import ClientProfile, ClientStatus
+from broker.domain.entities.client import Client, ClientStatus
 
 
 def test_add_user():
@@ -14,7 +14,7 @@ def test_add_user():
     mock_dao.add_user.return_value = ClientDTO(success=True, code=201)
 
     repo = DjangoClientRepository(dao=mock_dao)
-    client = ClientProfile(
+    client = Client(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 pytestmark = pytest.mark.django_db
 
-from broker.domain.entities.client import ClientProfile
+from broker.domain.entities.client import Client
 from broker.models import ClientOTP
 
 
@@ -100,7 +100,7 @@ def test_verify_passcode_no_secret(mock_totp):
 def test_register_secret():
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
-    user = ClientProfile(
+    user = Client(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",

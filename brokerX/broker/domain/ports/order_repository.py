@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from ...adapters.result import Result
-from ...domain.entities.client import ClientProfile
+from ...domain.entities.client import Client
 from ...domain.entities.order import Order
 from ...domain.entities.stock import Stock
 
@@ -23,7 +23,7 @@ class OrderRepository:
     @abstractmethod
     def add_order(
         self,
-        client: ClientProfile,
+        client: Client,
         stock: Stock,
         direction: str,
         initial_quantity: int,

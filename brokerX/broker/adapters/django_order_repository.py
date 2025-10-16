@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from ..adapters.dao.mysql_order_dao import MySQLOrderDAO
-from ..domain.entities.client import ClientProfile
+from ..domain.entities.client import Client
 from ..domain.entities.order import Order
 from ..domain.entities.stock import Stock
 from ..domain.ports.dao.order_dao import OrderDAO
@@ -18,7 +18,7 @@ class DjangoOrderRepository(OrderRepository):
 
     def add_order(
         self,
-        client: ClientProfile,
+        client: Client,
         stock: Stock,
         type: str,
         initial_quantity: int,
