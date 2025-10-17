@@ -1,3 +1,6 @@
+"use client"
+import { keycloak } from "@/app/keycloak";
+
 /* eslint-disable @next/next/no-img-element */
 function NavbarButton({text, route}: {text: string, route: string}) {
     return (
@@ -18,7 +21,7 @@ export function Navbar() {
                 <NavbarButton text="Home" route="/" />
                 <NavbarButton text="Wallet" route="/wallet" />
                 <NavbarButton text="Place Order" route="/create_account" />
-                <NavbarButton text="Logout" route="/login" />
+                <button onClick={() => keycloak.logout()}>Log out</button>
             </nav>
 
             <nav className="md:hidden bg-blue-300 flex h-[10vh] justify-between pr-[10px] sticky top-0">

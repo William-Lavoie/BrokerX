@@ -40,3 +40,5 @@ services:
 
 volumes:
   mysql_data:
+
+#TODO: add network

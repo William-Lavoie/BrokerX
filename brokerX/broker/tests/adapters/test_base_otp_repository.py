@@ -5,7 +5,7 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 from broker.adapters.base_otp_repository import BaseOTPRepository
-from broker.domain.entities.client import ClientProfile
+from broker.domain.entities.client import Client
 
 
 class DummyBaseOTPRepository(BaseOTPRepository):
@@ -24,7 +24,7 @@ class DummyBaseOTPRepository(BaseOTPRepository):
 def test_create_passcode(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = ClientProfile(
+    client = Client(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",
@@ -44,7 +44,7 @@ def test_create_passcode(mock_register, mock_send):
 def test_create_passcode_error_send(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = ClientProfile(
+    client = Client(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",
@@ -64,7 +64,7 @@ def test_create_passcode_error_send(mock_register, mock_send):
 def test_create_passcode_error_register(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = ClientProfile(
+    client = Client(
         first_name="John",
         last_name="Smith",
         address="456 Privett Drive",

@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 from xmlrpc.client import DateTime
 
-from ...domain.entities.client import ClientProfile
+from ...domain.entities.client import Client
 
 
 class TransactionStatus(Enum):
@@ -24,10 +24,10 @@ class Transaction:
         status: str,
         type: str,
         message: str,
-        client: Optional[ClientProfile] = None,
+        client: Optional[Client] = None,
         created_at=None,
     ):
-        self.client: Optional[ClientProfile] = client
+        self.client: Optional[Client] = client
         self.amount: Decimal = amount
         self.created_at: DateTime = created_at
         self.status: str = status

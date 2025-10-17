@@ -6,7 +6,7 @@ from broker.adapters.django_client_repository import DjangoClientRepository
 from broker.adapters.django_transaction_repository import DjangoTransactionRepository
 from broker.adapters.django_wallet_repository import DjangoWalletRepository
 from broker.adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from broker.domain.entities.client import ClientProfile, ClientStatus
+from broker.domain.entities.client import Client, ClientStatus
 from broker.services.add_funds_to_wallet_use_case import (
     AddFundsToWalletUseCase,
     AddFundsToWalletUseCaseResult,
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.django_db
 def test_execute_success():
     dao = MySQLClientDAO()
     dao.add_user(
-        client=ClientProfile(
+        client=Client(
             first_name="John",
             last_name="Smith",
             address="123 Main St",

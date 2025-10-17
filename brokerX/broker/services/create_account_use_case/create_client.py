@@ -1,5 +1,5 @@
 from ...adapters.result import Result
-from ...domain.entities.client import ClientProfile, ClientStatus
+from ...domain.entities.client import Client, ClientStatus
 from ...domain.ports.client_repository import ClientRepository
 from ...domain.ports.otp_repository import OTPDTO, OTPRepository
 from ...services.use_case_result import UseCaseResult
@@ -15,8 +15,8 @@ class CreateClientUseCase:
 
     def execute(self, command: CreateClientCommand) -> UseCaseResult:
 
-        # Create new ClientProfile entity
-        client = ClientProfile(
+        # Create new Client entity
+        client = Client(
             first_name=command.first_name,
             last_name=command.last_name,
             address=command.address,
