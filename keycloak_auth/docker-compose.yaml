@@ -1,17 +1,18 @@
 # Adapted from https://github.com/viniciusfinger/keycloak-docker-compose
 services:
   keycloak:
+    container_name: keycloak
     image: quay.io/keycloak/keycloak:26.4.1
     environment:
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 7080
+      KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_HTTP_ENABLED: "true"
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: "true"
       KC_LOG_LEVEL: info
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7080/health/ready"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:7080/health/ready || exit 1"]
       interval: 15s
       timeout: 2s
       retries: 15
@@ -21,3 +22,9 @@ services:
     ports:
       - "7080:7080"
       - "7443:7443"
+    networks:
+      - brokerX-network
+
+networks:
+  brokerX-network:
+    external: true

@@ -23,6 +23,7 @@ jobs:
         working-directory: brokerX
         run: |
           docker compose down -v
+          docker network create brokerX-network
           docker compose build
 
       - name: Start docker containers

@@ -9,6 +9,8 @@ git clean -fd
 # Start Docker containers
 docker compose stop
 docker compose down -v
+docker network rm brokerX-network
+docker network create brokerX-network
 docker compose build --no-cache
 docker compose up -d --remove-orphans
 

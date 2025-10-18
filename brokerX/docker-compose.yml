@@ -17,6 +17,8 @@ services:
       mysql:
         condition: service_healthy
     entrypoint: ["python", "entrypoint.py"]
+    networks:
+      - brokerX-network
 
   mysql:
     image: mysql:8
@@ -37,8 +39,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - brokerX-network
 
 volumes:
   mysql_data:
 
-#TODO: add network
+networks:
+  brokerX-network:
+    external: true

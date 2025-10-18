@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "broker",
     "corsheaders",
+    "django_keycloak",
+    "rest_framework",
+    "drf_keycloak",
 ]
 
 MIDDLEWARE = [
@@ -50,11 +53,43 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_keycloak.middleware.BaseKeycloakMiddleware",
+    "drf_keycloak.middleware.HeaderMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+]
+
+KEYCLOAK_CONFIG = {
+    "SERVER_URL": "http://keycloak:7080/realms/BrokerX",  # no /auth needed in newer Keycloak versions
+    "REALM": "BrokerX",
+    "CLIENT_ID": "react-brokerX",
+    "CLIENT_SECRET_KEY": "",  # only needed for confidential clients
+    "AUDIENCE": "react-brokerX",  # must match the client ID
+    "VERIFY_SSL": False,  # change to True in production!
+    "AUTHORIZATION_CONFIG": {
+        "METHOD": "token",  # Use 'token' for bearer tokens from frontend
+    },
+    "CLAIM_MAPPING": {
+        "first_name": "given_name",
+        "last_name": "family_name",
+        "email": "email",
+        "username": "preferred_username",
+    },
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "drf_keycloak.authentication.KeycloakAuthBackend",
+    ],
+}
 
 ROOT_URLCONF = "brokerX.urls"
 
