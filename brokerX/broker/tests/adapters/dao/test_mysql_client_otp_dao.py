@@ -95,8 +95,8 @@ def test_increment_attempts():
 
     result = dao.increment_attempts("john_smith@example.com")
 
-    assert result.success
-    assert result.code == 200
+    assert not result.success
+    assert result.code == 401
     assert result.attempts == 1
     assert not result.validated
 
@@ -111,8 +111,8 @@ def test_increment_attempts_maximum():
     client_otp.save()
 
     result = dao.increment_attempts("john_smith@example.com")
-    assert result.success
-    assert result.code == 200
+    assert not result.success
+    assert result.code == 401
     assert result.attempts == 3
     assert not result.validated
 

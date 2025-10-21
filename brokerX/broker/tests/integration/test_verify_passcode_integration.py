@@ -31,7 +31,7 @@ def test_execute():
     use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
 
     result = use_case.execute(
-        "test@email.com", pyotp.TOTP(s="JBSWY3DPEHPK3PXP", interval=600, digits=6)
+        "test@email.com", pyotp.TOTP(s="JBSWY3DPEHPK3PXP", interval=600, digits=6).now()
     )
 
     assert result.success
