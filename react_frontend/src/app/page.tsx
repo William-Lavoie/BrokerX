@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { keycloak } from "@/app/keycloak";
+import { keycloak } from "./keycloak";
 
 function Stock({symbol, price, quantity, value, change, profit}: {symbol: string, price: number, quantity: number, value: number, change: number, profit: number}) {
   return (
@@ -18,20 +18,13 @@ function Stock({symbol, price, quantity, value, change, profit}: {symbol: string
 export default function Home() {
   const [username, setUsername] = useState("Loading...");
 
-  useEffect(() => {
-
-    keycloak.init({ onLoad: "login-required",  checkLoginIframe: false, }).then((authenticated) => {
-      if (authenticated) {
-
-        const parsedToken = keycloak.tokenParsed;
-        const preferredUsername = parsedToken?.preferred_username || "Unknown user";
-        setUsername(preferredUsername);
-      } else {
-        console.warn("User is not authenticated");
-      }
-    }).catch((err) => {
-      console.error("Keycloak init error:", err);
-    });
+     useEffect(() => {
+    if (keycloak.authenticated && keycloak.tokenParsed) {
+      const preferredUsername = keycloak.tokenParsed.preferred_username || "Unknown user";
+      setUsername(preferredUsername);
+    } else {
+      console.warn("User not authenticated or Keycloak not ready");
+    }
   }, []);
 
   return (
@@ -45,7 +38,7 @@ export default function Home() {
             <thead className="bg-gray-200">
               <tr>
                 <th>Symbol</th>
-                <th>Price</th>
+                <th>eeeeeee</th>
                 <th>Total Value</th>
                 <th>Change</th>
                 <th>Volume</th>

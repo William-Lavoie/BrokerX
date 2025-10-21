@@ -1,0 +1,20 @@
+services:
+  react-brokerx:
+    build:
+      context: .  # current folder = react_frontend
+    container_name: react-brokerx
+    ports:
+      - "3000:3000"
+    networks:
+      - brokerX-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+    # ✅ fix: mount the correct project root
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev  # 👈 Optional, but ensures dev server with live reload
+
+networks:
+  brokerX-network:
+    external: true

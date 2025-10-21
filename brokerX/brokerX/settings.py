@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "broker",
     "corsheaders",
-    "django_keycloak",
     "rest_framework",
     "drf_keycloak",
 ]
@@ -53,21 +52,27 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_keycloak.middleware.BaseKeycloakMiddleware",
     "drf_keycloak.middleware.HeaderMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://react-brokerx:3000",
 ]
-
+OIDC_ISSUER = "http://localhost:7080/realms/BrokerX"
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "drf_keycloak.authentication.KeycloakAuthBackend",  # ✅ Handles JWT token auth
+    "django.contrib.auth.backends.ModelBackend",        # ✅ Fallback to local auth
+]
+
 KEYCLOAK_CONFIG = {
-    "SERVER_URL": "http://keycloak:7080/realms/BrokerX",  # no /auth needed in newer Keycloak versions
+    "SERVER_URL": "http://keycloak:7080",  # no /auth needed in newer Keycloak versions
     "REALM": "BrokerX",
     "CLIENT_ID": "react-brokerX",
     "CLIENT_SECRET_KEY": "",  # only needed for confidential clients
@@ -82,12 +87,13 @@ KEYCLOAK_CONFIG = {
         "email": "email",
         "username": "preferred_username",
     },
+    "VERIFY_TOKENS_WITH_KEYCLOAK": False,
 }
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "drf_keycloak.authentication.KeycloakAuthBackend",
+     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "drf_keycloak.authentication.KeycloakAuthBackend",  # ✅ works for DRF only
     ],
 }
 
@@ -207,6 +213,14 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+    },
+    "loggers": {
+    "": {  # root logger
+        "handlers": ["console", "error_file"],
+        "level": "ERROR",
+        "propagate": False,
+    },
+    # existing loggers...
     },
     "root": {
         "handlers": ["console", "error_file"],

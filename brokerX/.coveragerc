@@ -24,4 +24,4 @@ exclude_lines =
     @abstractmethod
 
 show_missing = True
-skip_covered = True
+skip_covered = False
