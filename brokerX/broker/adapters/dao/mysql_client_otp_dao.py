@@ -55,11 +55,11 @@ class MySQLClientOTPDAO(ClientOTPDAO):
 
                 if attempts >= 2:
                     otp.delete()
-                    return OTPDTO(success=True, code=200, attempts=attempts)
+                    return OTPDTO(success=False, code=401, attempts=attempts)
 
                 else:
                     otp.save()
-                    return OTPDTO(success=True, code=200, attempts=attempts)
+                    return OTPDTO(success=False, code=401, attempts=attempts)
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")

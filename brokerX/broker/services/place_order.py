@@ -11,20 +11,9 @@ from ..domain.ports.order_repository import OrderRepository
 from ..domain.ports.stock_repository import StockRepository
 from ..domain.ports.wallet_repository import WalletRepository
 from ..exceptions import DataAccessException
+from ..services.use_case_result import UseCaseResult
 
 logger = logging.getLogger(__name__)
-
-
-class PlaceOrderUseCaseResult:
-    def __init__(
-        self,
-        success: bool,
-        message: str = "",
-        code: int = 0,
-    ):
-        self.success: bool = success
-        self.message: str = message
-        self.code: int = code
 
 
 class PlaceOrderUseCase:
@@ -48,14 +37,14 @@ class PlaceOrderUseCase:
         quantity: int,
         symbol: str,
         idempotency_key: uuid.UUID,
-    ) -> PlaceOrderUseCaseResult:
+    ) -> UseCaseResult:
 
         if (
             quantity < 1
             or (limit and limit < Decimal("0.01"))
             or type not in ["Buy", "Sell"]
         ):
-            return PlaceOrderUseCaseResult(
+            return UseCaseResult(
                 success=False,
                 message="You have entered invalid data",
                 code=403,
@@ -66,7 +55,7 @@ class PlaceOrderUseCase:
             # Pre-trade control is embedded within the entities
             if not client.is_active():
                 logger.warning(f"Inactive client {email} tried to place an order.")
-                return PlaceOrderUseCaseResult(
+                return UseCaseResult(
                     success=False,
                     message="Your account must be active to place orders. The order was not processed.",
                     code=403,
@@ -80,7 +69,7 @@ class PlaceOrderUseCase:
                     logger.warning(
                         f"Client {email} tried to place a sell order with {quantity} shares."
                     )
-                    return PlaceOrderUseCaseResult(
+                    return UseCaseResult(
                         success=False,
                         message="You do not have enough shares to sell.",
                         code=400,
@@ -93,7 +82,7 @@ class PlaceOrderUseCase:
                     logger.warning(
                         f"Client {email} tried to place a sell order with {quantity} shares."
                     )
-                    return PlaceOrderUseCaseResult(
+                    return UseCaseResult(
                         success=False,
                         message="You do not have enough funds.",
                         code=400,
@@ -102,7 +91,7 @@ class PlaceOrderUseCase:
             order: Order = self.order_repository.add_order(
                 client=client,
                 stock=stock,
-                type=type,
+                direction=type,
                 limit=limit,
                 initial_quantity=quantity,
                 idempotency_key=idempotency_key,
@@ -112,7 +101,7 @@ class PlaceOrderUseCase:
             logger.info(
                 f"Client {email} placed a {type} order with {quantity} shares of {symbol}."
             )
-            return PlaceOrderUseCaseResult(
+            return UseCaseResult(
                 success=True,
                 message="The order was placed successfully.",
                 code=201,
@@ -123,7 +112,7 @@ class PlaceOrderUseCase:
                 f"StockInvalidException in PlaceOrderUseCase for symbol {symbol}: {stock_exception.log_message} {stock_exception.error_code}",
                 exc_info=True,
             )
-            return PlaceOrderUseCaseResult(
+            return UseCaseResult(
                 success=False,
                 message=stock_exception.user_message,
                 code=stock_exception.error_code,
@@ -134,14 +123,14 @@ class PlaceOrderUseCase:
                 f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, type {type}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
                 exc_info=True,
             )
-            return PlaceOrderUseCaseResult(
+            return UseCaseResult(
                 success=False,
                 message=order_exception.user_message,
                 code=order_exception.error_code,
             )
 
         except DataAccessException as data_access_exception:
-            return PlaceOrderUseCaseResult(
+            return UseCaseResult(
                 success=False,
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,

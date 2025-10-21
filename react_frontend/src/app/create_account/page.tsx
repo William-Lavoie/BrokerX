@@ -54,7 +54,7 @@ export default function Login() {
                 communication_method: formData.get("communication-method"),
                 password: formData.get("password"),
             };
-        const response = await fetch("http://localhost:8000/create-account", {
+        const response = await fetch("http://localhost:8000/account", {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
@@ -67,6 +67,9 @@ export default function Login() {
         }
 
         const data = await response.json();
+        if (data["succcess"]) {
+            window.location.href = "http://localhost:3000/validate_passcode"
+        }
 
         } catch (error) {
             console.error(error);

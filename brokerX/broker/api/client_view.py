@@ -38,4 +38,4 @@ class ClientView(APIView):
         use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
 
         result = use_case.execute(client_command)
-        return JsonResponse(asdict(result))
+        return JsonResponse(result.to_dict(), status=result.code)

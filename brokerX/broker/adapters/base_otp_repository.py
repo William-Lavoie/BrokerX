@@ -1,6 +1,5 @@
 import pyotp
 
-from ..domain.entities.client import Client
 from ..domain.ports.otp_repository import OTPDTO, OTPRepository
 
 
@@ -8,14 +7,14 @@ from ..domain.ports.otp_repository import OTPDTO, OTPRepository
 class BaseOTPRepository(OTPRepository):
 
     # Template pattern
-    def create_passcode(self, client: Client) -> OTPDTO:
+    def create_passcode(self, email: str) -> OTPDTO:
         secret = self.generate_passcode()
         passcode = pyotp.TOTP(s=secret, interval=600, digits=6)
 
-        if not self.send_passcode(client.email, passcode.now()):
+        if not self.send_passcode(email, passcode.now()):
             return OTPDTO(success=False, code=500)
 
-        if not self.register_secret(client.email, secret):
+        if not self.register_secret(email, secret):
             return OTPDTO(success=False, code=500)
 
         return OTPDTO(success=True, code=201, secret=secret, attempts=0)

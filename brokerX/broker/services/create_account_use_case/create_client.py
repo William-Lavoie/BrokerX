@@ -35,19 +35,24 @@ class CreateClientUseCase:
                 return UseCaseResult(
                     success=False,
                     message="There is already a user with the same email and/or phone number",
+                    code=result.code,
                 )
             elif result.code == 500:
                 return UseCaseResult(
                     success=False,
                     message="There was an unexpected error. Please try again or contact customer support.",
+                    code=result.code,
                 )
 
-        otp_result: OTPDTO = self.otp_repository.create_passcode(client)
+        otp_result: OTPDTO = self.otp_repository.create_passcode(client.email)
 
         if not otp_result.success:
             return UseCaseResult(
                 success=False,
                 message="There was an error creating your passcode.",
+                code=result.code,
             )
 
-        return UseCaseResult(success=True, message="The user was successfully created")
+        return UseCaseResult(
+            success=True, message="The user was successfully created", code=result.code
+        )
