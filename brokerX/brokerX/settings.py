@@ -68,7 +68,7 @@ CORS_ALLOW_HEADERS = [
 
 AUTHENTICATION_BACKENDS = [
     "drf_keycloak.authentication.KeycloakAuthBackend",  # ✅ Handles JWT token auth
-    "django.contrib.auth.backends.ModelBackend",        # ✅ Fallback to local auth
+    "django.contrib.auth.backends.ModelBackend",  # ✅ Fallback to local auth
 ]
 
 KEYCLOAK_CONFIG = {
@@ -92,7 +92,7 @@ KEYCLOAK_CONFIG = {
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-     "DEFAULT_AUTHENTICATION_CLASSES": [
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "drf_keycloak.authentication.KeycloakAuthBackend",  # ✅ works for DRF only
     ],
 }
@@ -215,12 +215,12 @@ LOGGING = {
         },
     },
     "loggers": {
-    "": {  # root logger
-        "handlers": ["console", "error_file"],
-        "level": "ERROR",
-        "propagate": False,
-    },
-    # existing loggers...
+        "": {  # root logger
+            "handlers": ["console", "error_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # existing loggers...
     },
     "root": {
         "handlers": ["console", "error_file"],

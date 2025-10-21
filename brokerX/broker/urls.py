@@ -13,7 +13,6 @@ urlpatterns = [
     path("add_funds_to_wallet/", views.add_funds_to_wallet, name="add_funds_to_wallet"),
     path("orders/", views.display_orders, name="display_orders"),
     path("get_name/", views.get_name, name="get_name"),
-   path("get_funds/", GetFundsView.as_view(), name="get-funds"),
-   #   path("get_funds/", views.get_funds, name="get-funds"),
-
+    path("get_funds/", GetFundsView.as_view(), name="get-funds"),
+    #   path("get_funds/", views.get_funds, name="get-funds"),
 ]

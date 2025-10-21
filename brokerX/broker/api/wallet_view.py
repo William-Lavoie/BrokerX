@@ -1,13 +1,15 @@
 import logging
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 logger = logging.getLogger(__name__)
 from rest_framework.exceptions import AuthenticationFailed
 
+
 class GetFundsView(APIView):
     permission_classes = [IsAuthenticated]
-
 
     def get(self, request):
         print("GetFundsView GET called")
@@ -19,6 +21,7 @@ class GetFundsView(APIView):
 
 
 import requests
+
 
 def debug_keycloak_response():
     r = requests.get("http://keycloak:7080/realms/BrokerX", verify=False)
