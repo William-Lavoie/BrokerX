@@ -7,7 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     try {
@@ -32,7 +32,8 @@ export default function Login() {
       localStorage.setItem("refresh_token", data.refresh);
 
       alert("Login successful!");
-      // TODO: Redirect or update UI here
+      window.location.href = "http://localhost:3000"
+
 
     } catch (error) {
       console.error(error);

@@ -1,11 +1,12 @@
 from broker import views
 from django.urls import path
 
+from .api.client_view import ClientView
 from .api.wallet_view import GetFundsView
 
 urlpatterns = [
     path("", views.display_homepage, name="display_login"),
-    path("create_user/", views.create_user, name="create_user"),
+    path("create-account", ClientView.as_view(), name="create_user"),
     path("confirm_passcode/", views.confirm_passcode, name="confirm_passcode"),
     path("login/", views.client_login, name="login"),
     path("client_logout/", views.client_logout, name="client_logout"),

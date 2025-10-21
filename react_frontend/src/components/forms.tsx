@@ -10,7 +10,7 @@ type TextInputProps = {
   handler?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function TextInput({ label, id, name, type = "text", handler }: TextInputProps) {    
+export function TextInput({ label, id, name, type = "text", handler }: TextInputProps) {
     const [value, setValue] = useState("")
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,13 +22,14 @@ export function TextInput({ label, id, name, type = "text", handler }: TextInput
     return (
         <div className="flex flex-col">
             <label htmlFor={id ?? label}>{label}</label>
-                <input 
+                <input
                     id={id ?? label}
                     className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none"
                     name={name ?? label}
                     type={type ?? "text"}
                     value={value}
                     onChange={handleChange}
+                    required
                 />
         </div>
     )

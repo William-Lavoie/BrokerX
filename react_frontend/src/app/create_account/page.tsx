@@ -4,7 +4,7 @@ import { TextInput } from "@/components/forms"
 import { useState } from "react"
 
 export default function Login() {
-    
+
     const [email_error, setEmailError] = useState("");
     const [password_error, setPasswordError] = useState("");
     const [password_confirm_error, setConfirmedPasswordError] = useState("");
@@ -29,7 +29,7 @@ export default function Login() {
         } else {
             setPasswordError("");
         }
-        
+
         if (confirm_password && password !== confirm_password) {
             setConfirmedPasswordError("The two passwords must match");
         } else {
@@ -37,58 +37,95 @@ export default function Login() {
         }
     }
 
+    async function create_account(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+        event.preventDefault();
+        try {
+
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+
+            const payload = {
+                first_name: formData.get("first-name"),
+                last_name: formData.get("last-name"),
+                email: formData.get("email"),
+                phone_number: formData.get("phone-number"),
+                date_of_birth: formData.get("date-of-birth"),
+                address: formData.get("address"),
+                communication_method: formData.get("communication-method"),
+                password: formData.get("password"),
+            };
+        const response = await fetch("http://localhost:8000/create-account", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error("Login failed");
+        }
+
+        const data = await response.json();
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+
     return (
         <div className="flex justify-center items-center h-full">
             <div className="md:border md:rounded-xl w-[70%] p-4">
-                <form className="flex flex-col gap-y-8 items-center">
+                <form className="flex flex-col gap-y-8 items-center" onSubmit={create_account}>
                     <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput label="First Name"></TextInput>     
-                        <TextInput label="Last Name"></TextInput>   
+                        <TextInput name="first-name" label="First Name"></TextInput>
+                        <TextInput name="last-name" label="Last Name"></TextInput>
                     </div>
-                    
+
                     <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput label="Email address" id="email-input" type="email" handler={emailMatch}></TextInput>  
+                        <TextInput name="email" label="Email address" id="email-input" type="email" handler={emailMatch}></TextInput>
                         <div>
-                            <TextInput label="Confirm Email" id="confirm-email-input" type="email" handler={emailMatch}></TextInput>
-                            <span className="text-red-500">{email_error}</span>       
-                        </div>   
+                            <TextInput name="confirm-email" label="Confirm Email" id="confirm-email-input" type="email" handler={emailMatch}></TextInput>
+                            <span className="text-red-500">{email_error}</span>
+                        </div>
                     </div>
 
                     <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput label="Phone Number" type="tel"></TextInput>     
-                        <TextInput label="Date of Birth" type="date"></TextInput>  {/* TODO: fix width */}
+                        <TextInput name="phone-number" label="Phone Number" type="tel"></TextInput>
+                        <TextInput name="date-of-birth" label="Date of Birth" type="date"></TextInput>  {/* TODO: fix width */}
                     </div>
 
                     <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput label="Address" type="text"></TextInput> 
+                        <TextInput name="address" label="Address" type="text"></TextInput>
                         <div className="w-50">
                             <label id="communication-method">Preferred communication method</label>
-                            <select id="communication-method" className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none">
+                            <select name="communication-method" id="communication-method" className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none">
                                 <option>Email</option>
                                 <option>SMS</option>
-                            </select> 
+                            </select>
                         </div>
-                        
+
                     </div>
 
                     <div className="sm:flex sm:flex-row sm:gap-x-6">
                         <div>
-                            <TextInput label="Password" id="password-input" type="password" handler={validatePasswords}></TextInput>
-                            <span className="text-red-500">{password_error}</span>       
+                            <TextInput name="password" label="Password" id="password-input" type="password" handler={validatePasswords}></TextInput>
+                            <span className="text-red-500">{password_error}</span>
                         </div>
-                      
+
                         <div>
-                            <TextInput label="Confirm Password" id="confirm-password-input" type="password" handler={validatePasswords}></TextInput> 
-                            <span className="text-red-500">{password_confirm_error}</span>       
-                        </div>    
+                            <TextInput name="confirm-password" label="Confirm Password" id="confirm-password-input" type="password" handler={validatePasswords}></TextInput>
+                            <span className="text-red-500">{password_confirm_error}</span>
+                        </div>
                     </div>
-                     
-                    <button className="bg-blue-500 w-1/3 h-10 rounded-xl">Submit</button>               
+
+                    <button className="bg-blue-500 w-1/3 h-10 rounded-xl">Submit</button>
                 </form>
                 <a href="/create_account">I don&apos;t have an account</a>
             </div>
         </div>
-       
-        
+
+
     )
 }
