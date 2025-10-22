@@ -22,12 +22,12 @@ class VerifyPassCode:
                 return UseCaseResult(
                     success=False,
                     message="You have made 3 attempts, the passcode has been disabled. You must ask for a new passcode.",
-                    code=401,
+                    code=422,
                 )
             return UseCaseResult(
                 success=False,
                 message=f"Wrong passcode. Attempts left : {3-validated.attempts}",
-                code=401,
+                code=422,
             )
 
         result = self.client_repository.update_user_status(

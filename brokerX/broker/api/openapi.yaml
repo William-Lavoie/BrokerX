@@ -1,11 +1,379 @@
-openapi: 3.0.0
+openapi: 3.0.4
 info:
-  title: My API
+  title: BrokerX API
   version: 1.0.0
+tags:
+  - name: Client
+    description: Operations related to client management
+
+  - name: Wallet
+    description: Operations related to wallet management
+
 paths:
-  /hello:
-    get:
-      summary: Say Hello
+  /client:
+    post:
+      tags:
+        - Client
+      summary: Create a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - address
+                - date_of_birth
+                - email
+                - phone_number
+                - password
+              properties:
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                address:
+                  type: string
+                  example: 123 Main St
+                date_of_birth:
+                  type: string
+                  format: date
+                  example: 1990-01-01
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                  description: Must be unique to each client
+                phone_number:
+                  type: string
+                  example: "123-456-7890"
+                  description: Must be unique to each client
+                password:
+                  type: string
+                  minLength: 8
+                  description: Password must be at least 8 characters long
+                  example: strongpassword123
+            example:
+              first_name: John
+              last_name: Doe
+              address: 123 Main St
+              date_of_birth: 1990-01-01
+              email: john.doe@example.com
+              phone_number: "123-456-7890"
+              password: strongpassword123
+      responses:
+        '201':
+          description: Client created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "The user was successfully created."
+        '409':
+          description: Client already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is already a user with the same email and/or phone number."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error. Please try again or contact customer support."
+
+  /passcode:
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+        - Client
+      summary: Validate a passcode
+      description: Clients must validate their passcode for their accounts to be active
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - passcode
+              properties:
+                passcode:
+                  type: string
+                  pattern: '^\d{6}$'
+                  example: "123456"
+                  description: 6 digits number
+            example:
+              passcode: "123456"
       responses:
         '200':
-          description: Successful response
+          description: Passcode validated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You have entered the correct passcode."
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."  
+        '404':
+          description: Client/passcode does not exist 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."          
+        '422':
+          description: Wrong/expired passcode
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Wrong passcode. Attempts left : 2."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
+    put:
+      security:
+      - BearerAuth: []
+      tags:
+        - Client
+      summary: Generate a new passcode and send it to the client
+      description: Passcodes expire after 3 wrong attempts or 10 minutes
+      responses:
+        '201':
+          description: Passcode generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "The passcode was sent to your email."
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."      
+        '404':
+          description: Client/passcode does not exist 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."      
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+  
+
+  /wallet:
+    get:
+      security:
+      - BearerAuth: []
+      tags:
+        - Wallet
+      summary: Get client balance
+      description: Clients use money from their virtual wallet to trade on BrokerX
+
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Your wallet balance is 20.00$."
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."  
+        '404':
+          description: Client/passcode does not exist 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."         
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+        - Wallet
+      summary: Add funds
+      description: Add funds to the wallet from an external mock banking system.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: >
+            A unique key provided by the client to ensure the request is processed only once.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  example: 25.00
+                  description: Amount in dollars to add to the wallet
+            example:
+              amount: 25.00
+      responses:
+        '200':
+          description: Transaction is already processed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "This transaction has already been processed."
+        '201':
+          description: The funds are added to the balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "The money has been successfully deposited into your account."
+        '400':
+          description: Invalid amount
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You cannot have more than 10,000.00$ in your wallet."
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."  
+        '404':
+          description: Client/wallet does not exist 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."         
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

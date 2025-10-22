@@ -135,7 +135,7 @@ class AddFundsToWalletUseCase:
         message = (
             "There was an error trying to get your balance."
             if not result.success
-            else ""
+            else f"Your wallet balance is {result.balance}$."
         )
 
         return AddFundsToWalletUseCaseResult(
