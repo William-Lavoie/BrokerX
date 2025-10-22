@@ -36,7 +36,7 @@ def test_get_balance():
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
-    balance = repo.get_balance("john_smith@example.com")
+    balance = repo.get_balance("john_smith@example.com").balance
 
     assert balance == Decimal("24.56")
     mock_dao.get_balance.assert_called_once_with("john_smith@example.com")
@@ -50,7 +50,7 @@ def test_get_balance_error():
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
-    balance = repo.get_balance("john_smith@example.com")
+    balance = repo.get_balance("john_smith@example.com").balance
 
     assert balance == Decimal("0.0")
     mock_dao.get_balance.assert_called_once_with("john_smith@example.com")

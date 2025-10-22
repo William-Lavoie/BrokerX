@@ -22,7 +22,7 @@ class MySQLWalletDAO(WalletDAO):
 
         except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
-            return WalletDTO(success=False, code=404)
+            return WalletDTO(success=False, code=404, balance=Decimal("0.00"))
 
     def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
         try:

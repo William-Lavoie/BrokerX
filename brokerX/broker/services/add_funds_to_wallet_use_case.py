@@ -1,3 +1,4 @@
+import logging
 import uuid
 from decimal import Decimal
 
@@ -12,6 +13,8 @@ from ..domain.ports.dao.wallet_dao import WalletDTO
 from ..domain.ports.transaction_repository import TransactionDTO, TransactionRepository
 from ..domain.ports.wallet_repository import WalletRepository
 from ..services.use_case_result import UseCaseResult
+
+logger = logging.getLogger(__name__)
 
 
 class AddFundsToWalletUseCaseResult(UseCaseResult):
@@ -89,6 +92,7 @@ class AddFundsToWalletUseCase:
             )
 
         wallet_dto: WalletDTO = self.wallet_repository.get_balance(email)
+        logger.error(wallet_dto)
         wallet = Wallet(balance=wallet_dto.balance)
 
         if not wallet.can_add_funds(amount):
