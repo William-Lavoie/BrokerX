@@ -32,18 +32,21 @@ class PlaceOrderUseCase:
     def execute(
         self,
         email: str,
-        type: str,
+        direction: str,
         limit: Optional[Decimal],
         quantity: int,
         symbol: str,
         idempotency_key: uuid.UUID,
     ) -> UseCaseResult:
 
+        direction = direction.lower()
+
         if (
             quantity < 1
             or (limit and limit < Decimal("0.01"))
-            or type not in ["Buy", "Sell"]
+            or direction not in ["buy", "sell"]
         ):
+            logger.warning(f"User {email} tried placing an order for {symbol} with {quantity} shares with direction {direction} and limit {limit}.")
             return UseCaseResult(
                 success=False,
                 message="You have entered invalid data",
@@ -63,7 +66,7 @@ class PlaceOrderUseCase:
 
             stock: Stock = self.stock_repository.get_stock_by_symbol(symbol)
 
-            if type == "sell":
+            if direction == "sell":
 
                 if not client.can_sell_shares(symbol=symbol, quantity=quantity):
                     logger.warning(
@@ -75,7 +78,7 @@ class PlaceOrderUseCase:
                         code=400,
                     )
 
-            elif type == "buy":
+            elif direction == "buy":
                 if not client.can_buy_shares(
                     stock=stock, quantity=quantity, limit=limit
                 ):
@@ -87,20 +90,16 @@ class PlaceOrderUseCase:
                         message="You do not have enough funds.",
                         code=400,
                     )
-
             order: Order = self.order_repository.add_order(
                 client=client,
                 stock=stock,
-                direction=type,
+                direction=direction,
                 limit=limit,
                 initial_quantity=quantity,
                 idempotency_key=idempotency_key,
             )
             client.orders.append(order)
 
-            logger.info(
-                f"Client {email} placed a {type} order with {quantity} shares of {symbol}."
-            )
             return UseCaseResult(
                 success=True,
                 message="The order was placed successfully.",
@@ -120,7 +119,7 @@ class PlaceOrderUseCase:
 
         except OrderInvalidException as order_exception:
             logger.error(
-                f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, type {type}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
+                f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, direction {direction}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
                 exc_info=True,
             )
             return UseCaseResult(

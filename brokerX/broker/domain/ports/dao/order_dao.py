@@ -12,7 +12,7 @@ class OrderDAO:
         self,
         email: str,
         symbol: str,
-        type: str,
+        direction: str,
         initial_quantity: int,
         idempotency_key: UUID,
         limit: Optional[Decimal],

@@ -20,7 +20,7 @@ class DjangoOrderRepository(OrderRepository):
         self,
         client: Client,
         stock: Stock,
-        type: str,
+        direction: str,
         initial_quantity: int,
         idempotency_key: UUID,
         limit: Optional[Decimal] = None,
@@ -28,7 +28,7 @@ class DjangoOrderRepository(OrderRepository):
         order_dto: OrderDTO = self.dao.add_order(
             email=client.email,
             symbol=stock.symbol,
-            type=type,
+            direction=direction,
             initial_quantity=initial_quantity,
             idempotency_key=idempotency_key,
             limit=limit,

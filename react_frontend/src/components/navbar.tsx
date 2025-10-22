@@ -24,7 +24,7 @@ export function Navbar() {
                 <img src="/images/default.png"></img>
                 <NavbarButton text="Home" route="/" />
                 <NavbarButton text="Wallet" route="/wallet" />
-                <NavbarButton text="Place Order" route="/create_account/validate_passcode" />
+                <NavbarButton text="Place Order" route="/place_order" />
                 <button onClick={logout}>Logout</button>
             </nav>
 
