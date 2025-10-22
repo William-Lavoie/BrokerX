@@ -1,4 +1,5 @@
 import json
+import logging
 from decimal import Decimal
 
 from ..domain.ports.payment_service_repository import (
@@ -6,6 +7,8 @@ from ..domain.ports.payment_service_repository import (
     PaymentServiceRepositoryResponse,
 )
 from ..external_source.mock_payment_service import MockPaymentService
+
+logger = logging.getLogger(__name__)
 
 
 class MockPaymentServiceRepository(PaymentServiceRepository):
@@ -22,6 +25,9 @@ class MockPaymentServiceRepository(PaymentServiceRepository):
             response = self.payment_service.withdraw_funds(email, amount)
             response = json.loads(response)
 
+            if not response.get("success"):
+                logger.error(response)
+
             return PaymentServiceRepositoryResponse(
                 success=response.get("success", False),
                 code=response.get("code", 0),
@@ -29,6 +35,7 @@ class MockPaymentServiceRepository(PaymentServiceRepository):
             )
 
         except Exception as error:
+            logger.error(f"An unexpected error occured: {error}")
             return PaymentServiceRepositoryResponse(
                 success=False, code=500, message=str(error)
             )

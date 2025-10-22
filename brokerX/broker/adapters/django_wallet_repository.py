@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from ..adapters.dao.mysql_wallet_dao import MySQLWalletDAO
-from ..domain.entities.wallet import Wallet
 from ..domain.ports.dao.wallet_dao import WalletDTO
 from ..domain.ports.wallet_repository import WalletRepository
 
@@ -14,10 +13,5 @@ class DjangoWalletRepository(WalletRepository):
     def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
         return self.dao.add_funds(email, amount)
 
-    def get_balance(self, email: str) -> Decimal:
-        wallet_dto: WalletDTO = self.dao.get_balance(email)
-        return (
-            Decimal(wallet_dto.balance)
-            if wallet_dto.success and wallet_dto.balance is not None
-            else Decimal("0.0")
-        )
+    def get_balance(self, email: str) -> WalletDTO:
+        return self.dao.get_balance(email)

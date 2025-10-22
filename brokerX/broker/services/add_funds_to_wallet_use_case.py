@@ -11,20 +11,24 @@ from ..domain.ports.client_repository import ClientRepository
 from ..domain.ports.dao.wallet_dao import WalletDTO
 from ..domain.ports.transaction_repository import TransactionDTO, TransactionRepository
 from ..domain.ports.wallet_repository import WalletRepository
+from ..services.use_case_result import UseCaseResult
 
 
-class AddFundsToWalletUseCaseResult:
+class AddFundsToWalletUseCaseResult(UseCaseResult):
     def __init__(
         self,
         success: bool,
-        message: str = "",
-        code: int = 0,
-        new_balance: Decimal = Decimal("0.00"),
+        message: str,
+        code: int,
+        balance: Decimal = Decimal("0.00"),
     ):
-        self.success: bool = success
-        self.message: str = message
-        self.code: int = code
-        self.new_balance: Decimal = new_balance
+        super().__init__(success=success, message=message, code=code)
+        self.balance: Decimal = balance
+
+    def to_dict(self):
+        dict = super().to_dict()
+        dict["balance"] = self.balance
+        return dict
 
 
 class AddFundsToWalletUseCase:
@@ -84,8 +88,8 @@ class AddFundsToWalletUseCase:
                 code=500,
             )
 
-        current_balance: Decimal = self.wallet_repository.get_balance(email)
-        wallet = Wallet(balance=current_balance)
+        wallet_dto: WalletDTO = self.wallet_repository.get_balance(email)
+        wallet = Wallet(balance=wallet_dto.balance)
 
         if not wallet.can_add_funds(amount):
             return AddFundsToWalletUseCaseResult(
@@ -109,7 +113,7 @@ class AddFundsToWalletUseCase:
                 success=True,
                 message="The money has been successfully deposited into your account",
                 code=200,
-                new_balance=wallet.balance,
+                balance=wallet.balance,
             )
 
         else:
@@ -118,8 +122,21 @@ class AddFundsToWalletUseCase:
                 success=False,
                 message="There was an error while trying to process your deposit. Please try again.",
                 code=500,
-                new_balance=wallet.balance,
+                balance=wallet.balance,
             )
 
-    def get_balance(self, email: str) -> Decimal:
-        return self.wallet_repository.get_balance(email)
+    def get_balance(self, email: str) -> AddFundsToWalletUseCaseResult:
+        result = self.wallet_repository.get_balance(email)
+
+        message = (
+            "There was an error trying to get your balance."
+            if not result.success
+            else ""
+        )
+
+        return AddFundsToWalletUseCaseResult(
+            success=result.success,
+            message=message,
+            code=result.code,
+            balance=result.balance,
+        )
