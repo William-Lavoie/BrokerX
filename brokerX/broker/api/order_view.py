@@ -37,6 +37,13 @@ class OrderView(APIView):
             DjangoWalletRepository(),
         )
 
-        result = use_case.execute(email=request.user.email, direction=direction, limit=limit, quantity=quantity, symbol=symbol, idempotency_key=idempotency_key)
+        result = use_case.execute(
+            email=request.user.email,
+            direction=direction,
+            limit=limit,
+            quantity=quantity,
+            symbol=symbol,
+            idempotency_key=idempotency_key,
+        )
 
         return JsonResponse(data=result.to_dict(), status=result.code)

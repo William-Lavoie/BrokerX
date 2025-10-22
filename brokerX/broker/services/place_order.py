@@ -46,7 +46,9 @@ class PlaceOrderUseCase:
             or (limit and limit < Decimal("0.01"))
             or direction not in ["buy", "sell"]
         ):
-            logger.warning(f"User {email} tried placing an order for {symbol} with {quantity} shares with direction {direction} and limit {limit}.")
+            logger.warning(
+                f"User {email} tried placing an order for {symbol} with {quantity} shares with direction {direction} and limit {limit}."
+            )
             return UseCaseResult(
                 success=False,
                 message="You have entered invalid data",
