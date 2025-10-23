@@ -52,7 +52,7 @@ class PlaceOrderUseCase:
             return UseCaseResult(
                 success=False,
                 message="You have entered invalid data",
-                code=403,
+                code=422,
             )
         try:
             client: Client = self.client_repository.get_user(email)
@@ -77,7 +77,7 @@ class PlaceOrderUseCase:
                     return UseCaseResult(
                         success=False,
                         message="You do not have enough shares to sell.",
-                        code=400,
+                        code=412,
                     )
 
             elif direction == "buy":
@@ -90,7 +90,7 @@ class PlaceOrderUseCase:
                     return UseCaseResult(
                         success=False,
                         message="You do not have enough funds.",
-                        code=400,
+                        code=412,
                     )
             order: Order = self.order_repository.add_order(
                 client=client,

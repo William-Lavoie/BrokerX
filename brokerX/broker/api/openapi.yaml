@@ -9,6 +9,9 @@ tags:
   - name: Wallet
     description: Operations related to wallet management
 
+  - name: Order
+    description: Operations related to order management
+
 paths:
   /client:
     post:
@@ -142,9 +145,9 @@ paths:
                   message:
                     type: string
                     example: "Authentication credentials were not provided."
-                    description: "The client is not logged in or the JWT has expired."  
+                    description: "The client is not logged in or the JWT has expired."
         '404':
-          description: Client/passcode does not exist 
+          description: Client/passcode does not exist
           content:
             application/json:
               schema:
@@ -152,7 +155,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is no user with email 'john.doe@hotmail.com'."          
+                    example: "There is no user with email 'john.doe@hotmail.com'."
         '422':
           description: Wrong/expired passcode
           content:
@@ -202,9 +205,9 @@ paths:
                   message:
                     type: string
                     example: "Authentication credentials were not provided."
-                    description: "The client is not logged in or the JWT has expired."      
+                    description: "The client is not logged in or the JWT has expired."
         '404':
-          description: Client/passcode does not exist 
+          description: Client/passcode does not exist
           content:
             application/json:
               schema:
@@ -212,7 +215,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is no user with email 'john.doe@hotmail.com'."      
+                    example: "There is no user with email 'john.doe@hotmail.com'."
         '500':
           description: Server error
           content:
@@ -223,7 +226,7 @@ paths:
                   message:
                     type: string
                     example: "There was an unexpected error."
-  
+
 
   /wallet:
     get:
@@ -255,9 +258,9 @@ paths:
                   message:
                     type: string
                     example: "Authentication credentials were not provided."
-                    description: "The client is not logged in or the JWT has expired."  
+                    description: "The client is not logged in or the JWT has expired."
         '404':
-          description: Client/passcode does not exist 
+          description: Client/passcode does not exist
           content:
             application/json:
               schema:
@@ -265,7 +268,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is no user with email 'john.doe@hotmail.com'."         
+                    example: "There is no user with email 'john.doe@hotmail.com'."
         '500':
           description: Server error
           content:
@@ -349,9 +352,9 @@ paths:
                   message:
                     type: string
                     example: "Authentication credentials were not provided."
-                    description: "The client is not logged in or the JWT has expired."  
-        '404':
-          description: Client/wallet does not exist 
+                    description: "The client is not logged in or the JWT has expired."
+        '403':
+          description: Client does not have the right permissions
           content:
             application/json:
               schema:
@@ -359,7 +362,140 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "There is no user with email 'john.doe@hotmail.com'."         
+                    example: "Client must be active to make deposits."
+                    description: "The client account is not active"
+        '404':
+          description: Client/wallet does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
+  /order:
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+        - Order
+      summary: Place an order
+      description: Clients place orders to trade financial assets
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: >
+            A unique key provided by the client to ensure the request is processed only once.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - direction
+                - quantity
+                - symbol
+              properties:
+                direction:
+                  type: string
+                  example: "sell"
+                  description: Must be "sell" or "BUY"
+                quantity:
+                  type: integer
+                  example: 10
+                  description: The number of shares to trade
+                symbol:
+                  type: string
+                  example: "XEQT"
+                  description: "Symbol of the share to trade"
+                limit:
+                  type: number
+                  example: 40.00
+                  description: Price limit for the transaction
+            example:
+              amount: "sell"
+      responses:
+        '200':
+          description: Order has already been placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "The order was placed successfully."
+        '201':
+          description: Order successfully placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "The order was placed successfully."
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."
+        '403':
+          description: Client does not have the right permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Client must be active to place orders."
+                    description: "The client account is not active"
+
+        '404':
+          description: Client/wallet does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."
+        '412':
+          description: Insuficient funds
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You do not have enough shares to sell."
+                    description: "The client does not have the balance to buy or the shares to sell."
         '500':
           description: Server error
           content:
