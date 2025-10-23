@@ -4,6 +4,7 @@ from dataclasses import asdict
 
 from django.http import JsonResponse
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from ..adapters.django_client_repository import DjangoClientRepository
 from ..adapters.email_otp_repository import EmailOTPRepository
@@ -14,6 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 class ClientView(APIView):
+    def get_permissions(self):
+        if self.request.method == "GET":
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+    
     def post(self, request):
         data = json.loads(request.body)
 
@@ -39,3 +47,11 @@ class ClientView(APIView):
 
         result = use_case.execute(client_command)
         return JsonResponse(result.to_dict(), status=result.code)
+
+
+    def get(self, request):
+        use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
+        result = use_case.get_client_info(request.user.email)
+        logger.error(result.to_dict())
+        return JsonResponse(result.to_dict())
+        

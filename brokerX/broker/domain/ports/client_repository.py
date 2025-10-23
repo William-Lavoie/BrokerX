@@ -22,7 +22,7 @@ class ClientDTO(Result):
 
 class ClientRepository:
     @abstractmethod
-    def get_user(self, email: str) -> Client:
+    def get_client(self, email: str) -> Client:
         pass
 
     @abstractmethod

@@ -55,7 +55,7 @@ class PlaceOrderUseCase:
                 code=422,
             )
         try:
-            client: Client = self.client_repository.get_user(email)
+            client: Client = self.client_repository.get_client(email)
 
             # Pre-trade control is embedded within the entities
             if not client.is_active():

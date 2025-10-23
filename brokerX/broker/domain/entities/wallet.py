@@ -1,3 +1,4 @@
+import copy
 from decimal import Decimal
 
 
@@ -12,3 +13,7 @@ class Wallet:
 
     def can_add_funds(self, amount: Decimal):
         return Decimal(self.balance) + amount <= self.MAX_WALLET_BALANCE
+
+    def to_dict(self):
+        return copy.copy(self.__dict__)
+    

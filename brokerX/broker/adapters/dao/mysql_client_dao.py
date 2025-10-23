@@ -89,9 +89,10 @@ class MySQLClientDAO(ClientDAO):
 
     def update_status(self, email: str, new_status: str) -> ClientDTO:
         try:
-            client = ClientModel.objects.get(user__email=email)
-            client.status = new_status
-            client.save()
+            with transaction.atomic():
+                client = ClientModel.objects.get(user__email=email)
+                client.status = new_status
+                client.save()
 
             return ClientDTO(success=True, code=200)
 

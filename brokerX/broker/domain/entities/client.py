@@ -1,3 +1,4 @@
+import copy
 from decimal import Decimal
 from enum import Enum
 from typing import Optional
@@ -35,7 +36,7 @@ class Client:
         first_name: str,
         last_name: str,
         address: str,
-        birth_date: str,  # TODO: refactor to datetime
+        birth_date: str,
         email: str,
         phone_number: str,
         status: str,
@@ -70,3 +71,9 @@ class Client:
             return self.wallet.balance >= limit * quantity
 
         return self.wallet.balance >= stock.last_price * Decimal(quantity)
+    
+    def to_dict(self):
+        dict = copy.copy(self.__dict__)
+        dict["wallet"] = self.wallet.to_dict()
+        return dict
+    

@@ -10,7 +10,7 @@ class DjangoClientRepository(ClientRepository):
         super().__init__()
         self.dao = dao if dao is not None else MySQLClientDAO()
 
-    def get_user(self, email: str) -> Client:
+    def get_client(self, email: str) -> Client:
         client_dto: ClientDTO = self.dao.get_client_by_email(email)
         if not client_dto.success:
             if client_dto.code == 404:

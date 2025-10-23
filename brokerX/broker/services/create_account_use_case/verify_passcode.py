@@ -15,10 +15,10 @@ class VerifyPassCode:
 
     def execute(self, email: str, passcode: str) -> UseCaseResult:
 
-        validated = self.otp_repository.verify_passcode(email, passcode)
+        otp_dto = self.otp_repository.verify_passcode(email, passcode)
 
-        if not validated.success:
-            if validated.attempts >= 3:
+        if not otp_dto.success:
+            if otp_dto.attempts >= 3:
                 return UseCaseResult(
                     success=False,
                     message="You have made 3 attempts, the passcode has been disabled. You must ask for a new passcode.",
@@ -26,7 +26,7 @@ class VerifyPassCode:
                 )
             return UseCaseResult(
                 success=False,
-                message=f"Wrong passcode. Attempts left : {3-validated.attempts}",
+                message=f"Wrong passcode. Attempts left : {3-otp_dto.attempts}",
                 code=422,
             )
 
