@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from ...domain.entities.client import Client
 from ...domain.ports.dao.client_dao import ClientDAO, ClientDTO
-from ...models import Client
+from ...models import Client as ClientModel
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class MySQLClientDAO(ClientDAO):
     def get_client_by_email(self, email: str) -> ClientDTO:
         try:
-            client = Client.objects.prefetch_related("wallets", "shares").get(
+            client = ClientModel.objects.prefetch_related("wallets", "shares").get(
                 email=email
             )
 
@@ -51,7 +51,7 @@ class MySQLClientDAO(ClientDAO):
 
     def add_user(self, client: Client) -> ClientDTO:
         try:
-            existing_user = Client.objects.filter(
+            existing_user = ClientModel.objects.filter(
                 Q(user__email=client.email) | Q(phone_number=client.phone_number)
             ).exists()
 
@@ -70,7 +70,7 @@ class MySQLClientDAO(ClientDAO):
                     password="TBD",
                 )
 
-                Client.objects.create(
+                ClientModel.objects.create(
                     user=user,
                     first_name=client.first_name,
                     last_name=client.last_name,
@@ -89,7 +89,7 @@ class MySQLClientDAO(ClientDAO):
 
     def update_status(self, email: str, new_status: str) -> ClientDTO:
         try:
-            client = Client.objects.get(user__email=email)
+            client = ClientModel.objects.get(user__email=email)
             client.status = new_status
             client.save()
 
@@ -101,7 +101,7 @@ class MySQLClientDAO(ClientDAO):
 
     def get_status(self, email: str) -> ClientDTO:
         try:
-            status = Client.objects.only("status").get(user__email=email).status
+            status = ClientModel.objects.only("status").get(user__email=email).status
             return ClientDTO(success=True, code=200, status=status)
 
         except ObjectDoesNotExist:

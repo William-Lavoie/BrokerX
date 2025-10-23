@@ -37,7 +37,7 @@ def test_execute_success():
         DjangoTransactionRepository(),
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "john@example.com", Decimal("10.3"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -46,4 +46,4 @@ def test_execute_success():
     assert (
         result.message == "The money has been successfully deposited into your account"
     )
-    assert result.new_balance == Decimal("10.3")
+    assert result.balance == Decimal("10.3")

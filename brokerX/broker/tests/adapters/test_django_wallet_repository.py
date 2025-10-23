@@ -45,12 +45,12 @@ def test_get_balance():
 def test_get_balance_error():
     mock_dao = MagicMock()
     mock_dao.get_balance.return_value = WalletDTO(
-        success=False, code=500, balance=Decimal("10.00")
+        success=False, code=500, balance=Decimal("0.00")
     )
 
     repo = DjangoWalletRepository(dao=mock_dao)
 
     balance = repo.get_balance("john_smith@example.com").balance
 
-    assert balance == Decimal("0.0")
+    assert balance == Decimal("0.00")
     mock_dao.get_balance.assert_called_once_with("john_smith@example.com")

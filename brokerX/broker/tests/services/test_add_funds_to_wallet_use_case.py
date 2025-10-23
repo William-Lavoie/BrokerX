@@ -30,7 +30,9 @@ def test_execute_success():
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
-    mock_wallet_repo.get_balance.return_value = Decimal("34.58")
+    mock_wallet_repo.get_balance.return_value = WalletDTO(
+        success=True, code=201, balance=Decimal("34.58")
+    )
     mock_wallet_repo.add_funds.return_value = WalletDTO(
         success=True, code=200, balance=Decimal("44.58")
     )
@@ -45,7 +47,7 @@ def test_execute_success():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -54,7 +56,7 @@ def test_execute_success():
     assert (
         result.message == "The money has been successfully deposited into your account"
     )
-    assert result.new_balance == Decimal("44.58")
+    assert result.balance == Decimal("44.58")
 
 
 def test_execute_client_inactive():
@@ -72,7 +74,7 @@ def test_execute_client_inactive():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -103,7 +105,7 @@ def test_execute_already_processed():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -135,7 +137,7 @@ def test_execute_payment_service_error():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -162,7 +164,9 @@ def test_execute_cannot_add_funds():
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
-    mock_wallet_repo.get_balance.return_value = Decimal("34.58")
+    mock_wallet_repo.get_balance.return_value = WalletDTO(
+        success=False, code=400, balance=Decimal("34.58")
+    )
 
     use_case = AddFundsToWalletUseCase(
         client_repository=mock_client_repo,
@@ -171,7 +175,7 @@ def test_execute_cannot_add_funds():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("100000.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -195,7 +199,9 @@ def test_execute_add_funds_error():
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
-    mock_wallet_repo.get_balance.return_value = Decimal("34.58")
+    mock_wallet_repo.get_balance.return_value = WalletDTO(
+        success=False, code=500, balance=Decimal("34.58")
+    )
     mock_wallet_repo.add_funds.return_value = WalletDTO(success=False, code=500)
 
     use_case = AddFundsToWalletUseCase(
@@ -205,7 +211,7 @@ def test_execute_add_funds_error():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -232,7 +238,9 @@ def test_execute_fail_transaction():
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
-    mock_wallet_repo.get_balance.return_value = Decimal("34.58")
+    mock_wallet_repo.get_balance.return_value = WalletDTO(
+        success=False, code=500, balance=Decimal("34.58")
+    )
     mock_wallet_repo.add_funds.return_value = WalletDTO(
         success=True, code=200, balance=Decimal("44.58")
     )
@@ -247,7 +255,7 @@ def test_execute_fail_transaction():
         transaction_repository=mock_transaction_repo,
     )
 
-    result: AddFundsToWalletUseCaseResult = use_case.execute(
+    result = use_case.execute(
         "test@example.com", Decimal("10.0"), "b4efcb78-d938-48cf-b75a-bfb5b58c52be"
     )
 
@@ -257,4 +265,4 @@ def test_execute_fail_transaction():
         result.message
         == "There was an error while trying to process your deposit. Please try again."
     )
-    assert result.new_balance == Decimal("44.58")
+    assert result.balance == Decimal("44.58")
