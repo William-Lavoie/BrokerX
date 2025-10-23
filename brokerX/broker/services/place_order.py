@@ -100,7 +100,6 @@ class PlaceOrderUseCase:
                 initial_quantity=quantity,
                 idempotency_key=idempotency_key,
             )
-            client.orders.append(order)
 
             return UseCaseResult(
                 success=True,

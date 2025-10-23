@@ -2,7 +2,6 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional
 
-from ...domain.entities.order import Order
 from ...domain.entities.stock import Stock
 from ...domain.entities.wallet import Wallet
 
@@ -43,7 +42,6 @@ class Client:
         password: str = "",
         wallet: Optional[Wallet] = None,
         shares: dict[str, int] = {},
-        orders: list[Order] = [],
     ):
         self.first_name: str = first_name
         self.last_name = last_name
@@ -55,7 +53,6 @@ class Client:
         self.password: str = password
         self.wallet: Optional[Wallet] = wallet
         self.shares: dict[str, int] = shares
-        self.orders: list[Order] = orders
 
     def is_active(self) -> bool:
         return self.status == ClientStatus.ACTIVE.value

@@ -33,9 +33,7 @@ class OrderMatchingUseCase:
     ) -> UseCaseResult:
 
         try:
-            matching_orders: list[Order] = self.order_repository.find_matching_orders(
-                order
-            )
+            matching_orders: list[Order] = self.order_repository.find_matching_orders(order)
 
             potential_matches = []
             for matching_order in matching_orders:

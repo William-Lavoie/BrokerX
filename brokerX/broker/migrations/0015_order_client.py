@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             model_name="order",
             name="client",
             field=models.ForeignKey(
-                default="aaa",
+                default=1,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="broker.client",
             ),
