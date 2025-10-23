@@ -44,3 +44,10 @@ class Order:
         self.initial_quantity: int = initial_quantity
         self.remaining_quantity: int = remaining_quantity
         self.order_id: Optional[UUID] = order_id
+
+    def price_is_acceptable(
+        self, offered_price: Decimal, market_price: Decimal
+    ) -> bool:
+        return (
+            self.limit is None and offered_price == market_price
+        )  # or (self.limit and )

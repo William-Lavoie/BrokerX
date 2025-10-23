@@ -42,3 +42,9 @@ class DjangoOrderRepository(OrderRepository):
         order_dto.stock = stock
         order_dto.client = client
         return super().get_order_from_dto(order_dto)
+
+    def find_matching_orders(self, order: Order) -> list[OrderDTO]:
+        matching_order_dtos = self.dao_find_matching_orders()
+        return [
+            super().get_order_from_dto(order_dto) for order_dto in matching_order_dtos
+        ]

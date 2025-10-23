@@ -18,3 +18,7 @@ class OrderDAO:
         limit: Optional[Decimal],
     ) -> OrderDTO:
         pass
+
+    @abstractmethod
+    def find_matching_orders(email: str, symbol: str, direction: str, quantity: int):
+        pass

@@ -18,6 +18,7 @@ class OrderDTO(Result):
     limit: Optional[Decimal] = Decimal("0.00")
     initial_quantity: int = 0
     remaining_quantity: int = 0
+    order_id: Optional[UUID] = None
 
 
 class OrderRepository:
@@ -31,6 +32,10 @@ class OrderRepository:
         idempotency_key: UUID,
         limit: Optional[Decimal] = None,
     ) -> Order:
+        pass
+
+    @abstractmethod
+    def find_matching_orders(order: Order) -> list[Order]:
         pass
 
     @classmethod

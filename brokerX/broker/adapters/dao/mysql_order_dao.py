@@ -58,3 +58,33 @@ class MySQLOrderDAO(OrderDAO):
                 exc_info=True,
             )
             return OrderDTO(success=False, code=404)
+
+    def find_matching_orders(
+        email: str, symbol: str, direction: str, quantity: int, limit: Decimal
+    ):
+        try:
+            new_direction = "B" if direction == "sell" else "S"
+
+            with transaction.atomic():
+                orders = Order.objects.filter(
+                    symbol=symbol, direction=new_direction
+                ).exclude(email=email)
+                return [
+                    OrderDTO(
+                        success=True,
+                        code=200,
+                        direction=order.direction,
+                        limit=order.limit,
+                        initial_quantity=order.initial_quantity,
+                        remaining_quantity=order.remaining_quantity,
+                        order_id=order.order_id,
+                    )
+                    for order in orders
+                ]
+
+        except ObjectDoesNotExist as e:
+            logger.error(
+                f"ObjectDoesNotExist exception : {e}",
+                exc_info=True,
+            )
+            return OrderDTO(success=False, code=404)
