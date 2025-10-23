@@ -48,3 +48,12 @@ class DjangoOrderRepository(OrderRepository):
         return [
             super().get_order_from_dto(order_dto) for order_dto in matching_order_dtos
         ]
+    
+    def get_orders_by_client(self, email: str) -> list[Order]:
+        order_dtos = self.dao.get_orders_by_client(email=email)
+        for order_dto in order_dtos:
+            order_dto.stock = Stock(symbol=order_dto.stock)
+            
+        return [
+            OrderRepository.get_order_from_dto(order_dto) for order_dto in order_dtos
+        ]

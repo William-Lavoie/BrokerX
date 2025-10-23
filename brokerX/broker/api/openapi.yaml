@@ -99,6 +99,81 @@ paths:
                   message:
                     type: string
                     example: "There was an unexpected error. Please try again or contact customer support."
+    
+    get:
+      security:
+      - BearerAuth: []
+      tags:
+        - Client
+      summary: Get client information
+
+      responses:
+        '200':
+          description: Client information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                    example: John
+                  last_name:
+                    type: string
+                    example: Doe
+                  address:
+                    type: string
+                    example: 123 Main St
+                  date_of_birth:
+                    type: string
+                    format: date
+                    example: 1990-01-01
+                  email:
+                    type: string
+                    format: email
+                    example: john.doe@example.com
+                  phone_number:
+                    type: string
+                    example: "123-456-7890"
+                example:
+                  first_name: John
+                  last_name: Doe
+                  address: 123 Main St
+                  date_of_birth: 1990-01-01
+                  email: john.doe@example.com
+                  phone_number: "123-456-7890"
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."
+        '404':
+          description: Client does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
 
   /passcode:
     post:
@@ -506,6 +581,83 @@ paths:
                   message:
                     type: string
                     example: "There was an unexpected error."
+
+    get:
+      security:
+      - BearerAuth: []
+      tags:
+        - Order
+      summary: Get orders history
+
+      responses:
+        '200':
+          description: Client orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object              
+                properties:
+                  message:
+                    type: string
+                    example: "The orders were fetched successfully."
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                          example: "XEQT"
+                        direction:
+                          type: string
+                          example: "buy"
+                        limit:
+                          type: number
+                          nullable: true
+                          example: 100.00
+                        initial_quantity:
+                          type: integer
+                          example: 10
+                        remaining_quantity:
+                          type: integer
+                          example: 5
+                        order_id:
+                          type: string
+                          nullable: true
+                          example: "123e4567-e89b-12d3-a456-426614174000"
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Authentication credentials were not provided."
+                    description: "The client is not logged in or the JWT has expired."
+        '404':
+          description: Client does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There is no user with email 'john.doe@hotmail.com'."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "There was an unexpected error."
+
+
 
 components:
   securitySchemes:

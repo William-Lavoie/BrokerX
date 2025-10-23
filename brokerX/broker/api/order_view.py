@@ -47,3 +47,15 @@ class OrderView(APIView):
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
+    
+    def get(self, request):
+
+        use_case = PlaceOrderUseCase(
+            DjangoClientRepository(),
+            DjangoStockRepository(),
+            DjangoOrderRepository(),
+            DjangoWalletRepository(),
+        )
+
+        result = use_case.get_orders(request.user.email)
+        return JsonResponse(data=result.to_dict(), status=result.code)

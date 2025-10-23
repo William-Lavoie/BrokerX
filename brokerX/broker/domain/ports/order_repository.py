@@ -38,6 +38,10 @@ class OrderRepository:
     def find_matching_orders(order: Order) -> list[Order]:
         pass
 
+    @abstractmethod
+    def get_orders_by_client(email: str) -> list[Order]:
+        pass
+
     @classmethod
     def get_order_from_dto(cls, dto: OrderDTO) -> Order:
         return Order(

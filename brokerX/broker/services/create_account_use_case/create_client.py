@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 
 from ...exceptions import DataAccessException
@@ -8,7 +7,6 @@ from ...domain.ports.client_repository import ClientRepository
 from ...domain.ports.otp_repository import OTPDTO, OTPRepository
 from ...services.use_case_result import UseCaseResult
 from ..commands.create_client_command import CreateClientCommand
-logger = logging.getLogger(__name__)
 
 
 class CreateClientUseCaseResult(UseCaseResult):

@@ -28,7 +28,7 @@ class Order:
         limit: Optional[Decimal] = Decimal("0.00"),
         initial_quantity: int = 0,
         remaining_quantity: int = 0,
-        order_id=Optional[UUID],
+        order_id: Optional[UUID] = None,
     ):
 
         if initial_quantity < 1:
@@ -51,3 +51,6 @@ class Order:
         return (
             self.limit is None and offered_price == market_price
         )  # or (self.limit and )
+    
+    def to_dict(self):
+        return {"symbol": self.stock.symbol if self.stock else "", "direction": self.direction, "limit": self.limit, "initial_quantity": self.initial_quantity, "remaining_quantity": self.remaining_quantity, "order_id": self.order_id}

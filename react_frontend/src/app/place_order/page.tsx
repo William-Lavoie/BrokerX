@@ -6,6 +6,19 @@ import { useEffect, useState } from "react"
 export default function Wallet() {
 
     const token = localStorage.getItem("access_token");
+    const [orders, setOrders] = useState([]);
+
+    useEffect(() => {
+        fetch("http://localhost:8000/order", {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+        })
+        .then((res) => res.json())
+        .then((data) => setOrders(data.orders || []))
+        .catch(console.error);
+    }, [token]);
 
     async function place_order(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
@@ -51,6 +64,17 @@ export default function Wallet() {
                 <TextInput name="direction" label="Type" type="text"></TextInput>
                 <button>Submit</button>
             </form>
+            <h2 className="text-lg font-bold mb-2">Your Orders</h2>
+            {orders.length === 0 && <p>No orders found.</p>}
+            <ul>
+                {orders.map((order, i) => (
+                <li key={i} className="border p-2 mb-2 rounded flex justify-between">
+                    <span>{order["symbol"]}</span>
+                    <span>{order["direction"]}</span>
+                    <span>Qty: {order["initial_quantity"]}</span>
+                </li>
+                ))}
+            </ul>
         </>
     )
 }

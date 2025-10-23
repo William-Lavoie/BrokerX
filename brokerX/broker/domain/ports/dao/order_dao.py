@@ -20,5 +20,9 @@ class OrderDAO:
         pass
 
     @abstractmethod
-    def find_matching_orders(email: str, symbol: str, direction: str, quantity: int):
+    def find_matching_orders(self, email: str, symbol: str, direction: str, quantity: int) -> list[OrderDTO]:
+        pass
+
+    @abstractmethod
+    def get_orders_by_client(self, email: str) -> list[OrderDTO]:
         pass

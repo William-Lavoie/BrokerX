@@ -60,7 +60,7 @@ class MySQLOrderDAO(OrderDAO):
             return OrderDTO(success=False, code=404)
 
     def find_matching_orders(
-        email: str, symbol: str, direction: str, quantity: int, limit: Decimal
+        self, email: str, symbol: str, direction: str, quantity: int, limit: Decimal
     ):
         try:
             new_direction = "B" if direction == "sell" else "S"
@@ -81,6 +81,30 @@ class MySQLOrderDAO(OrderDAO):
                     )
                     for order in orders
                 ]
+
+        except ObjectDoesNotExist as e:
+            logger.error(
+                f"ObjectDoesNotExist exception : {e}",
+                exc_info=True,
+            )
+            return OrderDTO(success=False, code=404)
+        
+    def get_orders_by_client(self, email: str) -> list[OrderDTO]:
+        try:
+            orders = Order.objects.filter(client__email=email)
+            return [
+                OrderDTO(
+                    success=True,
+                    code=200,
+                    direction=order.direction,
+                    limit=order.limit,
+                    initial_quantity=order.initial_quantity,
+                    remaining_quantity=order.remaining_quantity,
+                    order_id=order.order_id,
+                    stock=order.stock.symbol
+                )
+                for order in orders
+            ]
 
         except ObjectDoesNotExist as e:
             logger.error(
