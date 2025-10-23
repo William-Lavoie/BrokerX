@@ -57,4 +57,5 @@ urlpatterns = [
             "document_root": swagger_ui_path,
         },
     ),
+    path('', include('django_prometheus.urls')),
 ]
