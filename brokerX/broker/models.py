@@ -86,6 +86,7 @@ class Stock(models.Model):
 
 
 class Order(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     direction = models.CharField(max_length=100, choices=[("B", "Buy"), ("S", "Sell")])
     type = models.CharField(max_length=100, choices=[("M", "Market"), ("L", "Limit")])
     stock = models.ForeignKey(Stock, on_delete=models.SET_NULL, null=True)

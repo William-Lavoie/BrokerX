@@ -35,6 +35,7 @@ class MySQLOrderDAO(OrderDAO):
                     order_id=idempotency_key,
                     defaults={
                         "direction": direction,
+                        "client": client,
                         "type": type,
                         "stock": stock,
                         "initial_quantity": initial_quantity,

@@ -92,7 +92,6 @@ class AddFundsToWalletUseCase:
             )
 
         wallet_dto: WalletDTO = self.wallet_repository.get_balance(email)
-        logger.error(wallet_dto)
         wallet = Wallet(balance=wallet_dto.balance)
 
         if not wallet.can_add_funds(amount):

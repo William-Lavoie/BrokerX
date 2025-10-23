@@ -12,6 +12,7 @@ from ...domain.entities.stock import Stock
 
 @dataclass
 class OrderDTO(Result):
+    client: Optional[Client] = None
     stock: Optional[Stock] = None
     direction: str = ""
     limit: Optional[Decimal] = Decimal("0.00")
@@ -40,4 +41,5 @@ class OrderRepository:
             limit=dto.limit,
             initial_quantity=dto.initial_quantity,
             remaining_quantity=dto.remaining_quantity,
+            client=dto.client,
         )

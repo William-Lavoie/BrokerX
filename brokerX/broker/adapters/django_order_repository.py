@@ -40,4 +40,5 @@ class DjangoOrderRepository(OrderRepository):
             )
 
         order_dto.stock = stock
+        order_dto.client = client
         return super().get_order_from_dto(order_dto)
