@@ -71,9 +71,8 @@ class Client:
             return self.wallet.balance >= limit * quantity
 
         return self.wallet.balance >= stock.last_price * Decimal(quantity)
-    
+
     def to_dict(self):
         dict = copy.copy(self.__dict__)
         dict["wallet"] = self.wallet.to_dict()
         return dict
-    

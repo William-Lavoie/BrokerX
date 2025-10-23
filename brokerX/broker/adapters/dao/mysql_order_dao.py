@@ -88,7 +88,7 @@ class MySQLOrderDAO(OrderDAO):
                 exc_info=True,
             )
             return OrderDTO(success=False, code=404)
-        
+
     def get_orders_by_client(self, email: str) -> list[OrderDTO]:
         try:
             orders = Order.objects.filter(client__email=email)
@@ -101,7 +101,7 @@ class MySQLOrderDAO(OrderDAO):
                     initial_quantity=order.initial_quantity,
                     remaining_quantity=order.remaining_quantity,
                     order_id=order.order_id,
-                    stock=order.stock.symbol
+                    stock=order.stock.symbol,
                 )
                 for order in orders
             ]

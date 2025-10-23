@@ -47,7 +47,7 @@ class OrderView(APIView):
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
-    
+
     def get(self, request):
 
         use_case = PlaceOrderUseCase(

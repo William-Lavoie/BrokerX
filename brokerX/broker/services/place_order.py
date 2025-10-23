@@ -15,13 +15,14 @@ from ..services.use_case_result import UseCaseResult
 
 logger = logging.getLogger(__name__)
 
+
 class PlaceOrderUseCaseResult(UseCaseResult):
     def __init__(
         self,
         success: bool,
         message: str,
         code: int,
-        orders: Optional[list[Order]] = None
+        orders: Optional[list[Order]] = None,
     ):
         super().__init__(success=success, message=message, code=code)
         self.orders: Optional[list[Order]] = orders
@@ -34,7 +35,7 @@ class PlaceOrderUseCaseResult(UseCaseResult):
             data["orders"] = []
         return data
 
-    
+
 class PlaceOrderUseCase:
     def __init__(
         self,
@@ -154,13 +155,18 @@ class PlaceOrderUseCase:
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,
             )
-        
+
     def get_orders(self, email: str):
         try:
             orders = self.order_repository.get_orders_by_client(email=email)
             logger.error("EORRS")
             logger.error(orders)
-            return PlaceOrderUseCaseResult(success=True, code=200, message="Order fetched successfully", orders=orders)
+            return PlaceOrderUseCaseResult(
+                success=True,
+                code=200,
+                message="Order fetched successfully",
+                orders=orders,
+            )
 
         except ClientInvalidException as client_exception:
             return PlaceOrderUseCaseResult(

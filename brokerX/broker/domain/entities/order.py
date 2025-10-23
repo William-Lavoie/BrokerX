@@ -51,6 +51,13 @@ class Order:
         return (
             self.limit is None and offered_price == market_price
         )  # or (self.limit and )
-    
+
     def to_dict(self):
-        return {"symbol": self.stock.symbol if self.stock else "", "direction": self.direction, "limit": self.limit, "initial_quantity": self.initial_quantity, "remaining_quantity": self.remaining_quantity, "order_id": self.order_id}
+        return {
+            "symbol": self.stock.symbol if self.stock else "",
+            "direction": self.direction,
+            "limit": self.limit,
+            "initial_quantity": self.initial_quantity,
+            "remaining_quantity": self.remaining_quantity,
+            "order_id": self.order_id,
+        }

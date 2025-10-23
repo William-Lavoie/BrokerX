@@ -16,4 +16,3 @@ class Wallet:
 
     def to_dict(self):
         return copy.copy(self.__dict__)
-    
