@@ -3,8 +3,9 @@ import logging
 from dataclasses import asdict
 
 from django.http import JsonResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from ..adapters.django_client_repository import DjangoClientRepository
 from ..adapters.email_otp_repository import EmailOTPRepository
@@ -12,6 +13,8 @@ from ..services.commands.create_client_command import CreateClientCommand
 from ..services.create_account_use_case.create_client import CreateClientUseCase
 
 logger = logging.getLogger(__name__)
+
+counter_orders = Counter("orders", "Total calls to /orders")
 
 
 class ClientView(APIView):
@@ -49,6 +52,7 @@ class ClientView(APIView):
         return JsonResponse(result.to_dict(), status=result.code)
 
     def get(self, request):
+        counter_orders.inc()
         use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
         result = use_case.get_client_info(request.user.email)
         logger.error(result.to_dict())
