@@ -1,15 +1,15 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-const BASE_URL = 'http://broker-app:8000'; // Replace with your actual API URL 
+const BASE_URL = 'http://broker-app:8000'; // Replace with your actual API URL
 
 /**
  * @endpoint /passcode
  * @method POST
- * @param {string} token 
- * @returns 
+ * @param {string} token
+ * @returns
  */
-function postPasscode(token) {
+export function postPasscode(token) {
   const payload = JSON.stringify({
     passcode: '123456',
   });
@@ -25,10 +25,10 @@ function postPasscode(token) {
  * Retrieves a JWT token for a user
  * @endpoint api/token/
  * @method POST
- * @param {string} email 
- * @returns 
+ * @param {string} email
+ * @returns
  */
-function getJWTToken(email) {
+export function getJWTToken(email) {
   const res = http.post(`${BASE_URL}/api/token/`, JSON.stringify({username: email, password: "TBD"}), { headers : {
     'Content-Type': 'application/json',
   }});
@@ -39,9 +39,9 @@ function getJWTToken(email) {
 /**
  * @endpoint /client
  * @method GET
- * @param {string} token 
+ * @param {string} token
  */
-function getClient(token) {
+export function getClient(token) {
   http.get(`${BASE_URL}/client`, {
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -51,14 +51,14 @@ function getClient(token) {
 }
 
 /**
- * Creates a user instance with randomized email and password 
- * and returns the email. Note that this does not guarantee uniqueness, 
+ * Creates a user instance with randomized email and password
+ * and returns the email. Note that this does not guarantee uniqueness,
  * however under realistic charges collisions should be very rare.
  * @endpoint /client
  * @method GET
  * @returns email
  */
-function postClient() {
+export function postClient() {
     const randomNumber = Math.floor(Math.random() * 100000000);
     const email = `john.doe${randomNumber.toString().padStart(8, '0')}@example.com`;
     const phoneNumber = randomNumber.toString().padStart(9, '0')
@@ -81,12 +81,12 @@ function postClient() {
 /**
  * @endpoint /wallet
  * @method GET
- * @param {string} token 
+ * @param {string} token
  */
-function getWallet(token) {
+export function getWallet(token) {
   http.get(`${BASE_URL}/wallet`, {
       headers: {
-          'Authorization': `Be/arer ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
       }
   });
@@ -95,9 +95,9 @@ function getWallet(token) {
 /**
  * @endpoint /wallet
  * @method POST
- * @param {string} token 
+ * @param {string} token
  */
-function postWallet(token) {
+export function postWallet(token) {
   const headers = {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -112,9 +112,9 @@ function postWallet(token) {
 /**
  * @endpoint /order
  * @method GET
- * @param {string} token 
+ * @param {string} token
  */
-function getOrder(token) {
+export function getOrder(token) {
   const getPlaceOrder = http.get(`${BASE_URL}/order`, {
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -126,9 +126,9 @@ function getOrder(token) {
 /**
  * @endpoint /order
  * @method POST
- * @param {string} token 
+ * @param {string} token
  */
-function postOrder(token) {
+export function postOrder(token) {
   const headers = {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -140,7 +140,6 @@ function postOrder(token) {
     quantity: 10,
     symbol: 'AAPL',
     limit: 10.00,
-    'Idempotency-Key': generateUUID(),
   });
   const resPlaceOrder = http.post(`${BASE_URL}/order`, placeOrderPayload, { headers });
   check(resPlaceOrder, { 'Order placed successfully': (r) => r.status === 201 });
@@ -151,7 +150,7 @@ function postOrder(token) {
  * Returns a uuid for idempotency keys
  * @returns {uuid}
  */
-function generateUUID() {
+export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);

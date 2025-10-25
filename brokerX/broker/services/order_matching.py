@@ -43,7 +43,7 @@ class OrderMatchingUseCase:
                 price = (
                     order.stock.last_price
                     if not matching_order.limit
-                    else matching_order
+                    else matching_order.limit
                 )
 
                 if order.price_is_acceptable():

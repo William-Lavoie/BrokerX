@@ -1,4 +1,5 @@
 import logging
+import threading
 import uuid
 from decimal import Decimal
 from typing import Optional
@@ -11,6 +12,7 @@ from ..domain.ports.order_repository import OrderRepository
 from ..domain.ports.stock_repository import StockRepository
 from ..domain.ports.wallet_repository import WalletRepository
 from ..exceptions import DataAccessException
+from ..services.order_matching import OrderMatchingUseCase
 from ..services.use_case_result import UseCaseResult
 
 logger = logging.getLogger(__name__)
@@ -121,6 +123,15 @@ class PlaceOrderUseCase:
                 idempotency_key=idempotency_key,
             )
 
+            order_matching_use_case = OrderMatchingUseCase(
+                self.client_repository, self.stock_repository, self.order_repository
+            )
+
+            thread = threading.Thread(
+                target=order_matching_use_case.execute, args=(order,)
+            )
+            thread.start()
+
             return PlaceOrderUseCaseResult(
                 success=True,
                 message="The order was placed successfully.",
@@ -159,8 +170,6 @@ class PlaceOrderUseCase:
     def get_orders(self, email: str):
         try:
             orders = self.order_repository.get_orders_by_client(email=email)
-            logger.error("EORRS")
-            logger.error(orders)
             return PlaceOrderUseCaseResult(
                 success=True,
                 code=200,
