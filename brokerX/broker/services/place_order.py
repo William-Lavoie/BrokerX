@@ -105,7 +105,7 @@ class PlaceOrderUseCase:
                     stock=stock, quantity=quantity, limit=limit
                 ):
                     logger.warning(
-                        f"Client {email} tried to place a sell order with {quantity} shares."
+                        f"Client {email} tried to place a buy order with {quantity} shares."
                     )
                     return PlaceOrderUseCaseResult(
                         success=False,
