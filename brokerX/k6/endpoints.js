@@ -97,14 +97,14 @@ export function getWallet(token) {
  * @method POST
  * @param {string} token
  */
-export function postWallet(token) {
+export function postWallet(token, amount) {
   const headers = {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
     'Idempotency-Key': generateUUID(),
   };
 
-  const addFundsPayload = JSON.stringify({ amount: 1000.00 });
+  const addFundsPayload = JSON.stringify({ amount: amount });
   const resAddFunds = http.post(`${BASE_URL}/wallet`, addFundsPayload, { headers });
   check(resAddFunds, { 'Funds added successfully': (r) => r.status === 201 || r.status === 200 });
 }
@@ -139,7 +139,7 @@ export function postOrder(token) {
     direction: 'buy',
     quantity: 10,
     symbol: 'AAPL',
-    limit: 10.00,
+    limit: 1.00,
   });
   const resPlaceOrder = http.post(`${BASE_URL}/order`, placeOrderPayload, { headers });
   check(resPlaceOrder, { 'Order placed successfully': (r) => r.status === 201 });

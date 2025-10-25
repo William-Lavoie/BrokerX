@@ -1,11 +1,22 @@
-### Performance reports
+## Performance reports
+The following table presents key metrics that were polled at different stages of the application's lifecycle. Metrics were taken with 150 concurrent user.
 
-The following table shows various metrics calculated at various stages of phase 2.
-| Monolith | Monolith + Redis | Monolith + Redis + Nginx | Microservices |
-|----------|------------------|----------|-------------------------------|
-| P95 | **Maintainability** | Separation of concerns through the use of the hexagonal architecture |
-| P90 | **Persistence** | Support of a backend database with MySQL |
-| P50 | **Availability** | Greater or equal to 90% uptime |
-| Throughput (orders/s) | **Testability** | Coverage greater or equal than 80% |
-| P95 on POST /order | **Traceability** | Logging of errors in dedicated files |
-| Max concurent users (error rate < 5%) | 
+### Methodology
+The stress tests use `k6` to simulate HTTP traffic to `broker-app:8000`. The set up phase creates 150 users and keeps their tokens in an array. Then, virtual users randomly select a token and call the specified endpoints with this token. This ensures that as virtual users loop through the calls, they do not create more than 150 clients. Client registration and passcode validation are rare events, thus including them at a similar rate to common operations skews results.
+The tests ramp up to 150 users in 15 seconds, then remained steady for a 1 minute, then have a 30s rampdown.
+
+| Metric                           | Monolith                | Monolith + Redis           | Monolith + Redis + Nginx    | Microservices              |
+|----------------------------------|-------------------------|----------------------------|-----------------------------|----------------------------|
+| P95                              | 1495ms                       | -                          | -                           | -                          |
+| P90                              | 936ms                       | - | -                           | -                          |
+| P50                              |  95.5ms       | - | -                           | -                          |
+| Throughput (orders/s)            |  81.3    | -| -                           | -                          |
+| P95 on POST /order               | 488ms        | - | -                           | -                          |
+| Max concurrent users (error rate < 5%) | 160                       | -                          | -                           | -                          |
+
+### Observations
+
+#### Monolithic
+![Monolith general performance](./images/monolith1.png)
+![Monolith error performance](./images/monolith2.png)
+

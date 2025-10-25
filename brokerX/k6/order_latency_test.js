@@ -6,17 +6,24 @@ import { postClient, postWallet, postOrder, getJWTToken, postPasscode } from './
  * and adds their tokens to a pool so the users in the test refer to user of these accounts.
  * Allows to determine throughput as well as P50, P90 and P95 on this endpoint.
  */
-const BASE_URL = 'http://broker-app:8000';
 let tokens = [];
 
-
+export const options = {
+  stages: [
+    { duration: '15s', target: 150 },
+    { duration: '1m', target: 150 }
+  ],
+  thresholds: {
+    http_req_failed: ['rate<0.05'],
+  },
+}
 
 export function setup() {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 20; i++) {
     const email = postClient();
     const token = getJWTToken(email);
     postPasscode(token)
-    postWallet(token)
+    postWallet(token, 500.00)
     tokens.push(token);
   }
 

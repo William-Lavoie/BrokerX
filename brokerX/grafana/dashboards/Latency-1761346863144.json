@@ -84,7 +84,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!=\"prometheus-django-metrics\"}[5m]))) * 1000"
+              "options": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000"
             },
             "properties": [
               {
@@ -96,7 +96,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n\r\n"
+              "options": "histogram_quantile(0.9, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000"
             },
             "properties": [
               {
@@ -108,7 +108,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n"
+              "options": "histogram_quantile(0.5, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000"
             },
             "properties": [
               {
@@ -147,7 +147,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!=\"prometheus-django-metrics\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000",
           "legendFormat": "__auto",
           "range": true,
           "refId": "P95"
@@ -157,8 +157,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n\r\n",
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.9, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -170,8 +170,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n",
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.5, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"prometheus-django-metrics|django.views.static.serve|passcode\"}[5m]))) * 1000",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -243,30 +243,6 @@
           }
         },
         "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "client"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": true,
-                  "viz": true
-                }
-              }
-            ]
-          },
           {
             "matcher": {
               "id": "byName",
@@ -377,30 +353,6 @@
         },
         "overrides": [
           {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "client"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": true,
-                  "viz": true
-                }
-              }
-            ]
-          },
-          {
             "matcher": {
               "id": "byName",
               "options": "token_obtain_pair"
@@ -420,6 +372,115 @@
         "x": 0,
         "y": 16
       },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum by(le, method) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"django.views.static.serve|prometheus-django-metrics|<unnamed view>\"}[5m]))) * 1000",
+          "hide": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "P95"
+        }
+      ],
+      "title": "P95 per method",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "token_obtain_pair"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "token"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
       "id": 3,
       "options": {
         "legend": {
@@ -437,7 +498,7 @@
       "pluginVersion": "12.2.1",
       "targets": [
         {
-          "editorMode": "code",
+          "editorMode": "builder",
           "expr": "histogram_quantile(0.90, sum by(le, view) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"django.views.static.serve|prometheus-django-metrics\"}[5m]))) * 1000",
           "hide": false,
           "legendFormat": "__auto",
@@ -510,30 +571,6 @@
         },
         "overrides": [
           {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "client"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": true,
-                  "viz": true
-                }
-              }
-            ]
-          },
-          {
             "matcher": {
               "id": "byName",
               "options": "token_obtain_pair"
@@ -551,7 +588,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "id": 4,
       "options": {
@@ -597,5 +634,5 @@
   "timezone": "browser",
   "title": "Latency",
   "uid": "adr4b9j",
-  "version": 4
+  "version": 11
 }
