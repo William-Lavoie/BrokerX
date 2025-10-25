@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -142,7 +142,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "builder",
           "expr": "sum by(method) (rate(django_http_requests_total_by_method_total[1m]))",
@@ -158,7 +158,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -253,7 +253,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -352,7 +352,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "description": "Number of HTTP requests per day",
       "fieldConfig": {

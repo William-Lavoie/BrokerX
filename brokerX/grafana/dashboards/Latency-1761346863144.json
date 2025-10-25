@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -84,7 +84,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000"
+              "options": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!=\"prometheus-django-metrics\"}[5m]))) * 1000"
             },
             "properties": [
               {
@@ -96,7 +96,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000\r\n\r\n"
+              "options": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n\r\n"
             },
             "properties": [
               {
@@ -108,7 +108,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000\r\n"
+              "options": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n"
             },
             "properties": [
               {
@@ -144,10 +144,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000",
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!=\"prometheus-django-metrics\"}[5m]))) * 1000",
           "legendFormat": "__auto",
           "range": true,
           "refId": "P95"
@@ -155,10 +155,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000\r\n\r\n",
+          "expr": "histogram_quantile(0.90, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n\r\n",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -168,10 +168,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[5m])))*1000\r\n",
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~'prometheus-django-metrics'}[5m])))*1000\r\n",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -186,7 +186,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -304,8 +304,8 @@
       "pluginVersion": "12.2.1",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by(le, view) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"django.views.static.serve|prometheus-django-metrics\"}[5m]))) * 1000",
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum by(le, view) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!~\"django.views.static.serve|prometheus-django-metrics|<unnamed view>\"}[5m]))) * 1000",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -319,7 +319,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -452,7 +452,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -597,5 +597,5 @@
   "timezone": "browser",
   "title": "Latency",
   "uid": "adr4b9j",
-  "version": 5
+  "version": 4
 }

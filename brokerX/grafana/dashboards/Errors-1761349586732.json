@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -135,7 +135,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "(sum(rate(django_http_responses_total_by_status_view_method_total{status=~\"4..|5..\", status!=\"401\"}[5m])) * 100) / (sum(rate(django_http_responses_total_by_status_total[5m])))",
@@ -153,7 +153,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -265,7 +265,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "(sum(rate(django_http_responses_total_by_status_view_method_total{status=~\"5..\"}[5m])) * 100) / (sum(rate(django_http_responses_total_by_status_total[5m]))) or vector(0)",
@@ -283,7 +283,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bf21opc8e5w5cc"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -359,7 +359,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bf21opc8e5w5cc"
+            "uid": "Prometheus"
           },
           "editorMode": "code",
           "expr": "sum by(status) (rate(django_http_responses_total_by_status_view_method_total{status!~\"2..|3..\"}[5m]))",
