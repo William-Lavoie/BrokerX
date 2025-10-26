@@ -6,6 +6,7 @@ from ..adapters.dao.mysql_order_dao import MySQLOrderDAO
 from ..adapters.redis.redis_order import (
     redis_add_order,
     redis_get_orders,
+    redis_get_orders_by_stock,
     redis_set_orders,
 )
 from ..domain.entities.client import Client
@@ -51,12 +52,17 @@ class DjangoOrderRepository(OrderRepository):
         return order
 
     def find_matching_orders(self, order: Order) -> list[OrderDTO]:
+        redis_orders = redis_get_orders_by_stock(order.stock.symbol)
+        if redis_orders:
+            return redis_orders
+
         matching_order_dtos = self.dao.find_matching_orders(
             email=order.client.email,
             symbol=order.stock.symbol,
             direction=order.direction,
             limit=order.limit,
         )
+
         return [
             super().get_order_from_dto(order_dto) for order_dto in matching_order_dtos
         ]

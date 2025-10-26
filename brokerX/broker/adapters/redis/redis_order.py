@@ -40,12 +40,26 @@ def redis_get_orders(email: str) -> Optional[list[Order]]:
     except RedisError as re:
         logger.error(f"Redis error occurred while fetching order {email}: {re}")
 
+def redis_get_orders_by_stock(symbol: str) -> Optional[list[Order]]:
+    try:
+        orders_json = redis_client.get(f"orders:{symbol}")
+
+        if orders_json:
+            orders_data = json.loads(orders_json)
+            orders = [Order.from_dict(order) for order in orders_data]
+            return orders
+        else:
+            return None
+
+    except RedisError as re:
+        logger.error(f"Redis error occurred while fetching order {symbol}: {re}")
+
 
 def redis_add_order(email: str, order: Order):
     try:
-        orders_json = redis_client.get(f"orders:{email}")
-        if orders_json:
-            orders_data = json.loads(orders_json)
+        orders_client_json = redis_client.get(f"orders:{email}")
+        if orders_client_json:
+            orders_data = json.loads(orders_client_json)
         else:
             orders_data = []
 
@@ -53,6 +67,19 @@ def redis_add_order(email: str, order: Order):
 
         redis_client.set(
             f"orders:{email}",
+            json.dumps(
+                orders_data, default=lambda x: float(x) if isinstance(x, Decimal) else x
+            ),
+        )
+
+        orders_stock_json = redis_client.get(f"orders:{order.stock.symbol}")
+        if orders_stock_json:
+            orders_data = json.loads(orders_stock_json)
+        else:
+            orders_data = []
+
+        redis_client.set(
+            f"orders:{order.stock.symbol}",
             json.dumps(
                 orders_data, default=lambda x: float(x) if isinstance(x, Decimal) else x
             ),
