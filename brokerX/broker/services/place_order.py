@@ -8,6 +8,7 @@ from ..domain.entities.client import Client, ClientInvalidException
 from ..domain.entities.order import Order, OrderInvalidException
 from ..domain.entities.stock import Stock, StockInvalidException
 from ..domain.ports.client_repository import ClientRepository
+from ..domain.ports.dao.wallet_dao import WalletDTO
 from ..domain.ports.order_repository import OrderRepository
 from ..domain.ports.stock_repository import StockRepository
 from ..domain.ports.wallet_repository import WalletRepository
@@ -103,8 +104,14 @@ class PlaceOrderUseCase:
                     )
 
             elif direction == "buy":
+                wallet_dto: WalletDTO = self.wallet_repository.get_balance(
+                    email=client.email
+                )
                 if not client.can_buy_shares(
-                    stock=stock, quantity=quantity, limit=limit
+                    stock=stock,
+                    quantity=quantity,
+                    limit=limit,
+                    balance=wallet_dto.balance,
                 ):
                     logger.warning(
                         f"Client {email} tried to place a buy order with {quantity} shares."

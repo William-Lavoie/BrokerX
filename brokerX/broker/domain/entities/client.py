@@ -64,15 +64,16 @@ class Client:
         return self.shares.get(symbol, 0) == quantity
 
     def can_buy_shares(
-        self, stock: Stock, quantity: int, limit: Optional[Decimal]
+        self, stock: Stock, quantity: int, limit: Optional[Decimal], balance: Decimal
     ) -> bool:
-        if self.wallet is None:
+        logger.error(f"Wallet = {balance}")
+        if balance is None:
             return False
 
         if limit is not None:
-            return self.wallet.balance >= limit * quantity
+            return balance >= limit * quantity
 
-        return self.wallet.balance >= stock.last_price * Decimal(quantity)
+        return balance >= stock.last_price * Decimal(quantity)
 
     def to_dict(self):
         dict = copy.copy(self.__dict__)
@@ -81,7 +82,6 @@ class Client:
 
     @classmethod
     def from_dict(cls, data: dict):
-        logger.error(data)
         wallet = Wallet.from_dict(data["wallet"]) if "wallet" in data else None
         return cls(
             first_name=data["first_name"],

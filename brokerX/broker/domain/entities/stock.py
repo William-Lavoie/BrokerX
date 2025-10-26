@@ -1,3 +1,4 @@
+import copy
 from decimal import Decimal
 
 
@@ -31,3 +32,16 @@ class Stock:
         self.volume = volume
         self.last_price = last_price
         self.active = True
+
+    def to_dict(self):
+        return copy.copy(self.__dict__)
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            symbol=data.get("symbol", ""),
+            previous_close=Decimal(str(data.get("previous_close", "0.00"))),
+            volume=data.get("volume", 0),
+            last_price=Decimal(str(data.get("last_price", "0.00"))),
+            active=data.get("active", True),
+        )
