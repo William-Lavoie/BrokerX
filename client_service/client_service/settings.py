@@ -15,7 +15,8 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -126,3 +127,76 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name} : {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "mysql_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "mysql-error.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "redis_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "redis-error.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "client_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "client-error.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "access_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "access.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+    },
+    "loggers": {
+        "django.server": {
+            "handlers": ["console", "access_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "client": {
+            "handlers": ["console", "client_error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "mysql": {
+            "handlers": ["console", "mysql_error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "redis": {
+            "handlers": ["console", "redis_error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "client_error_file"],
+        "level": "WARNING",
+    },
+}
