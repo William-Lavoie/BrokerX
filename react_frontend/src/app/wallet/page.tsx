@@ -9,7 +9,7 @@ export default function Wallet() {
     const token = localStorage.getItem("access_token");
 
     useEffect(() => {
-      fetch('http://localhost:8000/wallet', {
+      fetch('http://localhost:8080/wallet', {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -30,7 +30,7 @@ export default function Wallet() {
 
             const idempotencyKey = crypto.randomUUID();
 
-            const response = await fetch("http://localhost:8000/wallet", {
+            const response = await fetch("http://localhost:8080/wallet", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

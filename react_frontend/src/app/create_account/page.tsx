@@ -54,7 +54,7 @@ export default function Login() {
                 communication_method: formData.get("communication-method"),
                 password: formData.get("password"),
             };
-        const response = await fetch("http://localhost:8000/client", {
+        const response = await fetch("http://localhost:8080/client", {
             method: "POST",
             headers: {
             "Content-Type": "application/json",

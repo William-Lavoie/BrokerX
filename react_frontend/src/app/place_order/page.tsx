@@ -9,7 +9,7 @@ export default function Wallet() {
     const [orders, setOrders] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:8000/order", {
+        fetch("http://localhost:8080/order", {
         headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export default function Wallet() {
             };
             const idempotencyKey = crypto.randomUUID();
 
-            const response = await fetch("http://localhost:8000/order", {
+            const response = await fetch("http://localhost:8080/order", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

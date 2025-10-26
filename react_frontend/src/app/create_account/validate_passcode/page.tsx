@@ -12,7 +12,7 @@ export default function App() {
 
   async function validate_passcode() {
     try {
-      const response = await fetch("http://localhost:8000/passcode", {
+      const response = await fetch("http://localhost:8080/passcode", {
           method: "POST",
           headers: {
           "Authorization": `Bearer ${token}`,
@@ -32,7 +32,7 @@ export default function App() {
 
   async function generate_passcode() {
     try {
-      const response = await fetch("http://localhost:8000/passcode", {
+      const response = await fetch("http://localhost:8080/passcode", {
           method: "PUT",
           headers: {
           "Authorization": `Bearer ${token}`,

@@ -15,7 +15,7 @@ export default function Home() {
 
 
     useEffect(() => {
-      fetch('http://localhost:8000/client', {
+      fetch('http://localhost:8080/client', {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -26,7 +26,7 @@ export default function Home() {
         .then(json => setClientInfo(json))
         .catch(error => console.error(error));
     }, []);
-    
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">

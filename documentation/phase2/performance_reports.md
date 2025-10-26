@@ -10,8 +10,8 @@ The tests ramp up to 150 users in 15 seconds, then remained steady for a 1 minut
 | P95                              | 1495ms                       | 468ms                         | -                           | -                          |
 | P90                              | 936ms                       | 429ms | -                           | -                          |
 | P50                              |  95.5ms       | 175ms | -                           | -                          |
-| Throughput (orders/s)            |  81.3    | -| -                           | -                          |
-| P95 on POST /order               | 488ms        | - | -                           | -                          |
+| Throughput (orders/s)            |  81.3    | 120 | -                           | -                          |
+| P95 on POST /order               | 649ms        | 475ms | -                           | -                          |
 | Max concurrent users (error rate < 5%) | 150                       | 170                          | -                           | -                          |
 
 ### Observations

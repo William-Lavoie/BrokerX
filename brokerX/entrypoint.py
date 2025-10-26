@@ -19,5 +19,4 @@ def wait_for_db(retries=10, delay=3):
 
 if __name__ == "__main__":
     wait_for_db()
-    execute_from_command_line(["manage.py", "migrate"])
     execute_from_command_line(["manage.py", "runserver", "0.0.0.0:8000"])
