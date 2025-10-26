@@ -37,6 +37,7 @@ pytest-django==4.11.1
 prometheus_client==0.23.1
 pytokens==0.1.10
 PyYAML==6.0.3
+redis==7.0.0
 rich==14.1.0
 shellingham==1.5.4
 sqlparse==0.5.3
