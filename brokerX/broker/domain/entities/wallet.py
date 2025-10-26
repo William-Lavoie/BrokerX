@@ -16,3 +16,7 @@ class Wallet:
 
     def to_dict(self):
         return copy.copy(self.__dict__)
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(balance=data["balance"])
