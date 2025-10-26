@@ -5,7 +5,6 @@ from enum import Enum
 from typing import Optional
 
 from ...domain.entities.stock import Stock
-from ...domain.entities.wallet import Wallet
 
 # TODO: integrate with django user authentification class
 # TODO: cronjob to delete users after 24h
@@ -43,7 +42,6 @@ class Client:
         phone_number: str,
         status: str,
         password: str = "",
-        wallet: Optional[Wallet] = None,
         shares: dict[str, int] = {},
     ):
         self.first_name: str = first_name
@@ -54,7 +52,6 @@ class Client:
         self.phone_number: str = phone_number
         self.status: str = status
         self.password: str = password
-        self.wallet: Optional[Wallet] = wallet
         self.shares: dict[str, int] = shares
 
     def is_active(self) -> bool:
@@ -66,7 +63,6 @@ class Client:
     def can_buy_shares(
         self, stock: Stock, quantity: int, limit: Optional[Decimal], balance: Decimal
     ) -> bool:
-        logger.error(f"Wallet = {balance}")
         if balance is None:
             return False
 
@@ -76,13 +72,19 @@ class Client:
         return balance >= stock.last_price * Decimal(quantity)
 
     def to_dict(self):
-        dict = copy.copy(self.__dict__)
-        dict["wallet"] = self.wallet.to_dict()
-        return dict
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "address": self.address,
+            "birth_date": self.birth_date,
+            "email": self.email,
+            "phone_number": self.phone_number,
+            "status": self.status,
+            "password": self.password,
+        }
 
     @classmethod
     def from_dict(cls, data: dict):
-        wallet = Wallet.from_dict(data["wallet"]) if "wallet" in data else None
         return cls(
             first_name=data["first_name"],
             last_name=data["last_name"],
@@ -92,6 +94,5 @@ class Client:
             phone_number=data["phone_number"],
             status=data.get("status", ""),
             password=data.get("password", ""),
-            wallet=wallet,
             shares=data.get("shares", {}),
         )

@@ -1,10 +1,10 @@
 from typing import Optional
 
-from ...exceptions import DataAccessException
 from ...adapters.result import Result
 from ...domain.entities.client import Client, ClientInvalidException, ClientStatus
 from ...domain.ports.client_repository import ClientRepository
 from ...domain.ports.otp_repository import OTPDTO, OTPRepository
+from ...exceptions import DataAccessException
 from ...services.use_case_result import UseCaseResult
 from ..commands.create_client_command import CreateClientCommand
 
@@ -41,7 +41,7 @@ class CreateClientUseCase:
             email=command.email,
             phone_number=command.phone_number,
             password=command.password,
-            status=ClientStatus.PENDING,
+            status=ClientStatus.PENDING.value,
         )
 
         # Save the new user

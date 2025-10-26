@@ -46,6 +46,8 @@ class DjangoClientRepository(ClientRepository):
         if client_dto.success:
             redis_update_client_status(email, new_status)
 
+        return client_dto
+
     def client_is_active(self, email: str) -> bool:
         redis_client = redis_get_client(email=email)
         if redis_client:

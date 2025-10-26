@@ -24,9 +24,10 @@ def redis_set_wallet_balance(email: str, balance: Decimal):
 def redis_get_wallet_balance(email: str) -> Optional[Decimal]:
     try:
         data = redis_client.get(f"balance:{email}")
-        balance = Decimal(data.decode("utf-8"))
 
-        if balance:
+        if data:
+            balance = Decimal(data.decode("utf-8"))
+
             logger.error(f"Successfully fetched balance for {email} in Redis.")
             return Decimal(balance)
         else:
