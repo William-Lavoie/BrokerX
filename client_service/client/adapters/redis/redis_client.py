@@ -11,7 +11,8 @@ from ...domain.entities.client import Client
 
 logger = logging.getLogger("redis")
 
-class RedisClient():
+
+class RedisClient:
     def set_client(self, client: Client) -> None:
         try:
             client_data_json = json.dumps(
@@ -23,8 +24,9 @@ class RedisClient():
             logger.info(f"Successfully stored client {client.email} in Redis.")
 
         except RedisError as re:
-            logger.error(f"Redis  error occurred while storing client {client.email}: {re}")
-
+            logger.error(
+                f"Redis  error occurred while storing client {client.email}: {re}"
+            )
 
     def get_client(self, email: str) -> Optional[Client]:
         try:
@@ -40,7 +42,6 @@ class RedisClient():
         except RedisError as re:
             logger.error(f"Redis error occurred while fetching client {email}: {re}")
 
-
     def update_client_status(self, email: str, new_status: str) -> None:
         try:
             client_json = redis_client.get(f"client:{email}")
@@ -50,7 +51,8 @@ class RedisClient():
                 client_dict["status"] = new_status
 
                 client_data_json = json.dumps(
-                    client_dict, default=lambda x: float(x) if isinstance(x, Decimal) else x
+                    client_dict,
+                    default=lambda x: float(x) if isinstance(x, Decimal) else x,
                 )
                 redis_client.set(f"client:{email}", client_data_json)
             else:

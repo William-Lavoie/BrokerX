@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 
 from ..adapters.base_otp_repository import BaseOTPRepository
 from ..domain.ports.otp_repository import OTPDTO
-from .dao.mysql_client_otp_dao import MySQLClientOTPDAO
+from .dao.mysql_otp_dao import MySQLClientOTPDAO
 
 logger = logging.getLogger(__name__)
 

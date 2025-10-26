@@ -2,12 +2,12 @@ import json
 import logging
 from dataclasses import asdict
 
+from client.adapters.django_client_repository import DjangoClientRepository
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
-from client.adapters.django_client_repository import DjangoClientRepository
-#from client.services.create_account_use_case.create_client import CreateClientUseCase
+# from client.services.create_account_use_case.create_client import CreateClientUseCase
 
 logger = logging.getLogger(__name__)
 

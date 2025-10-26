@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from ...adapters.result import Result
+from client.adapters.result import Result
 
 
 @dataclass

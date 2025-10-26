@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "client",
+    "otp",
 ]
 
 MIDDLEWARE = [
@@ -160,7 +161,7 @@ LOGGING = {
         },
         "client_error_file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_DIR / "client-error.logs",
+            "filename": LOG_DIR / "client.logs",
             "formatter": "verbose",
             "maxBytes": 5_000_000,
             "backupCount": 5,

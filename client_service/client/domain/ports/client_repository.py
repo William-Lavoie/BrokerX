@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from decimal import Decimal
+from typing import Optional
+from uuid import UUID
 
 from client.adapters.result import Result
 from client.domain.entities.client import Client
@@ -15,6 +16,7 @@ class ClientDTO(Result):
     email: str = ""
     phone_number: str = ""
     status: str = ""
+    client_id: Optional[UUID] = None
 
 
 class ClientRepository:
@@ -53,4 +55,5 @@ class ClientRepository:
             email=dto.email,
             phone_number=dto.phone_number,
             status=dto.status,
+            client_id=dto.client_id,
         )

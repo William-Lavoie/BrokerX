@@ -1,6 +1,8 @@
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
+from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +35,7 @@ class Client:
     email: str
     phone_number: str
     status: str
+    client_id: Optional[UUID]
     password: str = ""
 
     def is_active(self) -> bool:

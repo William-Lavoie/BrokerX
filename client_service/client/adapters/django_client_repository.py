@@ -1,9 +1,11 @@
 from client.adapters.dao.mysql_client_dao import MySQLClientDAO
+from client.adapters.redis.redis_client import RedisClient
+
 #
 from client.domain.entities.client import Client, ClientInvalidException, ClientStatus
 from client.domain.ports.client_repository import ClientRepository
 from client.domain.ports.dao.client_dao import ClientDTO
-from client.adapters.redis.redis_client import RedisClient
+
 from client_service.exceptions import DataAccessException
 
 
@@ -55,21 +57,24 @@ class DjangoClientRepository(ClientRepository):
             password=password,
         )
         if client_dto.success:
-          client = Client(    first_name=first_name,
-            last_name=last_name,
-            birth_date=birth_date,
-            email=email,
-            address=address,
-            phone_number=phone_number,
-            status=status)
-          self.redis.set_client(client=client)
+            client = Client(
+                first_name=first_name,
+                last_name=last_name,
+                birth_date=birth_date,
+                email=email,
+                address=address,
+                phone_number=phone_number,
+                status=status,
+                client_id=client_dto.client_id,
+            )
+            self.redis.set_client(client=client)
 
         return client_dto
 
     def update_user_status(self, email: str, new_status: str) -> ClientDTO:
         client_dto = self.dao.update_status(email, new_status)
         if client_dto.success:
-           self.redis.update_client_status(email, new_status)
+            self.redis.update_client_status(email, new_status)
 
         return client_dto
 

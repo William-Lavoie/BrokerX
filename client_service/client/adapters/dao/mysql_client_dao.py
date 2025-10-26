@@ -25,6 +25,7 @@ class MySQLClientDAO(ClientDAO):
                 phone_number=client.phone_number,
                 email=client.email,
                 status=client.status,
+                client_id=client.client_id,
             )
         except ObjectDoesNotExist:
             logger.error(

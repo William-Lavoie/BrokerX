@@ -23,19 +23,21 @@ def test_add_user():
         email="john_smith@example.com",
         phone_number="123-456-7890",
         status="fictional",
-        password="password123"
+        password="password123",
     )
 
     assert client_dto.success
     assert client_dto.code == 201
-    mock_dao.add_user.assert_called_once_with(first_name="John",
+    mock_dao.add_user.assert_called_once_with(
+        first_name="John",
         last_name="Smith",
         address="456 Privett Drive",
         birth_date="1978-01-01",
         email="john_smith@example.com",
         phone_number="123-456-7890",
         status="fictional",
-        password="password123")
+        password="password123",
+    )
 
 
 def test_update_user_status():

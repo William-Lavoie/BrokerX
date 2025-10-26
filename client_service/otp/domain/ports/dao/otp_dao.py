@@ -1,7 +1,6 @@
 from abc import abstractmethod
-from dataclasses import dataclass
 
-from ....domain.ports.otp_repository import OTPDTO
+from otp.domain.ports.otp_repository import OTPDTO
 
 
 class ClientOTPDAO:

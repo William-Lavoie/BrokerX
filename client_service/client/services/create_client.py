@@ -3,10 +3,11 @@ from typing import Optional
 from client.adapters.result import Result
 from client.domain.entities.client import ClientInvalidException
 from client.domain.ports.client_repository import ClientRepository
-#from client.domain.ports.otp_repository import OTPDTO, OTPRepository
 
 from client_service.exceptions import DataAccessException
 from client_service.use_case_results import UseCaseResult
+
+# from client.domain.ports.otp_repository import OTPDTO, OTPRepository
 
 
 class CreateClientUseCaseResult(UseCaseResult):
@@ -25,10 +26,12 @@ class CreateClientUseCaseResult(UseCaseResult):
 
 class CreateClientUseCase:
     def __init__(
-        self, client_repository: ClientRepository,# otp_repository: OTPRepository
+        self,
+        client_repository: ClientRepository,  # otp_repository: OTPRepository
     ):
         self.client_repository = client_repository
-      #  self.otp_repository = otp_repository
+
+    #  self.otp_repository = otp_repository
 
     def execute(
         self,

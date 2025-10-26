@@ -1,8 +1,8 @@
 import pytest
-from client.adapters.django_client_repository import DjangoClientRepository
 from broker.adapters.email_otp_repository import EmailOTPRepository
 from broker.services.commands.create_client_command import CreateClientCommand
 from broker.services.create_account_use_case.create_client import CreateClientUseCase
+from client.adapters.django_client_repository import DjangoClientRepository
 from django.contrib.auth.models import User
 
 pytestmark = pytest.mark.django_db
