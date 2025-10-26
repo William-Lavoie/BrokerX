@@ -35,7 +35,7 @@ class MySQLClientDAO(ClientDAO):
                 first_name=client.first_name,
                 last_name=client.last_name,
                 address=client.address,
-                birth_date=client.birth_date,
+                birth_date=str(client.birth_date),
                 phone_number=client.phone_number,
                 email=client.email,
                 status=client.status,

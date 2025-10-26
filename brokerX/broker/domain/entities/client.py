@@ -1,4 +1,5 @@
 import copy
+import logging
 from decimal import Decimal
 from enum import Enum
 from typing import Optional
@@ -9,6 +10,7 @@ from ...domain.entities.wallet import Wallet
 # TODO: integrate with django user authentification class
 # TODO: cronjob to delete users after 24h
 # User refers strictly to django auth model
+logger = logging.getLogger(__name__)
 
 
 class ClientInvalidException(Exception):
@@ -76,3 +78,20 @@ class Client:
         dict = copy.copy(self.__dict__)
         dict["wallet"] = self.wallet.to_dict()
         return dict
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        logger.error(data)
+        wallet = Wallet.from_dict(data["wallet"]) if "wallet" in data else None
+        return cls(
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            address=data["address"],
+            birth_date=data["birth_date"],
+            email=data["email"],
+            phone_number=data["phone_number"],
+            status=data.get("status", ""),
+            password=data.get("password", ""),
+            wallet=wallet,
+            shares=data.get("shares", {}),
+        )
