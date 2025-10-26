@@ -40,6 +40,7 @@ def redis_get_orders(email: str) -> Optional[list[Order]]:
     except RedisError as re:
         logger.error(f"Redis error occurred while fetching order {email}: {re}")
 
+
 def redis_get_orders_by_stock(symbol: str) -> Optional[list[Order]]:
     try:
         orders_json = redis_client.get(f"orders:{symbol}")

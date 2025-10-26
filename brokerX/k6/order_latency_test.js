@@ -10,8 +10,8 @@ let tokens = [];
 
 export const options = {
   stages: [
-    { duration: '15s', target: 150 },
-    { duration: '1m', target: 150 }
+    { duration: '30s', target: 170 },
+    { duration: '1m', target: 170 }
   ],
   thresholds: {
     http_req_failed: ['rate<0.05'],
@@ -19,7 +19,7 @@ export const options = {
 }
 
 export function setup() {
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 50; i++) {
     const email = postClient();
     const token = getJWTToken(email);
     postPasscode(token)
@@ -32,6 +32,9 @@ export function setup() {
 
 // Function to simulate actions using the JWT token (e.g., placing orders, adding funds)
 function simulateActions(token) {
+  postOrder(token)
+  postOrder(token)
+  postOrder(token)
   postOrder(token)
 }
 

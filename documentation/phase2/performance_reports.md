@@ -8,11 +8,11 @@ The tests ramp up to 150 users in 15 seconds, then remained steady for a 1 minut
 | Metric                           | Monolith                | Monolith + Redis           | Monolith + Redis + Nginx    | Microservices              |
 |----------------------------------|-------------------------|----------------------------|-----------------------------|----------------------------|
 | P95                              | 1495ms                       | 468ms                         | -                           | -                          |
-| P90                              | 936ms                       | - | -                           | -                          |
-| P50                              |  95.5ms       | - | -                           | -                          |
+| P90                              | 936ms                       | 429ms | -                           | -                          |
+| P50                              |  95.5ms       | 175ms | -                           | -                          |
 | Throughput (orders/s)            |  81.3    | -| -                           | -                          |
 | P95 on POST /order               | 488ms        | - | -                           | -                          |
-| Max concurrent users (error rate < 5%) | 150                       | -                          | -                           | -                          |
+| Max concurrent users (error rate < 5%) | 150                       | 170                          | -                           | -                          |
 
 ### Observations
 
@@ -23,5 +23,5 @@ The tests ramp up to 150 users in 15 seconds, then remained steady for a 1 minut
 
 
 #### Monolithic + Redis
-The addition of Redis significantly improved performance on the app, decreasing the P95 by 319%. We can see through the Redis CLI that more than 90% of requests to Redis hits, in other words 90% of requests that previously went to the database are now being handled by Redis, which explains the spike in performance. Redis however only serves fetch operations, the others thus need to be a focus for further optimization. 
+The addition of Redis significantly improved performance on the app, decreasing the P95 by 319%. We can see through the Redis CLI that more than 90% of requests to Redis hits, in other words 90% of requests that previously went to the database are now being handled by Redis, which explains the spike in performance. Redis however only serves fetch operations, the others thus need to be a focus for further optimization.
 
