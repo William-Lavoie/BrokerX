@@ -48,9 +48,7 @@ class Order:
     def price_is_acceptable(
         self, offered_price: Decimal, market_price: Decimal
     ) -> bool:
-        return (
-            self.limit is None and offered_price == market_price
-        )  # or (self.limit and )
+        return self.limit is None and offered_price == market_price
 
     def to_dict(self):
         return {
@@ -61,3 +59,14 @@ class Order:
             "remaining_quantity": self.remaining_quantity,
             "order_id": self.order_id,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            stock=None,
+            client=None,
+            direction=data.get("direction", ""),
+            initial_quantity=data.get("initial_quantity", 0),
+            remaining_quantity=data.get("remaining_quantity", 0),
+            order_id=data.get("order_id", ""),
+        )

@@ -3,6 +3,11 @@ from typing import Optional
 from uuid import UUID
 
 from ..adapters.dao.mysql_order_dao import MySQLOrderDAO
+from ..adapters.redis.redis_order import (
+    redis_add_order,
+    redis_get_orders,
+    redis_set_orders,
+)
 from ..domain.entities.client import Client
 from ..domain.entities.order import Order
 from ..domain.entities.stock import Stock
@@ -41,7 +46,9 @@ class DjangoOrderRepository(OrderRepository):
 
         order_dto.stock = stock
         order_dto.client = client
-        return super().get_order_from_dto(order_dto)
+        order = super().get_order_from_dto(order_dto)
+        redis_add_order(client.email, order)
+        return order
 
     def find_matching_orders(self, order: Order) -> list[OrderDTO]:
         matching_order_dtos = self.dao.find_matching_orders(
@@ -55,10 +62,17 @@ class DjangoOrderRepository(OrderRepository):
         ]
 
     def get_orders_by_client(self, email: str) -> list[Order]:
+        redis_orders = redis_get_orders(email=email)
+        if redis_orders:
+            return redis_orders
+
         order_dtos = self.dao.get_orders_by_client(email=email)
         for order_dto in order_dtos:
             order_dto.stock = Stock(symbol=order_dto.stock)
 
-        return [
+        orders = [
             OrderRepository.get_order_from_dto(order_dto) for order_dto in order_dtos
         ]
+
+        redis_set_orders(email=email, orders=orders)
+        return orders
