@@ -3,6 +3,8 @@ cfgv==3.4.0
 colorama==0.4.6
 distlib==0.4.0
 Django==5.2.7
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
 filelock==3.20.0
 identify==2.6.15
 iniconfig==2.3.0

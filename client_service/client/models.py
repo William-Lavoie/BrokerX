@@ -11,7 +11,7 @@ class Client(models.Model):
     last_name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     birth_date = models.DateField()
-    phone_number = models.CharField(max_length=100, unique=True)
+    phone_number = models.CharField(max_length=100, unique=True, db_index=True)
     status = models.CharField(
         max_length=20, choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")]
     )
