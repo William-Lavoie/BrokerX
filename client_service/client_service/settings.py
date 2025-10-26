@@ -200,3 +200,10 @@ LOGGING = {
         "level": "WARNING",
     },
 }
+
+REDIS_CONFIG = {
+    "host": "redis",
+    "port": 6379,
+    "db": 0,
+    "max_connections": 10,
+}

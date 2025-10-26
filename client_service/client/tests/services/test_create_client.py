@@ -1,10 +1,8 @@
 from unittest.mock import MagicMock
 
 import pytest
-from broker.adapters.result import Result
-from broker.domain.ports.otp_repository import OTPDTO
-from broker.services.commands.create_client_command import CreateClientCommand
-from broker.services.create_account_use_case.create_client import CreateClientUseCase
+from client.adapters.result import Result
+from client.services.create_client import CreateClientUseCase
 
 pytestmark = pytest.mark.django_db
 
