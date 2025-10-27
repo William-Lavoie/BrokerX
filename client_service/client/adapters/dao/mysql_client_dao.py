@@ -1,8 +1,7 @@
 import logging
 
 from client.domain.ports.dao.client_dao import ClientDAO, ClientDTO
-from client.models import Client
-from django.contrib.auth.models import User
+from client.models import Client, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
@@ -42,7 +41,6 @@ class MySQLClientDAO(ClientDAO):
         email: str,
         phone_number: str,
         address: str,
-        status: str,
         password: str,
     ) -> ClientDTO:
         try:
@@ -57,26 +55,39 @@ class MySQLClientDAO(ClientDAO):
                 return ClientDTO(success=False, code=409)
 
             with transaction.atomic():
-                user = User.objects.create_user(
+                user = User.objects.create(
                     first_name=first_name,
                     last_name=last_name,
                     email=email,
                     username=email,
-                    password=password,
                 )
+                user.set_password(password)
+                user.save()
 
-                Client.objects.create(
+                client = Client.objects.create(
                     user=user,
+                    client_id=user.uuid,
                     first_name=first_name,
                     last_name=last_name,
                     email=email,
                     phone_number=phone_number,
                     birth_date=birth_date,
                     address=address,
-                    status=status,
+                    status="P",
                 )
 
-            return ClientDTO(success=True, code=201)
+            return ClientDTO(
+                success=True,
+                code=201,
+                first_name=client.first_name,
+                last_name=client.last_name,
+                address=client.address,
+                birth_date=client.birth_date,
+                email=client.email,
+                phone_number=client.phone_number,
+                status=client.status,
+                client_id=client.client_id,
+            )
 
         except AttributeError as e:
             logger.error(f"The request is invalid: {e}")

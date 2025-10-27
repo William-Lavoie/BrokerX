@@ -17,7 +17,6 @@ class ClientDAO:
         email: str,
         phone_number: str,
         address: str,
-        status: str,
         password: str,
     ) -> ClientDTO:
         pass

@@ -1,23 +1,22 @@
 from abc import abstractmethod
+from uuid import UUID
 
 from otp.domain.ports.otp_repository import OTPDTO
 
 
-class ClientOTPDAO:
+class OTPDAO:
     @abstractmethod
-    def set_secret_key(self, email: str, secret: str) -> OTPDTO:
+    def set_secret_key(self, client_id: UUID, secret: str) -> OTPDTO:
         pass
 
     @abstractmethod
-    def get_secret_key(self, email: str) -> OTPDTO:
-        pass
-
-    # TODO: use a database constraint instead?
-    @abstractmethod
-    def delete_passcode(self, email: str) -> OTPDTO:
-        """Expire a passcode after 3 attemps, 10 mins or upon validation to prevent brute-forcing"""
+    def get_secret_key(self, client_id: UUID) -> OTPDTO:
         pass
 
     @abstractmethod
-    def increment_attempts(self, email: str) -> OTPDTO:
+    def delete_passcode(self, client_id: UUID) -> OTPDTO:
+        pass
+
+    @abstractmethod
+    def increment_attempts(self, client_id: UUID) -> OTPDTO:
         pass

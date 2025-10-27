@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Optional
+from uuid import UUID
 
 from client.adapters.result import Result
 
@@ -13,17 +15,19 @@ class OTPDTO(Result):
 
 class OTPRepository(ABC):
     @abstractmethod
-    def create_passcode(self, email: str) -> OTPDTO:
+    def create_passcode(self, client_id: Optional[UUID], email: str) -> OTPDTO:
         pass
 
     @abstractmethod
-    def send_passcode(self, email: str, passcode: str) -> bool:
+    def send_passcode(
+        self, client_id: Optional[UUID], email: str, passcode: str
+    ) -> bool:
         pass
 
     @abstractmethod
-    def verify_passcode(self, email: str, passcode: str) -> OTPDTO:
+    def verify_passcode(self, client_id: UUID, passcode: str) -> OTPDTO:
         pass
 
     @abstractmethod
-    def register_secret(self, email: str, secret: str) -> bool:
+    def register_secret(self, client_id: Optional[UUID], secret: str) -> bool:
         pass

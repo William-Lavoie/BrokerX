@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock
 
 import pytest
-from broker.adapters.result import Result
-from broker.domain.ports.otp_repository import OTPDTO
-from broker.services.create_account_use_case.verify_passcode import VerifyPassCode
+from client.adapters.result import Result
+from otp.domain.ports.otp_repository import OTPDTO
+from otp.services.verify_passcode import VerifyPassCode
 
 pytestmark = pytest.mark.django_db
 
@@ -21,7 +21,9 @@ def test_execute():
         client_repository=mock_client_repo, otp_repository=mock_otp_repo
     )
 
-    result = use_case.execute("test@email.com", "secret")
+    result = use_case.execute(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c", "test@email.com", "secret"
+    )
 
     assert result.success
     assert result.message == "You have entered the correct passcode"
@@ -40,7 +42,9 @@ def test_execute_max_attempts():
         client_repository=mock_client_repo, otp_repository=mock_otp_repo
     )
 
-    result = use_case.execute("test@email.com", "secret")
+    result = use_case.execute(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c", "test@email.com", "secret"
+    )
 
     assert not result.success
     assert (
@@ -62,7 +66,9 @@ def test_execute_wrong_password():
         client_repository=mock_client_repo, otp_repository=mock_otp_repo
     )
 
-    result = use_case.execute("test@email.com", "secret")
+    result = use_case.execute(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c", "test@email.com", "secret"
+    )
 
     assert not result.success
     assert result.message == "Wrong passcode. Attempts left : 1"
@@ -81,7 +87,9 @@ def test_execute_user_not_updated():
         client_repository=mock_client_repo, otp_repository=mock_otp_repo
     )
 
-    result = use_case.execute("test@email.com", "secret")
+    result = use_case.execute(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c", "test@email.com", "secret"
+    )
 
     assert not result.success
     assert result.message == "There was an error, please try again."

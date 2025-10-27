@@ -41,6 +41,7 @@ class RedisClient:
 
         except RedisError as re:
             logger.error(f"Redis error occurred while fetching client {email}: {re}")
+            return None
 
     def update_client_status(self, email: str, new_status: str) -> None:
         try:

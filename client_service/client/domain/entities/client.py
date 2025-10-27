@@ -64,4 +64,5 @@ class Client:
             phone_number=data.get("phone_number", ""),
             status=data.get("status", ""),
             password=data.get("password", ""),
+            client_id=data.get("client_id", None),
         )

@@ -1,11 +1,10 @@
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import ANY, patch
 
 import pytest
 
 pytestmark = pytest.mark.django_db
 
-from broker.adapters.base_otp_repository import BaseOTPRepository
-from broker.domain.entities.client import Client
+from otp.adapters.base_otp_repository import BaseOTPRepository
 
 
 class DummyBaseOTPRepository(BaseOTPRepository):
@@ -24,19 +23,11 @@ class DummyBaseOTPRepository(BaseOTPRepository):
 def test_create_passcode(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = Client(
-        first_name="John",
-        last_name="Smith",
-        address="456 Privett Drive",
-        birth_date="1978-01-01",
-        email="john_smith@example.com",
-        phone_number="123-456-7890",
-        status="fictional",
+    repo.create_passcode("b7da9c9a-7a07-4cd9-b05d-ee0af131eed4", "test")
+    mock_send.assert_called_once_with(
+        "b7da9c9a-7a07-4cd9-b05d-ee0af131eed4", "test", ANY
     )
-
-    repo.create_passcode(client.email)
-    mock_send.assert_called_once_with("john_smith@example.com", ANY)
-    mock_register.assert_called_once_with(client.email, ANY)
+    mock_register.assert_called_once_with("b7da9c9a-7a07-4cd9-b05d-ee0af131eed4", ANY)
 
 
 @patch.object(DummyBaseOTPRepository, "send_passcode")
@@ -44,17 +35,8 @@ def test_create_passcode(mock_register, mock_send):
 def test_create_passcode_error_send(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = Client(
-        first_name="John",
-        last_name="Smith",
-        address="456 Privett Drive",
-        birth_date="1978-01-01",
-        email="john_smith@example.com",
-        phone_number="123-456-7890",
-        status="fictional",
-    )
     mock_send.return_value = False
-    result = repo.create_passcode(client)
+    result = repo.create_passcode("b7da9c9a-7a07-4cd9-b05d-ee0af131eed4", "test")
     assert not result.success
     assert result.code == 500
 
@@ -64,17 +46,8 @@ def test_create_passcode_error_send(mock_register, mock_send):
 def test_create_passcode_error_register(mock_register, mock_send):
     repo = DummyBaseOTPRepository()
 
-    client = Client(
-        first_name="John",
-        last_name="Smith",
-        address="456 Privett Drive",
-        birth_date="1978-01-01",
-        email="john_smith@example.com",
-        phone_number="123-456-7890",
-        status="fictional",
-    )
     mock_register.return_value = False
-    result = repo.create_passcode(client)
+    result = repo.create_passcode("b7da9c9a-7a07-4cd9-b05d-ee0af131eed4", "test")
     assert not result.success
     assert result.code == 500
 

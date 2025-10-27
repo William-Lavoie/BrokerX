@@ -33,9 +33,8 @@ class ClientRepository:
         address: str,
         email: str,
         phone_number: str,
-        status: str,
         password: str,
-    ) -> Result:
+    ) -> ClientDTO:
         pass
 
     @abstractmethod

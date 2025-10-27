@@ -1,34 +1,30 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from broker.adapters.email_otp_repository import EmailOTPRepository
-from broker.domain.ports.otp_repository import OTPDTO
-from django.contrib.auth.models import User
+from otp.adapters.email_otp_repository import EmailOTPRepository
+from otp.domain.ports.otp_repository import OTPDTO
 
 pytestmark = pytest.mark.django_db
 
-from broker.domain.entities.client import Client
-from broker.models import ClientOTP
+from otp.models import OTP
 
 
 @pytest.fixture(autouse=True)
 def setup_function(db):
-    user = User.objects.create(
-        first_name="John",
-        last_name="Smith",
-        email="john_smith@example.com",
+    OTP.objects.create(
+        client_id="54cc5b84-5720-4c43-af3f-1ef8d13a440c",
+        secret="123abc",
+        number_attempts=0,
     )
-
-    ClientOTP.objects.create(user=user, secret="123abc", number_attempts=0)
     yield
 
 
-@patch("broker.adapters.email_otp_repository.send_mail")
+@patch("otp.adapters.email_otp_repository.send_mail")
 def test_send_passcode(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.return_value = 1
 
-    assert repo.send_passcode("john_smith@example.com", "123abc")
+    assert repo.send_passcode("test", "john_smith@example.com", "123abc")
     mock_send_mail.assert_called_once_with(
         "Here is your passcode: ",
         "123abc",
@@ -38,23 +34,23 @@ def test_send_passcode(mock_send_mail):
     )
 
 
-@patch("broker.adapters.email_otp_repository.send_mail")
+@patch("otp.adapters.email_otp_repository.send_mail")
 def test_send_passcode_failure(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.return_value = 0
 
-    assert not repo.send_passcode("john_smith@example.com", "123abc")
+    assert not repo.send_passcode("test", "john_smith@example.com", "123abc")
 
 
-@patch("broker.adapters.email_otp_repository.send_mail")
+@patch("otp.adapters.email_otp_repository.send_mail")
 def test_send_passcode_exception(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.side_effect = Exception("Server error")
 
-    assert not repo.send_passcode("john_smith@example.com", "123abc")
+    assert not repo.send_passcode("test", "john_smith@example.com", "123abc")
 
 
-@patch("broker.adapters.email_otp_repository.pyotp.TOTP")
+@patch("otp.adapters.email_otp_repository.pyotp.TOTP")
 def test_verify_passcode(mock_totp):
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
@@ -63,13 +59,15 @@ def test_verify_passcode(mock_totp):
     )
     mock_totp.return_value.now.return_value = "123456"
 
-    result = repo.verify_passcode("john_smith@example.com", "123456")
+    result = repo.verify_passcode("54cc5b84-5720-4c43-af3f-1ef8d13a440c", "123456")
     assert result.success
 
-    mock_dao.delete_passcode.assert_called_once_with("john_smith@example.com")
+    mock_dao.delete_passcode.assert_called_once_with(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c"
+    )
 
 
-@patch("broker.adapters.email_otp_repository.pyotp.TOTP")
+@patch("otp.adapters.email_otp_repository.pyotp.TOTP")
 def test_invalid_passcode_wrong_passcode(mock_totp):
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
@@ -81,34 +79,30 @@ def test_invalid_passcode_wrong_passcode(mock_totp):
     )
     mock_totp.return_value.now.return_value = "123456"
 
-    result = repo.verify_passcode("john_smith@example.com", "987654")
+    result = repo.verify_passcode("54cc5b84-5720-4c43-af3f-1ef8d13a440c", "987654")
     assert not result.success
-    mock_dao.increment_attempts.assert_called_once_with("john_smith@example.com")
+    mock_dao.increment_attempts.assert_called_once_with(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c"
+    )
 
 
-@patch("broker.adapters.email_otp_repository.pyotp.TOTP")
+@patch("otp.adapters.email_otp_repository.pyotp.TOTP")
 def test_verify_passcode_no_secret(mock_totp):
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
     mock_dao.get_secret_key.return_value = OTPDTO(success=False, code=500)
     mock_totp.return_value.now.return_value = "123456"
 
-    result = repo.verify_passcode("john_smith@example.com", "123456")
+    result = repo.verify_passcode("54cc5b84-5720-4c43-af3f-1ef8d13a440c", "123456")
     assert not result.success
 
 
 def test_register_secret():
     mock_dao = MagicMock()
     repo = EmailOTPRepository(mock_dao)
-    user = Client(
-        first_name="John",
-        last_name="Smith",
-        address="456 Privett Drive",
-        birth_date="1978-01-01",
-        email="john_smith@example.com",
-        phone_number="123-456-7890",
-        status="fictional",
-    )
-    repo.register_secret(user.email, "123abc")
 
-    mock_dao.set_secret_key.assert_called_once_with("john_smith@example.com", "123abc")
+    repo.register_secret("54cc5b84-5720-4c43-af3f-1ef8d13a440c", "123abc")
+
+    mock_dao.set_secret_key.assert_called_once_with(
+        "54cc5b84-5720-4c43-af3f-1ef8d13a440c", "123abc"
+    )

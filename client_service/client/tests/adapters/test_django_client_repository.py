@@ -22,7 +22,6 @@ def test_add_user():
         birth_date="1978-01-01",
         email="john_smith@example.com",
         phone_number="123-456-7890",
-        status="fictional",
         password="password123",
     )
 
@@ -35,7 +34,6 @@ def test_add_user():
         birth_date="1978-01-01",
         email="john_smith@example.com",
         phone_number="123-456-7890",
-        status="fictional",
         password="password123",
     )
 

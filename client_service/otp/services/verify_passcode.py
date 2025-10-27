@@ -1,7 +1,10 @@
-from ...domain.entities.client import ClientStatus
-from ...domain.ports.client_repository import ClientRepository
-from ...domain.ports.otp_repository import OTPRepository
-from ...services.use_case_result import UseCaseResult
+from uuid import UUID
+
+from client.domain.entities.client import ClientStatus
+from client.domain.ports.client_repository import ClientRepository
+from otp.domain.ports.otp_repository import OTPRepository
+
+from client_service.use_case_results import UseCaseResult
 
 
 class VerifyPassCode:
@@ -13,9 +16,9 @@ class VerifyPassCode:
         self.otp_repository = otp_repository
         self.client_repository = client_repository
 
-    def execute(self, email: str, passcode: str) -> UseCaseResult:
+    def execute(self, client_id: UUID, email: str, passcode: str) -> UseCaseResult:
 
-        otp_dto = self.otp_repository.verify_passcode(email, passcode)
+        otp_dto = self.otp_repository.verify_passcode(client_id, passcode)
 
         if not otp_dto.success:
             if otp_dto.attempts >= 3:
@@ -47,8 +50,8 @@ class VerifyPassCode:
             code=200,
         )
 
-    def generate_passcode(self, email: str) -> UseCaseResult:
-        otp_dto = self.otp_repository.create_passcode(email)
+    def generate_passcode(self, client_id: UUID, email: str) -> UseCaseResult:
+        otp_dto = self.otp_repository.create_passcode(client_id=client_id, email=email)
 
         if otp_dto.success:
             return UseCaseResult(

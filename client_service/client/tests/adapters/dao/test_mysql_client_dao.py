@@ -64,7 +64,6 @@ def test_add_client():
         birth_date="1954-01-01",
         email="tom_hanks@example.com",
         phone_number="514-872-1231",
-        status="fictional",
         password="password123",
     )
     assert result.success
@@ -82,7 +81,7 @@ def test_add_client():
     assert saved_client.address == "398 Sherbrooke"
     assert str(saved_client.birth_date) == "1954-01-01"
     assert saved_client.phone_number == "514-872-1231"
-    assert saved_client.status == "fictional"
+    assert saved_client.status == "P"
 
 
 def test_add_client_email_already_used():
@@ -95,7 +94,6 @@ def test_add_client_email_already_used():
         birth_date="2001-01-01",
         email="john_smith@example.com",
         phone_number="234-633-6431",
-        status="pending",
         password="password123",
     )
     assert not result.success
@@ -112,7 +110,6 @@ def test_add_client_phone_already_used():
         birth_date="2001-01-01",
         email="mike_collin@example.com",
         phone_number="123-456-7890",
-        status="pending",
         password="password123",
     )
     assert not result.success
@@ -129,7 +126,6 @@ def test_add_client_invalid_data():
         birth_date="2001-01-01",
         email=12,
         phone_number="123-456-7840",
-        status="pending",
         password="strongpassword123",
     )
 

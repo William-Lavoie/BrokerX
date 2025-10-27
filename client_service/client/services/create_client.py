@@ -1,13 +1,11 @@
 from typing import Optional
 
-from client.adapters.result import Result
 from client.domain.entities.client import ClientInvalidException
-from client.domain.ports.client_repository import ClientRepository
+from client.domain.ports.client_repository import ClientDTO, ClientRepository
+from otp.domain.ports.otp_repository import OTPDTO, OTPRepository
 
 from client_service.exceptions import DataAccessException
 from client_service.use_case_results import UseCaseResult
-
-# from client.domain.ports.otp_repository import OTPDTO, OTPRepository
 
 
 class CreateClientUseCaseResult(UseCaseResult):
@@ -26,12 +24,10 @@ class CreateClientUseCaseResult(UseCaseResult):
 
 class CreateClientUseCase:
     def __init__(
-        self,
-        client_repository: ClientRepository,  # otp_repository: OTPRepository
+        self, client_repository: ClientRepository, otp_repository: OTPRepository
     ):
         self.client_repository = client_repository
-
-    #  self.otp_repository = otp_repository
+        self.otp_repository = otp_repository
 
     def execute(
         self,
@@ -41,46 +37,48 @@ class CreateClientUseCase:
         email: str,
         phone_number: str,
         address: str,
-        status: str,
         password: str,
     ) -> UseCaseResult:
 
-        result: Result = self.client_repository.add_user(
+        client_dto: ClientDTO = self.client_repository.add_user(
             first_name=first_name,
             last_name=last_name,
             birth_date=birth_date,
             email=email,
             address=address,
             phone_number=phone_number,
-            status=status,
             password=password,
         )
 
-        if not result.success:
-            if result.code == 409:
+        if not client_dto.success:
+            if client_dto.code == 409:
                 return UseCaseResult(
                     success=False,
                     message="There is already a user with the same email and/or phone number",
-                    code=result.code,
+                    code=client_dto.code,
                 )
-            elif result.code == 500:
+            elif client_dto.code == 500:
                 return UseCaseResult(
                     success=False,
                     message="There was an unexpected error. Please try again or contact customer support.",
-                    code=result.code,
+                    code=client_dto.code,
                 )
 
-        # otp_result: OTPDTO = self.otp_repository.create_passcode(client.email)
+        otp_result: OTPDTO = self.otp_repository.create_passcode(
+            client_id=client_dto.client_id, email=email
+        )
 
-        # if not otp_result.success:
-        #  return UseCaseResult(
-        #         success=False,
-        #         message="There was an error creating your passcode.",
-        #         code=result.code,
-        #    )
+        if not otp_result.success:
+            return UseCaseResult(
+                success=False,
+                message="There was an error creating your passcode.",
+                code=otp_result.code,
+            )
 
         return UseCaseResult(
-            success=True, message="The user was successfully created", code=result.code
+            success=True,
+            message="The user was successfully created",
+            code=otp_result.code,
         )
 
     def get_client_info(self, email: str):

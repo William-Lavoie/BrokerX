@@ -42,7 +42,6 @@ class DjangoClientRepository(ClientRepository):
         address: str,
         email: str,
         phone_number: str,
-        status: str,
         password: str,
     ) -> ClientDTO:
 
@@ -53,7 +52,6 @@ class DjangoClientRepository(ClientRepository):
             email=email,
             address=address,
             phone_number=phone_number,
-            status=status,
             password=password,
         )
         if client_dto.success:
@@ -64,7 +62,7 @@ class DjangoClientRepository(ClientRepository):
                 email=email,
                 address=address,
                 phone_number=phone_number,
-                status=status,
+                status=client_dto.status,
                 client_id=client_dto.client_id,
             )
             self.redis.set_client(client=client)

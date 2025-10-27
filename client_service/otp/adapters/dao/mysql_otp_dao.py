@@ -1,18 +1,16 @@
 import logging
 from uuid import UUID
 
-from client.adapters.result import Result
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from otp.domain.ports.dao.otp_dao import ClientOTPDAO
+from otp.domain.ports.dao.otp_dao import OTPDAO
 from otp.domain.ports.otp_repository import OTPDTO
 from otp.models import OTP
 
 logger = logging.getLogger("mysql")
 
 
-class MySQLOTPDAO(ClientOTPDAO):
+class MySQLOTPDAO(OTPDAO):
     def set_secret_key(self, client_id: UUID, secret: str) -> OTPDTO:
         with transaction.atomic():
             OTP.objects.update_or_create(

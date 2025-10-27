@@ -1,15 +1,18 @@
 import json
-import logging
-from dataclasses import asdict
 
 from client.adapters.django_client_repository import DjangoClientRepository
+from client.services.create_client import CreateClientUseCase
 from django.http import JsonResponse
+from otp.adapters.email_otp_repository import EmailOTPRepository
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-# from client.services.create_account_use_case.create_client import CreateClientUseCase
+from client_service.serializers import MyTokenObtainPairSerializer
 
-logger = logging.getLogger(__name__)
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class ClientView(APIView):
@@ -33,11 +36,18 @@ class ClientView(APIView):
 
         use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
 
-        result = use_case.execute(client_command)
+        result = use_case.execute(
+            first_name=first_name,
+            last_name=last_name,
+            birth_date=birth_date,
+            email=email,
+            phone_number=phone_number,
+            address=address,
+            password=password,
+        )
         return JsonResponse(result.to_dict(), status=result.code)
 
     def get(self, request):
         use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
         result = use_case.get_client_info(request.user.email)
-        logger.error(result.to_dict())
         return JsonResponse(result.to_dict())

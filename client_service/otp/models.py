@@ -1,6 +1,5 @@
-import uuid
+# mypy: ignore-errors
 
-from client.models import Client
 from django.core.validators import MaxValueValidator
 from django.db import models
 

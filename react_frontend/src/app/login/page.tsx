@@ -11,7 +11,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/token/", {
+      const response = await fetch("http://localhost:8001/api/token/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

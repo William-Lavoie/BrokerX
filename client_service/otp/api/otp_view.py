@@ -1,13 +1,12 @@
 import json
 import logging
 
+from client.adapters.django_client_repository import DjangoClientRepository
 from django.http import JsonResponse
+from otp.adapters.email_otp_repository import EmailOTPRepository
+from otp.services.verify_passcode import VerifyPassCode
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from ..adapters.django_client_repository import DjangoClientRepository
-from ..adapters.email_otp_repository import EmailOTPRepository
-from ..services.create_account_use_case.verify_passcode import VerifyPassCode
 
 logger = logging.getLogger(__name__)
 
