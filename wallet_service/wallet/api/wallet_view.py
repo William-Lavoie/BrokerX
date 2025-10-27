@@ -5,14 +5,12 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from wallet.adapters.django_transaction_repository import DjangoTransactionRepository
+from wallet.adapters.django_wallet_repository import DjangoWalletRepository
+from wallet.adapters.mock_payment_service_repository import MockPaymentServiceRepository
+from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 
-from ..adapters.django_client_repository import DjangoClientRepository
-from ..adapters.django_transaction_repository import DjangoTransactionRepository
-from ..adapters.django_wallet_repository import DjangoWalletRepository
-from ..adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from ..services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wallet")
 
 
 class WalletView(APIView):
@@ -27,20 +25,20 @@ class WalletView(APIView):
         idempotency_key = request.headers.get("Idempotency-Key")
 
         use_case = AddFundsToWalletUseCase(
-            DjangoClientRepository(),
             MockPaymentServiceRepository(),
             DjangoWalletRepository(),
             DjangoTransactionRepository(),
         )
 
-        result = use_case.execute(request.user.email, amount, idempotency_key)
+        result = use_case.execute(
+            request.user.uuid, request.user.email, amount, idempotency_key
+        )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
 
     def get(self, request):
 
         use_case = AddFundsToWalletUseCase(
-            DjangoClientRepository(),
             MockPaymentServiceRepository(),
             DjangoWalletRepository(),
             DjangoTransactionRepository(),

@@ -1,8 +1,9 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
+from uuid import UUID
 
-from ....adapters.result import Result
+from wallet.adapters.result import Result
 
 
 @dataclass
@@ -12,9 +13,9 @@ class WalletDTO(Result):
 
 class WalletDAO:
     @abstractmethod
-    def get_balance(self, email: str) -> WalletDTO:
+    def get_balance(self, client_id: UUID) -> WalletDTO:
         pass
 
     @abstractmethod
-    def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
+    def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
         pass

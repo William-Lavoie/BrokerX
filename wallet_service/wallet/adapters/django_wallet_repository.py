@@ -1,31 +1,32 @@
 from decimal import Decimal
+from uuid import UUID
 
-from ..adapters.dao.mysql_wallet_dao import MySQLWalletDAO
-from ..adapters.redis.redis_wallet import (
-    redis_get_wallet_balance,
-    redis_set_wallet_balance,
-)
-from ..domain.ports.dao.wallet_dao import WalletDTO
-from ..domain.ports.wallet_repository import WalletRepository
+from wallet.adapters.dao.mysql_wallet_dao import MySQLWalletDAO
+from wallet.adapters.redis.redis_wallet import RedisWallet
+from wallet.domain.ports.dao.wallet_dao import WalletDTO
+from wallet.domain.ports.wallet_repository import WalletRepository
 
 
 class DjangoWalletRepository(WalletRepository):
-    def __init__(self, dao=None):
+    def __init__(self, dao=None, redis=None):
         super().__init__()
         self.dao = dao if dao is not None else MySQLWalletDAO()
+        self.redis = redis if redis is not None else RedisWallet()
 
-    def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
-        wallet_dto = self.dao.add_funds(email, amount)
+    def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
+        wallet_dto = self.dao.add_funds(client_id, amount)
         if wallet_dto.success:
-            redis_set_wallet_balance(email=email, balance=wallet_dto.balance)
+            self.redis.set_wallet_balance(
+                client_id=client_id, balance=wallet_dto.balance
+            )
 
         return wallet_dto
 
-    def get_balance(self, email: str) -> WalletDTO:
-        redis_balance = redis_get_wallet_balance(email=email)
+    def get_balance(self, client_id: UUID) -> WalletDTO:
+        redis_balance = self.redis.get_wallet_balance(client_id=client_id)
         if redis_balance:
             return WalletDTO(success=True, code=200, balance=Decimal(redis_balance))
 
-        wallet_dto = self.dao.get_balance(email)
-        redis_set_wallet_balance(email, wallet_dto.balance)
+        wallet_dto = self.dao.get_balance(client_id)
+        self.redis.set_wallet_balance(client_id, wallet_dto.balance)
         return wallet_dto

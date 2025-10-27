@@ -1,29 +1,19 @@
-import uuid
 from decimal import Decimal
 
 import pytest
-from broker.adapters.dao.mysql_transaction_dao import MySQLTransactionDAO
+from wallet.adapters.dao.mysql_transaction_dao import MySQLTransactionDAO
 
 pytestmark = pytest.mark.django_db
 
-from broker.models import Transaction
-from django.contrib.auth.models import User
+from wallet.models import Transaction
 
 
 @pytest.fixture(autouse=True)
 def setup_function(db):
-    user = User.objects.create(
-        first_name="John",
-        last_name="Smith",
-        email="john_smith@example.com",
-    )
-
     Transaction.objects.create(
-        user=user,
+        client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("10.50"),
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6",
-        status="P",
-        transaction_type="D",
         message="This is a test",
     )
     yield
@@ -33,9 +23,8 @@ def test_write_transaction():
     dao = MySQLTransactionDAO()
 
     result = dao.write_transaction(
-        email="john_smith@example.com",
+        client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("20.99"),
-        type="D",
         idempotency_key="43b80e5d-ae6c-4789-a696-2fd81db4296e",
     )
 
@@ -43,9 +32,7 @@ def test_write_transaction():
     assert result.code == 201
     assert result.amount.compare(Decimal("20.99")) == 0
     assert result.status == "P"
-    assert result.type == "D"
     assert not result.message
-    assert result.new
 
     saved_transaction = Transaction.objects.filter(
         idempotency_key="43b80e5d-ae6c-4789-a696-2fd81db4296e"
@@ -57,7 +44,6 @@ def test_write_transaction():
 
     assert saved_transaction.amount.compare(Decimal("20.99")) == 0
     assert saved_transaction.status == "P"
-    assert saved_transaction.transaction_type == "D"
     assert (
         str(saved_transaction.idempotency_key) == "43b80e5d-ae6c-4789-a696-2fd81db4296e"
     )
@@ -67,19 +53,16 @@ def test_write_transaction_same_uuid():
     dao = MySQLTransactionDAO()
 
     result = dao.write_transaction(
-        email="john_smith@example.com",
+        client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("20.99"),
-        type="D",
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6",
     )
 
     assert result.success
-    assert result.code == 201
+    assert result.code == 200
     assert result.amount.compare(Decimal("10.50")) == 0
     assert result.status == "P"
-    assert result.type == "D"
     assert result.message == "This is a test"
-    assert not result.new
 
     saved_transaction = Transaction.objects.filter(
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6"
@@ -92,23 +75,22 @@ def test_write_transaction_no_user():
     dao = MySQLTransactionDAO()
 
     result = dao.write_transaction(
-        email="test@example.com",
-        amount=Decimal(20.99),
-        type="D",
-        idempotency_key="e4b88817-87de-fb1f734d57a6",
+        client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
+        amount=Decimal("20.99"),
+        idempotency_key="be3fcd15-9012-4666-8803-fcb2d5686f60",
     )
 
-    assert not result.success
-    assert result.code == 404
+    assert result.success
+    assert result.code == 201
+    assert Decimal(result.amount) == Decimal("20.99")
 
 
 def test_write_transaction_bad_uuid():
     dao = MySQLTransactionDAO()
 
     result = dao.write_transaction(
-        email="john_smith@example.com",
+        client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal(20.99),
-        type="D",
         idempotency_key="not a uuid",
     )
 

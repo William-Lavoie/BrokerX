@@ -1,39 +1,26 @@
 import logging
 from decimal import Decimal
+from uuid import UUID
 
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from wallet.domain.ports.dao.wallet_dao import WalletDAO, WalletDTO
+from wallet.models import Wallet
 
-from ...domain.ports.dao.wallet_dao import WalletDAO, WalletDTO
-from ...models import Client, Wallet
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("mysql")
 
 
 class MySQLWalletDAO(WalletDAO):
-    def get_balance(self, email: str) -> WalletDTO:
-        try:
-            with transaction.atomic():
-                client = Client.objects.get(email=email)
-                wallet, created = Wallet.objects.get_or_create(client=client)
+    def get_balance(self, client_id: UUID) -> WalletDTO:
+        with transaction.atomic():
+            wallet, created = Wallet.objects.get_or_create(client_id=client_id)
 
-                return WalletDTO(success=True, code=200, balance=wallet.balance)
+            return WalletDTO(success=True, code=200, balance=wallet.balance)
 
-        except ObjectDoesNotExist:
-            logger.error(f"There is no user with the email {email}")
-            return WalletDTO(success=False, code=404, balance=Decimal("0.00"))
+    def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
+        with transaction.atomic():
+            wallet, created = Wallet.objects.get_or_create(client_id=client_id)
 
-    def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
-        try:
-            with transaction.atomic():
-                client = Client.objects.get(email=email)
-                wallet, created = Wallet.objects.get_or_create(client=client)
-                wallet.balance += amount
-                wallet.save()
+            wallet.balance = Decimal(wallet.balance) + Decimal(amount)
+            wallet.save()
 
-                return WalletDTO(success=True, code=200, balance=wallet.balance)
-
-        except ObjectDoesNotExist:
-            logger.error(f"There is no user with the email {email}")
-            return WalletDTO(success=False, code=404)
+            return WalletDTO(success=True, code=200, balance=wallet.balance)

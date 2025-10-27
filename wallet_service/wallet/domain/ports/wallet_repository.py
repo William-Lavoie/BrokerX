@@ -1,14 +1,15 @@
 from abc import abstractmethod
 from decimal import Decimal
+from uuid import UUID
 
-from ...domain.ports.dao.wallet_dao import WalletDTO
+from wallet.domain.ports.dao.wallet_dao import WalletDTO
 
 
 class WalletRepository:
     @abstractmethod
-    def add_funds(self, email: str, amount: Decimal) -> WalletDTO:
+    def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
         pass
 
     @abstractmethod
-    def get_balance(self, email: str) -> WalletDTO:
+    def get_balance(self, client_id: UUID) -> WalletDTO:
         pass

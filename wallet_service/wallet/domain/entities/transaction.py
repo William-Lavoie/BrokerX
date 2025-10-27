@@ -1,9 +1,6 @@
 from decimal import Decimal
 from enum import Enum
-from typing import Optional
 from xmlrpc.client import DateTime
-
-from ...domain.entities.client import Client
 
 
 class TransactionStatus(Enum):
@@ -22,16 +19,12 @@ class Transaction:
         self,
         amount: Decimal,
         status: str,
-        type: str,
         message: str,
-        client: Optional[Client] = None,
         created_at=None,
     ):
-        self.client: Optional[Client] = client
         self.amount: Decimal = amount
         self.created_at: DateTime = created_at
         self.status: str = status
-        self.type: str = type
         self.message: str = message
 
     def has_been_processed(self) -> bool:
