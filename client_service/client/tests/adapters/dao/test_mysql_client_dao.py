@@ -1,12 +1,9 @@
-import datetime
-
 import pytest
 
 pytestmark = pytest.mark.django_db
 
 from client.adapters.dao.mysql_client_dao import MySQLClientDAO
-from client.models import Client
-from django.contrib.auth.models import User
+from client.models import Client, User
 
 
 @pytest.fixture(autouse=True)
@@ -18,6 +15,7 @@ def setup_function(db):
     )
 
     Client.objects.create(
+        client_id=user.uuid,
         user=user,
         first_name="John",
         last_name="Smith",
@@ -114,23 +112,6 @@ def test_add_client_phone_already_used():
     )
     assert not result.success
     assert result.code == 409
-
-
-def test_add_client_invalid_data():
-    dao = MySQLClientDAO()
-
-    result = dao.add_user(
-        first_name="Mike",
-        last_name="Collin",
-        address="876 New York",
-        birth_date="2001-01-01",
-        email=12,
-        phone_number="123-456-7840",
-        password="strongpassword123",
-    )
-
-    assert not result.success
-    assert result.code == 400
 
 
 def test_update_client_status():

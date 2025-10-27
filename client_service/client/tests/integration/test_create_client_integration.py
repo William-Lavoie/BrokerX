@@ -1,7 +1,7 @@
 import pytest
 from client.adapters.django_client_repository import DjangoClientRepository
+from client.models import User
 from client.services.create_client import CreateClientUseCase
-from django.contrib.auth.models import User
 from otp.adapters.email_otp_repository import EmailOTPRepository
 
 pytestmark = pytest.mark.django_db

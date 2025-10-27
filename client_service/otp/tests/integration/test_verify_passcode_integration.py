@@ -1,8 +1,7 @@
 import pyotp
 import pytest
 from client.adapters.django_client_repository import DjangoClientRepository
-from client.models import Client
-from django.contrib.auth.models import User
+from client.models import Client, User
 from otp.adapters.email_otp_repository import EmailOTPRepository
 from otp.models import OTP
 from otp.services.verify_passcode import VerifyPassCode
