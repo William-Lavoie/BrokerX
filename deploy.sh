@@ -24,6 +24,7 @@ git reset --hard >/dev/null 2>&1
 git clean -fd >/dev/null 2>&1
 
 docker network rm brokerx-network >/dev/null 2>&1 || true
+docker network create brokerx-network
 
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
