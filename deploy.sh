@@ -3,11 +3,13 @@ set -euo pipefail
 
 SERVICES=("client_service" "wallet_service", "order_service")
 
-git reset --hard
-git pull origin main
-git clean -fd
+git stash >/dev/null 2>&1
+git checkout main >/dev/null 2>&1
+git reset --hard >/dev/null 2>&1
+git pull origin main >/dev/null 2>&1
+git clean -fd >/dev/null 2>&1
 
-docker network rm brokerx-network > /dev/null || true
+docker network rm brokerx-network >/dev/null 2>&1 || true
 
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
@@ -17,8 +19,8 @@ for SERVICE in "${SERVICES[@]}"; do
     docker compose build --no-cache
     docker compose up -d
 
-    echo "$SERVICE deployed successfully."
-    cd "..."
+    echo "\033[0;32m$SERVICE deployed successfully.\033[0;32m"
+    cd ".."
 done
 cd ".."
 
@@ -28,7 +30,7 @@ docker volume prune -f
 docker network prune -f
 docker builder prune -af
 
-echo "All services deployed successfully."
+echo "\033[0;32mAll services deployed successfully.\033[0;32m"
 
 echo "Deploying frontend"
 cd "react_frontend"
