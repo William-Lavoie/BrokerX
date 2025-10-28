@@ -33,6 +33,7 @@ for SERVICE in "${SERVICES[@]}"; do
     docker compose down -v --remove-orphans
     docker compose build --no-cache
     docker compose up -d
+    docker compose run --rm "$SERVICE" python manage.py migrate
 
     echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
     cd ".."
