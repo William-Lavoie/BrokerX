@@ -1,15 +1,29 @@
 @startuml
-  node "Host (Virtual Machine)" {
-    node "broker_app" #lightblue {
-      component "brokerX"
-    }
-
-    node "broker_mysql" #lightblue {
-      database "brokerX_db"
-    }
-
-    "broker_app" <--> "broker_mysql" : port 3306
+node "Host" {
+  node "Gateway" {
+    component "KrakenD"
   }
+  
+  node "Client service" #lightblue {
+    component "client_service"
+    component "client-redis"
+    database "client-mysql"
+  }
+
+  node "Wallet service" #lightblue {
+    node "Wallet Core" {
+      component "wallet_service"
+    }
+    component "wallet-redis"
+    database "wallet-mysql"
+  }
+
+  node "Order service" #lightblue {
+    component "order_service"
+    component "order-redis"
+    database "order-mysql"
+  }
+}
 
 legend right
   == Legend ==

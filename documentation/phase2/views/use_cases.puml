@@ -2,4 +2,5 @@
     "Non client"--> (Client Registration and Identity Validation)
     Client --> (Authentication)
     Client --> (Add funds to the wallet)
+    Client --> (Place Order)
 @enduml

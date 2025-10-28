@@ -1,4 +1,4 @@
-@startuml Context diagram
+@startuml
 left to right direction
 skinparam style strictuml
 skinparam ActorStyle awesome
@@ -11,14 +11,24 @@ skinparam legendBackgroundColor #F9F9F9
 skinparam legendBorderColor #CCCCCC
 
 actor Client as "Client"
-rectangle "BrokerX" as BrokerX
+rectangle "Client service" as "CS"
+rectangle "Wallet service" as "WS"
+rectangle "Order service" as "OS"
+rectangle "Gateway" as "G"
 rectangle "Simulated Payment Service" as SPS
-database "MySQL Database" as DB
+database "MySQL" as DBC
+database "MySQL" as DBW
+database "MySQL" as DBO
 
-Client --> BrokerX : Uses Platform
-BrokerX --> SPS : Sends Withdrawal Requests
-BrokerX --> DB : Storing Data
 
+User interface --> G : Sends HTTP requests
+G --> CS
+G --> WS
+G --> OS
+WS --> SPS
+WS --> DBW
+CS --> DBC
+OS --> BDO
 
 legend right
   |= Symbol |= Meaning           |
