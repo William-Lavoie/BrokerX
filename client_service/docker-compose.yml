@@ -51,4 +51,4 @@ services:
       start_period: 5s
 
 volumes:
-  mysql_data:
+  client_mysql_data:
