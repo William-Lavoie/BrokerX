@@ -1,29 +1,48 @@
 # BrokerX -  Architecture Documentation Version 2.0
+## Table of Contents
+- ARC42
+  - [1. Introduction and Goals](#1-introduction-and-goals)
+  - [2. Architectural Constraints](#2-architectural-constraints)
+  - [3. System Scope and Context](#3-system-scope-and-context)
+  - [4. Solution Strategy](#4-solution-strategy)
+  - [5. Building Block View](#5-building-block-view)
+  - [6. Runtime View](#6-runtime-view)
+  - [7. Deployment View](#7-deployment-view)
+  - [8. Cross-cutting Concepts](#8-cross-cutting-concepts)
+  - [9. Design Decisions](#9-design-decisions)
+  - [10. Quality Requirements](#10-quality-requirements)
+  - [11. Risks and Technical Debt](#11-risks-and-technical-debt)
+  - [12. Glossary](#12-glossary)
 
-This document is based on the arc42 model and describes the BrokerX platform, a web-based simulated stock broking platform made for LOG430, Fall 2025, ÉTS, Montréal.
+
+This document is based on the arc42 model available at https://arc42.org/overview.
 
 
 ## 1. Introduction and Goals
 ### Requirements overview
-The BrokerX application is a web-based client-server system for simulated stock broking. It is an educational project that aims to replicate in a simulated environment online broking applications such as WealthSimple. No real money or personal information will be collected, exchanged, and/or used in the making, deployment and/or use of this application.
+BrokerX is a web-based application for simulated stock broking. It is an educational project that aims to replicate in a simulated environment online broking applications such as WealthSimple. No real money or personal information will be collected, exchanged, and/or used in the making, deployment and/or use of this application.
 
 ### Phase 2 overview
-The central goal of phase 2 was to improve performance and set up a monitoring to build a robust environment. Several changes were introduced, including, but not limited to:
+The central goal of phase 2 was to improve performance and set up monitoring to build a robust environment. Several changes were introduced, including, but not limited to:
 - The user interface was decoupled from the backend which now serves JSON responses through a REST API.
-- A Next.js frontend with React was made to communicate with BrokerX. Since it is considered external to BrokerX, it will not be discussed     further  in this documentation.
-- The monolith was migrated to a microservices based application
+- A Next.js frontend with React was made to communicate with BrokerX. Since it is considered external to BrokerX, it will not be discussed as part of the application, however readers can find a brief overview in section [TBD].
+- The application was migrated from a monolithic architecture to microservices.
 
 ### Quality goals
 
 | Priority | Quality goal | Scenario |
 |----------|------------------|----------|
-| 1 | **Maintainability** | Separation of concerns through the use of the hexagonal architecture |
-| 2 | **Persistence** | Support of a backend database with MySQL |
-| 3 | **Availability** | Greater or equal to 90% uptime |
+| 1 | **Maintainability** | Separation of concerns through the use of the hexagonal architecture within each service |
+| 2 | **Persistence** | Support of a backend database per service with MySQL|
+| 3 | **Availability** | Greater or equal to 95.5% uptime |
 | 4 | **Testability** | Coverage greater or equal than 80% |
 | 5 | **Traceability** | Logging of errors in dedicated files |
+| 6* | **Deployability** | Services must be deployable independently |
+| 7* | **Scalability** | Must allow for a high number of concurent users
+| 8* | **Reliability** | Must remain operable if one or several services fail |
+| 9* | **Performance** | See section [TBD]
 
-
+\* These quality goals were added in phase 2.
 
 ### Stakeholders
 - Developer : Learning how to design and implement a system from beginning to end.
@@ -35,9 +54,9 @@ The central goal of phase 2 was to improve performance and set up a monitoring t
 | Constraint | Description | Justification |
 |----------|---------------|---------------|
 | **Backend Technologies** | Use of Python, Django, MySQL, Docker | Well documented and versatile tools |
-| **REST API** | Allows communication with BrokerX through JWT, Swagger documentation, Postman collection and tests |
-| **Testing** | Pytest (unit testing), Cypress (E2E) | Reliable testing frameworks that allow full coverage |
-| **Metrics** | Monitoring with Prometheus, load tests with K6 |
+| **REST API** | KrakenD, JWT, Postman, Swagger | Follows RESTful practices, handles inter-service communication with authentication |
+| **Testing** | Pytest (unit  and integration testing), K6 (stress tests) | Reliable testing frameworks that allow full coverage and simulation of real usage |
+| **Metrics** | Prometheus, Grafana |
 | **Logging** | Loki for easy and reliable logging | 
 | **Dashboards** | Panels for common metrics with Grafana for monitoring at a glance |
 | **Caching** | Redis for fast server side caching on certain endpoint |
