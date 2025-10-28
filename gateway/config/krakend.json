@@ -1,0 +1,158 @@
+{
+  "version": 3,
+  "name": "BrokerX API Gateway",
+  "port": 8080,
+  "timeout": "3000ms",
+  "cache_ttl": "3600s",
+  "endpoints": [
+    {
+        "endpoint": "/api/token/",
+        "method": "POST",
+        "backend": [
+            {
+            "host": ["http://client_service:8001"],
+            "url_pattern": "/api/token/"
+            }
+        ]
+    },
+    {
+        "endpoint": "/api/token/refresh/",
+        "method": "POST",
+        "backend": [
+            {
+            "host": ["http://client_service:8001"],
+            "url_pattern": "/api/token/refresh/"
+            }
+        ]
+    },
+    {
+      "endpoint": "/client",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://client_service:8001"],
+          "url_pattern": "/client"
+        }
+      ]
+    },
+    {
+      "endpoint": "/client",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://client_service:8001"],
+          "url_pattern": "/client"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/passcode",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://client_service:8001"],
+          "url_pattern": "/passcode"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/passcode",
+      "method": "PUT",
+      "backend": [
+        {
+          "host": ["http://client_service:8001"],
+          "url_pattern": "/passcode"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/wallet",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://wallet_service:8003"],
+          "url_pattern": "/wallet"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/wallet",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://wallet_service:8003"],
+          "url_pattern": "/wallet"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/order",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://order_service:8002"],
+          "url_pattern": "/order"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    },
+    {
+      "endpoint": "/order",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://order_service:8002"],
+          "url_pattern": "/order"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+            "alg": "HS256",
+            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
+            "cache": true
+        }
+      }
+    }
+  ]
+}

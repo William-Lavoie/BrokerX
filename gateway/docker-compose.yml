@@ -1,0 +1,14 @@
+services:
+  api-gateway:
+    image: devopsfaith/krakend:2.4
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/krakend.json:/etc/krakend/krakend.json
+    networks:
+      - brokerx-network
+
+networks:
+  brokerx-network:
+    external: true

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from corsheaders.defaults import default_headers
@@ -57,6 +58,14 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "authorization",
     "idempotency-key",
 ]
+
+SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

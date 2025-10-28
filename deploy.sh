@@ -37,6 +37,15 @@ for SERVICE in "${SERVICES[@]}"; do
     echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
     cd ".."
 done
+
+echo "Deploying Gateway..."
+
+cd "gateway"
+docker compose down -v --remove-orphans
+docker compose build --no-cache
+docker compose up -d
+
+echo -e "\033[0;32mGateway deployed successfully.\033[0m"
 cd ".."
 
 docker image prune -f
