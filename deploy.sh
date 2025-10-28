@@ -30,7 +30,7 @@ fi
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
 
-    cd "{$SERVICE}_service"
+    cd "${SERVICE}_service"
     docker compose down -v --remove-orphans
     docker compose build --no-cache
     docker compose up -d
