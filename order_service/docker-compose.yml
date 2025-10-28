@@ -24,7 +24,7 @@ services:
     container_name: order-mysql
     restart: unless-stopped
     ports:
-      - "3303:3303"
+      - "3302:3302"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: order_db

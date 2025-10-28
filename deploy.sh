@@ -1,7 +1,22 @@
 #!/bin/bash
 set -euo pipefail
 
-SERVICES=("client_service" "wallet_service", "order_service")
+ALL_SERVICES=("client_service" "wallet_service" "order_service")
+
+if [ "$#" -gt 0 ]; then
+    SERVICES=()
+    for s in "$@"; do
+        if [[ " ${ALL_SERVICES[*]} " == *" $s "* ]]; then
+            SERVICES+=("$s")
+        else
+            echo -e "\033[0;31mUnknown service: $s\033[0m"
+            exit 1
+        fi
+    done
+else
+    # No arguments, deploy all services
+    SERVICES=("${ALL_SERVICES[@]}")
+fi
 
 git stash >/dev/null 2>&1
 git reset --hard >/dev/null 2>&1
@@ -18,7 +33,7 @@ for SERVICE in "${SERVICES[@]}"; do
     docker compose build --no-cache
     docker compose up -d
 
-    echo "\033[0;32m$SERVICE deployed successfully.\033[0;32m"
+    echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
     cd ".."
 done
 cd ".."
@@ -29,7 +44,7 @@ docker volume prune -f
 docker network prune -f
 docker builder prune -af
 
-echo "\033[0;32mAll services deployed successfully.\033[0;32m"
+echo -e "\033[0;32mAll services deployed successfully.\033[0m"
 
 echo "Deploying frontend"
 cd "react_frontend"
