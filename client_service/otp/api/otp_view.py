@@ -8,24 +8,26 @@ from otp.services.verify_passcode import VerifyPassCode
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django.server")
 
 
 class OTPView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        logger.error(request.body)
+        logger.error(request.headers)
         data = json.loads(request.body)
 
         passcode = data["passcode"]
 
         use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
-        result = use_case.execute(request.user.email, passcode)
+        result = use_case.execute(request.user.uuid, request.user.email, passcode)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
 
     def put(self, request):
         use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
-        result = use_case.generate_passcode(request.user.email)
+        result = use_case.generate_passcode(request.user.uuid, request.user.email)
 
         return JsonResponse(data=result.to_dict(), status=result.code)

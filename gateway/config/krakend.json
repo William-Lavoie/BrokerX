@@ -7,9 +7,10 @@
   "output_encoding": "json",
   "extra_config": {
     "router": {
-        "auto_options": true
+        "auto_options": true,
+        "return_error_msg": true
     },
-    "github.com/devopsfaith/krakend-cors": {
+    "security/cors": {
       "allow_origins": ["*"],
       "allow_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
@@ -24,9 +25,15 @@
         "method": "POST",
         "backend": [
             {
-            "host": ["http://client_service:8001"],
+            "host": ["http://client-app:8001"],
             "url_pattern": "/api/token/"
             }
+        ],
+        "input_headers": [
+          "Content-Type",
+          "Content-Length",
+          "Authorization",
+          "Idempotency-Key"
         ]
     },
     {
@@ -34,9 +41,15 @@
         "method": "POST",
         "backend": [
             {
-            "host": ["http://client_service:8001"],
+            "host": ["http://client-app:8001"],
             "url_pattern": "/api/token/refresh/"
             }
+        ],
+        "input_headers": [
+          "Content-Type",
+          "Content-Length",
+          "Authorization",
+          "Idempotency-Key"
         ]
     },
     {
@@ -44,9 +57,33 @@
       "method": "POST",
       "backend": [
         {
-          "host": ["http://client_service:8001"],
-          "url_pattern": "/client"
+          "host": ["http://client-app:8001"],
+          "url_pattern": "/client",
+          "extra_config": {
+            "http": {
+              "forward_request_body": true,
+              "forward_response": true,
+              "backend/http": {
+              "return_error_code": true,
+               "forward_request_headers": [
+                "Authorization",
+                "Content-Type",
+                "Content-Length",
+                "Idempotency-Key"
+              ]
+            },
+
+              "read_all": true,
+              "headers_to_pass": ["Content-Type"]
+            }
+          }
         }
+      ],
+      "input_headers": [
+        "Content-Type",
+        "Content-Length",
+        "Authorization",
+        "Idempotency-Key"
       ]
     },
     {
@@ -54,119 +91,158 @@
       "method": "GET",
       "backend": [
         {
-          "host": ["http://client_service:8001"],
-          "url_pattern": "/client"
-        }
-      ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
+          "host": ["http://client-app:8001"],
+          "url_pattern": "/client",
+          "extra_config": {
+        "http": {
+          "forward_request_headers": [
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Idempotency-Key"
+          ]
         }
       }
+        }
+      ],
+      "input_headers": [
+        "Content-Type",
+        "Content-Length",
+        "Authorization",
+        "Idempotency-Key"
+      ]
     },
     {
       "endpoint": "/passcode",
       "method": "POST",
       "backend": [
         {
-          "host": ["http://client_service:8001"],
-          "url_pattern": "/passcode"
+          "host": ["http://client-app:8001"],
+          "url_pattern": "/passcode",
+          "extra_config": {
+            "http": {
+              "forward_request_body": true,
+              "forward_response": true,
+              "backend/http": {
+              "return_error_code": true,
+               "forward_request_headers": [
+                "Authorization",
+                "Content-Type",
+                "Content-Length",
+                "Idempotency-Key"
+              ]
+            },
+
+              "read_all": true,
+              "headers_to_pass": ["Content-Type"]
+            }
+          }
         }
       ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
-        }
-      }
+      "input_headers": [
+        "Content-Type",
+        "Content-Length",
+        "Authorization",
+        "Idempotency-Key"
+      ]
     },
     {
       "endpoint": "/passcode",
       "method": "PUT",
       "backend": [
         {
-          "host": ["http://client_service:8001"],
+          "host": ["http://client-app:8001"],
           "url_pattern": "/passcode"
         }
       ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
-        }
-      }
+      "input_headers": [
+        "Content-Type",
+        "Content-Length",
+        "Authorization",
+        "Idempotency-Key"
+      ]
     },
     {
       "endpoint": "/wallet",
       "method": "GET",
+      "input_headers": ["Authorization", "Content-Type"],
       "backend": [
         {
-          "host": ["http://wallet_service:8003"],
-          "url_pattern": "/wallet"
-        }
-      ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
+          "host": ["http://wallet-app:8003"],
+          "url_pattern": "/wallet",
+          "extra_config": {
+        "http": {
+          "forward_request_headers": [
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Idempotency-Key"
+          ]
         }
       }
+        }
+      ]
     },
     {
       "endpoint": "/wallet",
       "method": "POST",
+      "input_headers": ["Authorization", "Content-Type"],
       "backend": [
         {
-          "host": ["http://wallet_service:8003"],
-          "url_pattern": "/wallet"
-        }
-      ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
+          "host": ["http://wallet-app:8003"],
+          "url_pattern": "/wallet",
+          "extra_config": {
+        "http": {
+          "forward_request_headers": [
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Idempotency-Key"
+          ]
         }
       }
+        }
+      ]
     },
     {
       "endpoint": "/order",
       "method": "POST",
       "backend": [
         {
-          "host": ["http://order_service:8002"],
-          "url_pattern": "/order"
-        }
-      ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
+          "host": ["http://order-app:8002"],
+          "url_pattern": "/order",
+          "extra_config": {
+        "http": {
+          "forward_request_headers": [
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Idempotency-Key"
+          ]
         }
       }
+        }
+      ]
     },
     {
       "endpoint": "/order",
       "method": "GET",
       "backend": [
         {
-          "host": ["http://order_service:8002"],
-          "url_pattern": "/order"
-        }
-      ],
-      "extra_config": {
-        "github.com/devopsfaith/krakend-jose/validator": {
-            "alg": "HS256",
-            "keys-to-validate": ["gq35rgaerFW53T45GQ345FAdasfawf24k7iy"],
-            "cache": true
+          "host": ["http://order-app:8002"],
+          "url_pattern": "/order",
+          "extra_config": {
+        "http": {
+          "forward_request_headers": [
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Idempotency-Key"
+          ]
         }
       }
+        }
+      ]
     }
   ]
 }

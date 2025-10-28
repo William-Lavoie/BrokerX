@@ -18,6 +18,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    entrypoint: ["python", "entrypoint.py"]
+    networks:
+      - brokerx-network
 
   mysql:
     image: mysql:8
@@ -38,6 +41,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - brokerx-network
 
   redis:
     container_name: client-redis
@@ -49,6 +54,12 @@ services:
       timeout: 5s
       retries: 10
       start_period: 5s
+    networks:
+      - brokerx-network
 
 volumes:
   client_mysql_data:
+
+networks:
+  brokerx-network:
+    external: true

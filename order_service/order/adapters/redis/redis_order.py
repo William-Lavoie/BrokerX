@@ -5,7 +5,7 @@ from typing import Optional
 
 from redis import RedisError
 
-from brokerX.redis import redis_client
+from order_service.redis import redis_client
 
 from ...domain.entities.order import Order
 

@@ -3,7 +3,7 @@ import logging
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from wallet.adapters.django_transaction_repository import DjangoTransactionRepository
 from wallet.adapters.django_wallet_repository import DjangoWalletRepository
@@ -14,7 +14,7 @@ logger = logging.getLogger("wallet")
 
 
 class WalletView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         data = json.loads(request.body)
@@ -37,6 +37,7 @@ class WalletView(APIView):
         return JsonResponse(data=result.to_dict(), status=result.code)
 
     def get(self, request):
+        logger.error(request.headers)
 
         use_case = AddFundsToWalletUseCase(
             MockPaymentServiceRepository(),
@@ -44,6 +45,6 @@ class WalletView(APIView):
             DjangoTransactionRepository(),
         )
 
-        result = use_case.get_balance(request.user.email)
+        result = use_case.get_balance(request.user.uuid)
 
         return JsonResponse(data=result.to_dict(), status=result.code)

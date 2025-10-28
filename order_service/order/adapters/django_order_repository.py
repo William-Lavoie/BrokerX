@@ -2,19 +2,18 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from ..adapters.dao.mysql_order_dao import MySQLOrderDAO
-from ..adapters.redis.redis_order import (
+from order.adapters.dao.mysql_order_dao import MySQLOrderDAO
+from order.adapters.redis.redis_order import (
     redis_add_order,
     redis_get_orders,
     redis_get_orders_by_stock,
     redis_set_orders,
 )
-from ..domain.entities.client import Client
-from ..domain.entities.order import Order
-from ..domain.entities.stock import Stock
-from ..domain.ports.dao.order_dao import OrderDAO
-from ..domain.ports.order_repository import OrderDTO, OrderRepository
-from ..exceptions import DataAccessException
+from order.domain.entities.order import Order
+from order.domain.ports.dao.order_dao import OrderDAO
+from order.domain.ports.order_repository import OrderDTO, OrderRepository
+
+from order_service.exceptions import DataAccessException
 
 
 class DjangoOrderRepository(OrderRepository):
@@ -24,16 +23,16 @@ class DjangoOrderRepository(OrderRepository):
 
     def add_order(
         self,
-        client: Client,
-        stock: Stock,
+        client_id: UUID,
+        symbol: str,
         direction: str,
         initial_quantity: int,
         idempotency_key: UUID,
         limit: Optional[Decimal] = None,
     ) -> Order:
         order_dto: OrderDTO = self.dao.add_order(
-            email=client.email,
-            symbol=stock.symbol,
+            client_id=client_id,
+            symbol=symbol,
             direction=direction,
             initial_quantity=initial_quantity,
             idempotency_key=idempotency_key,
@@ -42,13 +41,11 @@ class DjangoOrderRepository(OrderRepository):
 
         if not order_dto.success:
             raise DataAccessException(
-                user_message=f"An unexpected error occurred when trying to access {stock.symbol}"
+                user_message=f"An unexpected error occurred when trying to access {}"
             )
 
-        order_dto.stock = stock
-        order_dto.client = client
         order = super().get_order_from_dto(order_dto)
-        redis_add_order(client.email, order)
+        redis_add_order(client_id, order)
         return order
 
     def find_matching_orders(self, order: Order) -> list[OrderDTO]:

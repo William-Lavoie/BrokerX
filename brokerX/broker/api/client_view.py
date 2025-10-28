@@ -12,7 +12,7 @@ from ..adapters.email_otp_repository import EmailOTPRepository
 from ..services.commands.create_client_command import CreateClientCommand
 from ..services.create_account_use_case.create_client import CreateClientUseCase
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django.server")
 
 counter_orders = Counter("orders", "Total calls to /orders")
 

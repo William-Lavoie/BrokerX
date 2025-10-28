@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ALL_SERVICES=("client" "wallet" "order")
+ALL_SERVICES=("client" "wallet")
 
 if [ "$#" -gt 0 ]; then
     SERVICES=()
@@ -14,14 +14,8 @@ if [ "$#" -gt 0 ]; then
         fi
     done
 else
-    # No arguments, deploy all services
     SERVICES=("${ALL_SERVICES[@]}")
 fi
-
-git stash >/dev/null 2>&1
-git reset --hard >/dev/null 2>&1
-#git pull origin main >/dev/null 2>&1
-git clean -fd >/dev/null 2>&1
 
 if ! docker network ls | grep -q brokerx-network; then
     docker network create brokerx-network
@@ -34,11 +28,10 @@ for SERVICE in "${SERVICES[@]}"; do
     docker compose down -v --remove-orphans
     docker compose build --no-cache
     docker compose up -d
-    until docker compose exec -T mysql mysqladmin ping -h "localhost" --silent; do
+    until docker compose exec -T mysql mysqladmin ping -h "${SERVICE}-mysql" --silent; do
         echo "Waiting for MySQL..."
         sleep 2
     done
-    docker compose exec "${SERVICE}-app" python manage.py migrate
 
     echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
     cd ".."

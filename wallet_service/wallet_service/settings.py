@@ -29,7 +29,7 @@ SECRET_KEY = "django-insecure-b3@dfi7984c*mkf*)z9x)jew(l7nqy@w7b)rg%ynk_0eo@4=9l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS: list = ["localhost"]
+ALLOWED_HOSTS: list = ["localhost", "wallet-app"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
