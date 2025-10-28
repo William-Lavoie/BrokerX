@@ -1,0 +1,19 @@
+@startuml
+  node "Host (Virtual Machine)" {
+    node "broker_app" #lightblue {
+      component "brokerX"
+    }
+
+    node "broker_mysql" #lightblue {
+      database "brokerX_db"
+    }
+
+    "broker_app" <--> "broker_mysql" : port 3306
+  }
+
+legend right
+  == Legend ==
+  #lightblue : Docker container
+endlegend
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+start
+:Access BrokerX through the browser;
+
+if (User has an active session?) then (yes)
+else (no)
+  if (User has an account?) then (yes)
+  else (no)
+    :Create an account;
+    :Receive passcode through email;
+    :Enter passcode;
+  endif
+  :Login;
+endif
+
+repeat
+  if (Add funds) then (yes)
+     :Choose amount;
+     :Confirm deposit;
+  elseif(Place order) then (yes)
+     :Enter order information;
+     :Confirm order placement;
+  endif
+repeat while (User stays logged in?)
+:Logout;
+stop
+@enduml
