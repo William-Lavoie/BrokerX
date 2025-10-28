@@ -24,7 +24,7 @@ services:
     container_name: wallet-mysql
     restart: unless-stopped
     ports:
-      - "3303:3303"
+      - "3303:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: wallet_db
