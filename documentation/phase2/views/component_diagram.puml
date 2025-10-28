@@ -1,0 +1,58 @@
+@startuml
+package "Domain (Core)" {
+    package "Entities" {
+        [Client]
+    }
+
+    package "Ports (Interfaces)" {
+        interface ClientRepository
+        interface OTPRepository
+    }
+
+    package "Dao" {
+        interface ClientDAO
+        interface OTPDAO
+    }
+}
+
+package "Views" {
+    [ClientView]
+    [OTPView]
+}
+
+package "Adapters" {
+    [DjangoClientRepository]
+    [BaseOTPRepository]
+    [EmailOTPRepository]
+
+    package "DAO" {
+        [MySQLClientDAO]
+        [MySQLOTPDAO]
+    }
+    
+    package "Redis" {
+        [RedisClient]
+    }
+}
+
+package "Services" {
+    [CreateClient]
+    [VerifyPassCode]
+}
+
+[ClientView] --> [CreateClient] : Send create client request
+[CreateClient] -> [DjangoClientRepository] : create client
+[DjangoClientRepository] -> [RedisClient] : cache client information
+[DjangoClientRepository] -> [MySQLClientDAO] : store client information
+
+[CreateClient] -> [EmailOTPRepository] : generate passcode
+
+[OTPView] --> [VerifyPassCode] : Send verify passcode request
+[VerifyPasscode] --> [DjangoClientRepository] : update client status
+[VerifyPasscode] --> [EmailOTPRepository] : verify passcode
+
+[DjangoClientRepository] --|> [ClientRepository]
+[EmailOTPRepository] --|> [BaseOTPRepository]
+[EmailOTPRepository] --> [MySQLOTPDAO] : store OTP information
+
+@enduml
