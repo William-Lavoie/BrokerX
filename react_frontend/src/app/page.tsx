@@ -15,7 +15,7 @@ export default function Home() {
 
 
     useEffect(() => {
-      fetch('http://localhost:8001/client', {
+      fetch('http://localhost:8080/client', {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,

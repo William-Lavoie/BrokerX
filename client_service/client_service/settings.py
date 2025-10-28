@@ -59,6 +59,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "idempotency-key",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
