@@ -26,7 +26,6 @@ git clean -fd >/dev/null 2>&1
 if ! docker network ls | grep -q brokerx-network; then
     docker network create brokerx-network
 fi
-docker network create brokerx-network
 
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
