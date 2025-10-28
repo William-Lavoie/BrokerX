@@ -34,6 +34,10 @@ for SERVICE in "${SERVICES[@]}"; do
     docker compose down -v --remove-orphans
     docker compose build --no-cache
     docker compose up -d
+    until docker compose exec -T mysql mysqladmin ping -h "localhost" --silent; do
+        echo "Waiting for MySQL..."
+        sleep 2
+    done
     docker compose exec "${SERVICE}-app" python manage.py migrate
 
     echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
