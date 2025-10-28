@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ALL_SERVICES=("client_service" "wallet_service" "order_service")
+ALL_SERVICES=("client" "wallet" "order")
 
 if [ "$#" -gt 0 ]; then
     SERVICES=()
@@ -30,11 +30,11 @@ fi
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
 
-    cd "$SERVICE"
+    cd "{$SERVICE}_service"
     docker compose down -v --remove-orphans
     docker compose build --no-cache
     docker compose up -d
-    docker compose run --rm "$SERVICE" python manage.py migrate
+    docker compose run --rm "${SERVICE}_service-${SERVICE}" python manage.py migrate
 
     echo -e "\033[0;32m$SERVICE deployed successfully.\033[0m"
     cd ".."
