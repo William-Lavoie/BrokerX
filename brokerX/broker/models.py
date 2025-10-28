@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-# The models will be accessed only through DAO, otherwise use entities
+# The models wil be accessed only through DAO, otherwise use entities
 # i.e the model is only used to define the DB
 
 # TODO: separate models into separate files
