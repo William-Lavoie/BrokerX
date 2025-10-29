@@ -69,6 +69,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "idempotency-key",
 ]
 
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",

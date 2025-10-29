@@ -1,0 +1,65 @@
+services:
+  client-app:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: client-mysql
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: pass
+      DB_NAME: client_db
+    ports:
+      - "8001:8001"
+    expose:
+      - "8001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    entrypoint: ["python", "entrypoint.py"]
+    networks:
+      - brokerx-network
+
+  mysql:
+    image: mysql:8
+    container_name: client-mysql
+    restart: unless-stopped
+    ports:
+      - "3301:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: client_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - client_mysql_data:/var/lib/mysql
+      - ./mysql-init/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - brokerx-network
+
+  redis:
+    container_name: client-redis
+    image: redis:7
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - brokerx-network
+
+volumes:
+  client_mysql_data:
+
+networks:
+  brokerx-network:
+    external: true

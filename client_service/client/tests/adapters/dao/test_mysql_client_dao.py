@@ -1,0 +1,150 @@
+import pytest
+
+pytestmark = pytest.mark.django_db
+
+from client.adapters.dao.mysql_client_dao import MySQLClientDAO
+from client.models import Client, User
+
+
+@pytest.fixture(autouse=True)
+def setup_function(db):
+    user = User.objects.create(
+        first_name="John",
+        last_name="Smith",
+        email="john_smith@example.com",
+    )
+
+    Client.objects.create(
+        client_id=user.uuid,
+        user=user,
+        first_name="John",
+        last_name="Smith",
+        email="john_smith@example.com",
+        address="456 Privett Drive",
+        birth_date="1978-01-01",
+        phone_number="123-456-7890",
+        status="fictional",
+    )
+    yield
+
+
+def test_get_client_by_email():
+    dao = MySQLClientDAO()
+
+    client_dto = dao.get_client_by_email("john_smith@example.com")
+
+    assert client_dto.success
+    assert client_dto.code == 200
+    assert client_dto.address == "456 Privett Drive"
+    assert client_dto.first_name == "John"
+    assert client_dto.last_name == "Smith"
+    assert client_dto.birth_date == "1978-01-01"
+    assert client_dto.phone_number == "123-456-7890"
+    assert client_dto.status == "fictional"
+
+
+def test_get_client_by_email_not_existing():
+    dao = MySQLClientDAO()
+
+    client_dto = dao.get_client_by_email("joe@example.com")
+
+    assert not client_dto.success
+    assert client_dto.code == 404
+
+
+def test_add_client():
+    dao = MySQLClientDAO()
+
+    result = dao.add_user(
+        first_name="Tom",
+        last_name="Hanks",
+        address="398 Sherbrooke",
+        birth_date="1954-01-01",
+        email="tom_hanks@example.com",
+        phone_number="514-872-1231",
+        password="password123",
+    )
+    assert result.success
+    assert result.code == 201
+
+    saved_client = Client.objects.filter(email="tom_hanks@example.com")
+
+    assert saved_client.count() == 1
+
+    saved_client = saved_client.first()
+
+    assert saved_client.first_name == "Tom"
+    assert saved_client.last_name == "Hanks"
+    assert saved_client.email == "tom_hanks@example.com"
+    assert saved_client.address == "398 Sherbrooke"
+    assert str(saved_client.birth_date) == "1954-01-01"
+    assert saved_client.phone_number == "514-872-1231"
+    assert saved_client.status == "P"
+
+
+def test_add_client_email_already_used():
+    dao = MySQLClientDAO()
+
+    result = dao.add_user(
+        first_name="Mike",
+        last_name="Collin",
+        address="876 New York",
+        birth_date="2001-01-01",
+        email="john_smith@example.com",
+        phone_number="234-633-6431",
+        password="password123",
+    )
+    assert not result.success
+    assert result.code == 409
+
+
+def test_add_client_phone_already_used():
+    dao = MySQLClientDAO()
+
+    result = dao.add_user(
+        first_name="Mike",
+        last_name="Collin",
+        address="876 New York",
+        birth_date="2001-01-01",
+        email="mike_collin@example.com",
+        phone_number="123-456-7890",
+        password="password123",
+    )
+    assert not result.success
+    assert result.code == 409
+
+
+def test_update_client_status():
+    dao = MySQLClientDAO()
+    result = dao.update_status("john_smith@example.com", "updated")
+
+    assert result.success
+    assert result.code == 200
+
+    client = Client.objects.get(email="john_smith@example.com")
+    assert client.status == "updated"
+
+
+def test_update_status_no_user():
+    dao = MySQLClientDAO()
+    result = dao.update_status("test@user.com", "updated")
+
+    assert not result.success
+    assert result.code == 404
+
+
+def test_get_client_status():
+    dao = MySQLClientDAO()
+    result = dao.get_status("john_smith@example.com")
+
+    assert result.success
+    assert result.code == 200
+    assert result.status == "fictional"
+
+
+def test_get_status_no_client():
+    dao = MySQLClientDAO()
+    result = dao.get_status("test@user.com")
+
+    assert not result.success
+    assert result.code == 404
