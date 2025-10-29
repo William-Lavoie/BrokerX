@@ -11,24 +11,24 @@ skinparam legendBackgroundColor #F9F9F9
 skinparam legendBorderColor #CCCCCC
 
 actor Client as "Client"
-rectangle "Client service" as "CS"
-rectangle "Wallet service" as "WS"
-rectangle "Order service" as "OS"
-rectangle "Gateway" as "G"
+rectangle "Client service" as CS
+rectangle "Wallet service" as WS
+rectangle "Order service" as OS
+rectangle "Gateway" as G
 rectangle "Simulated Payment Service" as SPS
 database "MySQL" as DBC
 database "MySQL" as DBW
 database "MySQL" as DBO
 
 
-User interface --> G : Sends HTTP requests
+Client --> G : Sends HTTP requests
 G --> CS
 G --> WS
 G --> OS
 WS --> SPS
 WS --> DBW
 CS --> DBC
-OS --> BDO
+OS --> DBO
 
 legend right
   |= Symbol |= Meaning           |

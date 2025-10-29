@@ -1,4 +1,12 @@
 @startuml
+left to right direction
+skinparam style strictuml
+skinparam ActorStyle awesome
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  RoundCorner 15
+}
 package "Domain (Core)" {
     package "Entities" {
         [Client]
@@ -29,7 +37,7 @@ package "Adapters" {
         [MySQLClientDAO]
         [MySQLOTPDAO]
     }
-    
+
     package "Redis" {
         [RedisClient]
     }
@@ -37,7 +45,7 @@ package "Adapters" {
 
 package "Services" {
     [CreateClient]
-    [VerifyPassCode]
+    [VerifyPasscode]
 }
 
 [ClientView] --> [CreateClient] : Send create client request
@@ -46,12 +54,17 @@ package "Services" {
 [DjangoClientRepository] -> [MySQLClientDAO] : store client information
 
 [CreateClient] -> [EmailOTPRepository] : generate passcode
+[CreateClient] -> [Client]
+[DjangoClientRepository] -> [Client]
 
-[OTPView] --> [VerifyPassCode] : Send verify passcode request
+[OTPView] --> [VerifyPasscode] : Send verify passcode request
 [VerifyPasscode] --> [DjangoClientRepository] : update client status
 [VerifyPasscode] --> [EmailOTPRepository] : verify passcode
 
 [DjangoClientRepository] --|> [ClientRepository]
+[BaseOTPRepository] --|>  [OTPRepository]
+[MySQLClientDAO] --|> [ClientDAO]
+[MySQLOTPDAO] --|> [OTPDAO]
 [EmailOTPRepository] --|> [BaseOTPRepository]
 [EmailOTPRepository] --> [MySQLOTPDAO] : store OTP information
 

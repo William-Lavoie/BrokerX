@@ -1,9 +1,9 @@
 @startuml
 node "Host" {
-  node "Gateway" {
+  node "Gateway" #lightblue {
     component "KrakenD"
   }
-  
+
   node "Client service" #lightblue {
     component "client_service"
     component "client-redis"
@@ -11,9 +11,7 @@ node "Host" {
   }
 
   node "Wallet service" #lightblue {
-    node "Wallet Core" {
-      component "wallet_service"
-    }
+    component "wallet_service"
     component "wallet-redis"
     database "wallet-mysql"
   }

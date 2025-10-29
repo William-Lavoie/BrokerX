@@ -2,17 +2,7 @@
     class CreateClientUseCase{
         + client_repository : ClientRepository
         + otp_repository : OTPRepository
-        + execute(command: CreateClientCommand) : UseCaseResult
-    }
-
-    class CreateClientCommand{
-        + first_name: string
-        + last_name: string
-        + address: string
-        + birth_date: string
-        + email: string
-        + phone_number: string
-        + password: string
+        + execute(first_name: str, last_name: str, birth_date: str, email: str, phone_number: str, address: str, password: str,) : UseCaseResult
     }
 
     class UseCaseResult{
@@ -21,7 +11,7 @@
     }
 
     class ClientRepository <<abstract>> {
-        + add_user(client: ClientProfile) : Result
+        + add_user(client: Client) : Result
         + update_user_status(email: str, new_status: str) : Result
         + client_is_active(email: str) : bool
     }
@@ -43,7 +33,7 @@
         +validated : bool
     }
 
-    class ClientProfile {
+    class Client {
         +first_name : str
         +last_name : str
         +address : str
@@ -55,7 +45,7 @@
     }
 
     class OTPRepository <<abstract>> {
-        + create_passcode(client: ClientProfile) : OTPDTO
+        + create_passcode(client: Client) : OTPDTO
         + send_passcode(email: str, passcode: str) : bool
         + verify_passcode(email: str, passcode: str) : OTPDTO
         + register_secret(email: str, secret: str) : bool
@@ -63,7 +53,7 @@
 
     class DjangoClientRepository {
         -dao : ClientDAO
-        +add_user(client: ClientProfile) : ClientDTO
+        +add_user(client: Client) : ClientDTO
         +update_user_status(email: str, new_status: str) : ClientDTO
         +client_is_active(email: str) : bool
     }
@@ -90,19 +80,19 @@
     }
 
     class BaseOTPRepository {
-        +create_passcode(client: ClientProfile) : OTPDTO
+        +create_passcode(client: Client) : OTPDTO
         +generate_passcode() : str
     }
 
     class MySQLClientDAO {
-        +add_user(client: ClientProfile) : ClientDTO
+        +add_user(client: Client) : ClientDTO
         +update_status(email: str, new_status: str) : ClientDTO
         +get_status(email: str) : ClientDTO
     }
 
 
     class ClientDAO{
-        +add_user(client: ClientProfile) : ClientDTO
+        +add_user(client: Client) : ClientDTO
         +update_status(email: str, new_status: str) : ClientDTO
         +get_status(email: str) : ClientDTO
     }
@@ -114,7 +104,7 @@ EmailOTPRepository --> MySQLClientOTPDAO
 BaseOTPRepository --|> OTPRepository
 DjangoClientRepository --|> ClientRepository
 DjangoClientRepository --> ClientDTO
-DjangoClientRepository --> ClientProfile
+DjangoClientRepository --> Client
 ClientDAO--> ClientDTO
 ClientDTO --|> Result
 DjangoClientRepository --> MySQLClientDAO
@@ -122,8 +112,7 @@ MySQLClientDAO --|> ClientDAO
 CreateClientUseCase --> DjangoClientRepository
 CreateClientUseCase --> EmailOTPRepository
 CreateClientUseCase --> OTPDTO
-CreateClientUseCase --> ClientProfile
-CreateClientUseCase --> CreateClientCommand
+CreateClientUseCase --> Client
 CreateClientUseCase --> UseCaseResult
 ClientOTPDAO --> OTPDTO
 
