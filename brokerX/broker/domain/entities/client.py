@@ -26,9 +26,9 @@ class ClientInvalidException(Exception):
 
 
 class ClientStatus(Enum):
-    ACTIVE = "Active"
-    PENDING = "Pending"
-    REJECTED = "Rejected"
+    ACTIVE = "ACTIVE"
+    PENDING = "PENDING"
+    REJECTED = "REJECTED"
 
 
 class Client:

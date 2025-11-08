@@ -74,7 +74,7 @@ class MySQLClientDAO(ClientDAO):
                     phone_number=phone_number,
                     birth_date=birth_date,
                     address=address,
-                    status="P",
+                    status="PENDING",
                 )
 
                 client_dto = ClientDTO(

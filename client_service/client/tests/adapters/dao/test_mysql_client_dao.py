@@ -79,7 +79,7 @@ def test_add_client():
     assert saved_client.address == "398 Sherbrooke"
     assert str(saved_client.birth_date) == "1954-01-01"
     assert saved_client.phone_number == "514-872-1231"
-    assert saved_client.status == "P"
+    assert saved_client.status == "PENDING"
 
 
 def test_add_client_email_already_used():
