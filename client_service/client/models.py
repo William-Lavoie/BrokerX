@@ -20,5 +20,23 @@ class Client(models.Model):
     birth_date = models.DateField()
     phone_number = models.CharField(max_length=100, unique=True, db_index=True)
     status = models.CharField(
-        max_length=20, choices=[("A", "Active"), ("P", "Pending"), ("R", "Rejected")]
+        max_length=20,
+        choices=[
+            ("ACTIVE", "Active"),
+            ("PENDING", "Pending"),
+            ("REJECTED", "Rejected"),
+        ],
     )
+
+
+class ClientCreationAudit(models.Model):
+    ACTIONS = [
+        ("CLIENT_CREATED", "Client Created"),
+        ("CLIENT_ACTIVATED", "Client Activated"),
+        ("CLIENT_REJECTED", "Client Rejected"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=100, choices=ACTIONS)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    metadata = models.JSONField(default=dict, blank=True)

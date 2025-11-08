@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Optional
 from uuid import UUID
 
@@ -17,6 +17,12 @@ class ClientDTO(Result):
     phone_number: str = ""
     status: str = ""
     client_id: Optional[UUID] = None
+
+    def to_dict(self):
+        data = asdict(self)
+        if self.client_id:
+            data["client_id"] = str(self.client_id)
+        return data
 
 
 class ClientRepository:

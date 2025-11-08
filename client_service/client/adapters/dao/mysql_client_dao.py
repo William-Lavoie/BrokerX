@@ -1,7 +1,8 @@
+import json
 import logging
 
 from client.domain.ports.dao.client_dao import ClientDAO, ClientDTO
-from client.models import Client, User
+from client.models import Client, ClientCreationAudit, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
@@ -76,18 +77,26 @@ class MySQLClientDAO(ClientDAO):
                     status="P",
                 )
 
-            return ClientDTO(
-                success=True,
-                code=201,
-                first_name=client.first_name,
-                last_name=client.last_name,
-                address=client.address,
-                birth_date=client.birth_date,
-                email=client.email,
-                phone_number=client.phone_number,
-                status=client.status,
-                client_id=client.client_id,
-            )
+                client_dto = ClientDTO(
+                    success=True,
+                    code=201,
+                    first_name=client.first_name,
+                    last_name=client.last_name,
+                    address=client.address,
+                    birth_date=client.birth_date,
+                    email=client.email,
+                    phone_number=client.phone_number,
+                    status=client.status,
+                    client_id=client.client_id,
+                )
+
+                ClientCreationAudit.objects.create(
+                    user=user,
+                    action="CLIENT_CREATED",
+                    metadata=json.dumps(client_dto.to_dict()),
+                )
+
+            return client_dto
 
         except AttributeError as e:
             logger.error(f"The request is invalid: {e}")
