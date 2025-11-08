@@ -32,3 +32,5 @@ __pycache__/
 django.error_logs
 django.access_logs
 *.logs
+
+react_frontend/src/test/*
