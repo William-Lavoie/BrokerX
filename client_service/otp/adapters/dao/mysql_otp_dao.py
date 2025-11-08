@@ -1,6 +1,7 @@
 import logging
 from uuid import UUID
 
+from client.models import ClientCreationAudit, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from otp.domain.ports.dao.otp_dao import OTPDAO
@@ -44,7 +45,13 @@ class MySQLOTPDAO(OTPDAO):
                 otp.number_attempts += 1
                 attempts: int = otp.number_attempts
 
-                if attempts >= 2:
+                ClientCreationAudit.objects.create(
+                    user=User.objects.get(uuid=client_id),
+                    action=("FAILED_ACTIVATION"),
+                    metadata={"number_attemps": attempts},
+                )
+
+                if attempts > 2:
                     otp.delete()
                     return OTPDTO(success=False, code=401, attempts=attempts)
 

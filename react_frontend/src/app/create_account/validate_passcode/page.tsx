@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { InputOtp } from 'primereact/inputotp';
 import "./validate_passcode.css"
+import { toast } from 'react-toastify';
 
 
 
@@ -22,7 +23,12 @@ export default function App() {
       });
 
     if (!response.ok) {
-        throw new Error("Login failed");
+        if (response.status === 422) {
+          const data = await response.json();
+          console.log("HERE");
+          toast.error(data["message"]);
+          return;
+      }
     }
 
     } catch (error) {

@@ -116,13 +116,13 @@ def test_add_client_phone_already_used():
 
 def test_update_client_status():
     dao = MySQLClientDAO()
-    result = dao.update_status("john_smith@example.com", "updated")
+    result = dao.update_status("john_smith@example.com", "ACTIVE")
 
     assert result.success
     assert result.code == 200
 
     client = Client.objects.get(email="john_smith@example.com")
-    assert client.status == "updated"
+    assert client.status == "ACTIVE"
 
 
 def test_update_status_no_user():

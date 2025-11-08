@@ -1,4 +1,5 @@
 import pytest
+from client.models import User
 from otp.models import OTP
 
 pytestmark = pytest.mark.django_db
@@ -8,6 +9,13 @@ from otp.adapters.dao.mysql_otp_dao import MySQLOTPDAO
 
 @pytest.fixture(autouse=True)
 def setup_function(db):
+    user = User.objects.create(
+        first_name="John",
+        last_name="Smith",
+        email="john_smith@example.com",
+        uuid="fc6a8193-d8a7-4b43-aa5c-63a376a89e60",
+    )
+
     OTP.objects.create(
         client_id="fc6a8193-d8a7-4b43-aa5c-63a376a89e60",
         secret="123abc",

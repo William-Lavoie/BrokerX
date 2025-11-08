@@ -103,13 +103,22 @@ class MySQLClientDAO(ClientDAO):
             return ClientDTO(success=False, code=400)
 
     def update_status(self, email: str, new_status: str) -> ClientDTO:
-        with transaction.atomic():
-            updated_rows = Client.objects.filter(email=email).update(status=new_status)
+        try:
+            with transaction.atomic():
+                client = Client.objects.get(email=email)
+                client.status = new_status
+                client.save()
 
-        if updated_rows == 0:
+            ClientCreationAudit.objects.create(
+                user=client.user,
+                action=("CLIENT_ACTIVATED" if "ACTIVE" else "CLIENT_REJECTED"),
+            )
+
+            return ClientDTO(success=True, code=200)
+
+        except ObjectDoesNotExist:
             logger.error(f"There is no user with the email {email}")
             return ClientDTO(success=False, code=404)
-        return ClientDTO(success=True, code=200)
 
     def get_status(self, email: str) -> ClientDTO:
         try:

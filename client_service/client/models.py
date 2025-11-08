@@ -34,6 +34,7 @@ class ClientCreationAudit(models.Model):
         ("CLIENT_CREATED", "Client Created"),
         ("CLIENT_ACTIVATED", "Client Activated"),
         ("CLIENT_REJECTED", "Client Rejected"),
+        ("FAILED_VALIDATION", "Failed Validation"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
