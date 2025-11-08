@@ -2,6 +2,7 @@
 
 import { TextInput } from "@/components/forms"
 import { useState } from "react"
+import { toast } from "react-toastify";
 
 export default function Login() {
 
@@ -63,6 +64,10 @@ export default function Login() {
         });
 
         if (!response.ok) {
+             if (response.status === 409) {
+                toast.error("An account with this email or phone number already exists. Do you wish to recover your account?");
+                return;
+            }
             throw new Error("Login failed");
         }
 
