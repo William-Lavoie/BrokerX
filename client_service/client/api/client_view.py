@@ -1,6 +1,3 @@
-import json
-import logging
-
 from client.adapters.django_client_repository import DjangoClientRepository
 from client.services.create_client import CreateClientUseCase
 from django.http import JsonResponse
@@ -10,8 +7,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from client_service.serializers import MyTokenObtainPairSerializer
-
-logger = logging.getLogger("django.server")
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -27,8 +22,6 @@ class ClientView(APIView):
         return [permission() for permission in permission_classes]
 
     def post(self, request):
-        logger.error(request.body)
-        logger.error(request.headers)
         data = request.data
 
         first_name = data["first_name"]
@@ -53,9 +46,6 @@ class ClientView(APIView):
         return JsonResponse(result.to_dict(), status=result.code)
 
     def get(self, request):
-        logger.error(request.body)
-        logger.error(request.headers)
         use_case = CreateClientUseCase(DjangoClientRepository(), EmailOTPRepository())
         result = use_case.get_client_info(request.user.email)
-        logger.error(request.user.uuid)
         return JsonResponse(result.to_dict())

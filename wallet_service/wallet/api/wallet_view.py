@@ -3,6 +3,8 @@ import logging
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from wallet.adapters.django_transaction_repository import DjangoTransactionRepository
@@ -13,6 +15,7 @@ from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 logger = logging.getLogger("wallet")
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class WalletView(APIView):
     permission_classes = [AllowAny]
 
@@ -30,9 +33,10 @@ class WalletView(APIView):
             DjangoTransactionRepository(),
         )
 
-        result = use_case.execute(
-            request.user.uuid, request.user.email, amount, idempotency_key
-        )
+        uuid = "4f3251cca4f54b2e9e244189b737c8ed"
+        email = "nico@robin.com"
+
+        result = use_case.execute(uuid, email, amount, idempotency_key)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
 
@@ -45,6 +49,7 @@ class WalletView(APIView):
             DjangoTransactionRepository(),
         )
 
-        result = use_case.get_balance(request.user.uuid)
+        uuid = "4f3251cca4f54b2e9e244189b737c8ed"
+        result = use_case.get_balance(uuid)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
