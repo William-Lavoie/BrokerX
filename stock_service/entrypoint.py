@@ -6,7 +6,7 @@ from django.core.management import execute_from_command_line
 from django.db import connections
 from django.db.utils import OperationalError
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wallet_service.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "stock_service.settings")
 
 
 def wait_for_db(retries=10, delay=3):
@@ -23,4 +23,4 @@ def wait_for_db(retries=10, delay=3):
 if __name__ == "__main__":
     wait_for_db()
     execute_from_command_line(["manage.py", "migrate", "--noinput"])
-    execute_from_command_line(["manage.py", "runserver", "0.0.0.0:8003"])
+    execute_from_command_line(["manage.py", "runserver", "0.0.0.0:8004"])

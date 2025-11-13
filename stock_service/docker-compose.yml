@@ -10,9 +10,9 @@ services:
       DB_PASSWORD: pass
       DB_NAME: stock_db
     ports:
-      - "8003:8003"
+      - "8004:8004"
     expose:
-      - "8003"
+      - "8004"
     depends_on:
       mysql:
         condition: service_healthy
@@ -27,7 +27,7 @@ services:
     container_name: stock-mysql
     restart: unless-stopped
     ports:
-      - "3303:3306"
+      - "3304:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: stock_db

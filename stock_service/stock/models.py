@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 from django.db import models
 
 

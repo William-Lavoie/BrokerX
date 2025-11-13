@@ -1,13 +1,14 @@
 import copy
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
 
 class StockInvalidException(Exception):
     def __init__(
         self,
         user_message: str = "The stock you have selected does not exist or has been retired.",
-        log_message: str = "Stock instance has been created with active = False",
+        log_message: str = "Stock instance was found found or is not active.",
         error_code: int = 400,
     ):
         super().__init__(user_message)
@@ -20,20 +21,20 @@ class Stock:
     def __init__(
         self,
         symbol: str = "",
-        name: str = "",
-        exchange: str = "",
-        currency: str = "CAD",
-        last_price: Decimal = Decimal("0.00"),
-        open_price: Decimal = Decimal("0.00"),
-        high_price: Decimal = Decimal("0.00"),
-        low_price: Decimal = Decimal("0.00"),
-        close_price: Decimal = Decimal("0.00"),
-        bid_price: Decimal = Decimal("0.00"),
-        bid_size: int = 0,
-        ask_price: Decimal = Decimal("0.00"),
-        ask_size: int = 0,
-        volume: int = 0,
-        timestamp: datetime = None,
+        name: Optional[str] = None,
+        exchange: Optional[str] = "",
+        currency: Optional[str] = "CAD",
+        last_price: Optional[Decimal] = Decimal("0.00"),
+        open_price: Optional[Decimal] = Decimal("0.00"),
+        high_price: Optional[Decimal] = Decimal("0.00"),
+        low_price: Optional[Decimal] = Decimal("0.00"),
+        close_price: Optional[Decimal] = Decimal("0.00"),
+        bid_price: Optional[Decimal] = Decimal("0.00"),
+        bid_size: Optional[int] = 0,
+        ask_price: Optional[Decimal] = Decimal("0.00"),
+        ask_size: Optional[int] = 0,
+        volume: Optional[int] = 0,
+        timestamp: Optional[str] = None,
         active: bool = True,
     ):
         if not active or not symbol or not symbol.isalpha():
@@ -60,7 +61,7 @@ class Stock:
 
         # Volume and timestamp
         self.volume = volume
-        self.timestamp = timestamp or datetime.utcnow()
+        self.timestamp = timestamp
 
         self.active = active
 

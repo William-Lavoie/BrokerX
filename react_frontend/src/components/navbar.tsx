@@ -1,9 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { redirect } from "next/dist/server/api-utils";
-import { Dropdown } from 'react-bootstrap';
+import { Button, Dropdown, Form } from 'react-bootstrap';
 import ProfileDropdown from "./profile_picture";
+
+async function get_stock_info(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+        event.preventDefault();
+        try {
+
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const symbol = formData.get("symbol");
+
+
+            const response = await fetch(`http://localhost:8004/stock?symbol=${symbol}`, {
+                method: "GET",
+            });
+
+            if (!response.ok) {
+                throw new Error("");
+            }
+
+            const data = await response.json();
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
 function NavbarButton({text, route}: {text: string, route: string}) {
     return (
@@ -25,7 +48,20 @@ export function Navbar() {
                 <NavbarButton text="Wallet" route="/wallet" />
                 <NavbarButton text="Place Order" route="/place_order" />
 
-                <div className="w-1/10 ml-auto">
+                <div className="d-flex items-center">
+                    <Form className="d-flex h-1/3" onSubmit={get_stock_info}>
+                        <Form.Control
+                            name="symbol"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search"
+                            required
+                        />
+                        <Button variant="outline-success" type='submit'>Search</Button>
+                    </Form>
+                </div>
+
+                <div className="w-1/10  ml-auto">
                     <ProfileDropdown/>
                 </div>
             </nav>

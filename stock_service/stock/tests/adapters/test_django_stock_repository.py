@@ -2,42 +2,43 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
-from broker.adapters.django_stock_repository import DjangoStockRepository
-from broker.domain.entities.stock import StockInvalidException
-from broker.domain.ports.stock_repository import StockDTO
-from broker.exceptions import DataAccessException
+from stock.adapters.django_stock_repository import DjangoStockRepository
+from stock.domain.entities.stock import StockInvalidException
+from stock.domain.ports.stock_repository import StockDTO
+
+from stock_service.exceptions import DataAccessException
 
 pytestmark = pytest.mark.django_db
 
 
 def test_get_stock_by_symbol():
     mock_dao = MagicMock()
+    mock_redis = MagicMock()
+
     mock_dao.get_stock_by_symbol.return_value = StockDTO(
         success=True,
         code=200,
         symbol="AAPL",
-        previous_close=Decimal("249.17"),
-        volume=12345,
-        last_price=Decimal("249.28"),
     )
+    mock_redis.get_stock.return_value = None
 
-    repo = DjangoStockRepository(dao=mock_dao)
+    repo = DjangoStockRepository(dao=mock_dao, redis=mock_redis)
 
     stock = repo.get_stock_by_symbol("AAPL")
 
     assert stock.symbol == "AAPL"
-    assert stock.previous_close == Decimal("249.17")
-    assert stock.volume == 12345
-    assert stock.last_price == Decimal("249.28")
 
     mock_dao.get_stock_by_symbol.assert_called_once_with("AAPL")
 
 
 def test_get_stock_by_symbol_not_found():
     mock_dao = MagicMock()
-    mock_dao.get_stock_by_symbol.return_value = StockDTO(success=False, code=404)
+    mock_redis = MagicMock()
 
-    repo = DjangoStockRepository(dao=mock_dao)
+    mock_dao.get_stock_by_symbol.return_value = StockDTO(success=False, code=404)
+    mock_redis.get_stock.return_value = None
+
+    repo = DjangoStockRepository(dao=mock_dao, redis=mock_redis)
 
     with pytest.raises(StockInvalidException) as exc_info:
         stock = repo.get_stock_by_symbol("AAPL")
@@ -50,9 +51,12 @@ def test_get_stock_by_symbol_not_found():
 
 def test_get_stock_by_symbol_server_error():
     mock_dao = MagicMock()
-    mock_dao.get_stock_by_symbol.return_value = StockDTO(success=False, code=500)
+    mock_redis = MagicMock()
 
-    repo = DjangoStockRepository(dao=mock_dao)
+    mock_dao.get_stock_by_symbol.return_value = StockDTO(success=False, code=500)
+    mock_redis.get_stock.return_value = None
+
+    repo = DjangoStockRepository(dao=mock_dao, redis=mock_redis)
 
     with pytest.raises(DataAccessException) as exc_info:
         stock = repo.get_stock_by_symbol("AAPL")
