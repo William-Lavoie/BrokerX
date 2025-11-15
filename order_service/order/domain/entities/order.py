@@ -170,7 +170,22 @@ class Order:
         return self.limit is None and offered_price == market_price
 
     def to_dict(self):
-        return copy.copy(self.__dict__)
+        return {
+            "order_id": str(self.order_id) if self.order_id else None,
+            "client_id": str(self.client_id),
+            "symbol": self.symbol,
+            "order_type": self.order_type,
+            "order_style": self.order_style,
+            "order_duration": self.order_duration,
+            "quantity": self.quantity,
+            "quantity_executed": self.quantity_executed,
+            "price": float(self.price) if self.price is not None else None,
+            "end_date": self.end_date.isoformat() if self.end_date else None,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "executed_at": self.executed_at.isoformat() if self.executed_at else None,
+        }
 
     def update_from_dto(self, order_dto: OrderDTO) -> None:
         self.order_id = order_dto.order_id

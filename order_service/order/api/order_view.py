@@ -29,6 +29,18 @@ class OrderView(APIView):
         end_date = data.get("end_date", None)
         quantity = data.get("quantity", 0)
 
+        if (
+            not symbol
+            or not order_type
+            or not order_style
+            or not order_duration
+            or not quantity
+        ):
+            return JsonResponse(
+                data={"message": "Missing required parameters.", "orders": []},
+                status=400,
+            )
+
         idempotency_key = request.headers.get("Idempotency-Key")
 
         use_case = PlaceOrderUseCase(

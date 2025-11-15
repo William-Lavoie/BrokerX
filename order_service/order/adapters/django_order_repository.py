@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from django.db import transaction
 from order.adapters.dao.mysql_order_dao import MySQLOrderDAO
 from order.adapters.redis.redis_order import RedisOrder
 from order.domain.entities.order import Order, OrderDTO
@@ -17,25 +18,26 @@ class DjangoOrderRepository(OrderRepository):
         self.redis = redis if redis is not None else RedisOrder()
 
     def add_order(self, order: Order, idempotency_key: UUID) -> None:
-        order_dto: OrderDTO = self.dao.add_order(
-            client_id=order.client_id,
-            symbol=order.symbol,
-            order_type=order.order_type,
-            order_style=order.order_style,
-            order_duration=order.order_duration,
-            quantity=order.quantity,
-            idempotency_key=idempotency_key,
-            price=order.price,
-            end_date=order.end_date,
-        )
-
-        if not order_dto.success:
-            raise DataAccessException(
-                user_message=f"An unexpected error occurred when trying to place the order."
+        with transaction.atomic():
+            order_dto: OrderDTO = self.dao.add_order(
+                client_id=order.client_id,
+                symbol=order.symbol,
+                order_type=order.order_type,
+                order_style=order.order_style,
+                order_duration=order.order_duration,
+                quantity=order.quantity,
+                idempotency_key=idempotency_key,
+                price=order.price,
+                end_date=order.end_date,
             )
 
-        order.update_from_dto(order_dto=order_dto)
-        self.redis.set_order(order.client_id, order)
+            if not order_dto.success:
+                raise DataAccessException(
+                    user_message=f"An unexpected error occurred when trying to place the order."
+                )
+
+            order.update_from_dto(order_dto=order_dto)
+            self.redis.set_order(order.client_id, order)
 
     def find_matching_orders(self, order: Order) -> list[OrderDTO]:
         redis_orders = redis_get_orders_by_stock(order.stock.symbol)

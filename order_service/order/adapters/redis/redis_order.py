@@ -74,7 +74,7 @@ class RedisOrder:
                 ),
             )
 
-            orders_stock_json = redis_client.get(f"orders:{order.stock.symbol}")
+            orders_stock_json = redis_client.get(f"orders:{order.symbol}")
             if orders_stock_json:
                 orders_data = json.loads(orders_stock_json)
             else:

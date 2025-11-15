@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
 type TextInputProps = {
   label: string;
@@ -21,7 +22,11 @@ export function TextInput({ label, id, name, type = "text", handler }: TextInput
     };
     return (
         <div className="flex flex-col">
-            <label htmlFor={id ?? label}>{label}</label>
+             <FloatingLabel
+                controlId="floatingInput"
+                label={label}
+                className="mb-3"
+            >
                 <input
                     id={id ?? label}
                     className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none"
@@ -31,6 +36,7 @@ export function TextInput({ label, id, name, type = "text", handler }: TextInput
                     onChange={handleChange}
                     required
                 />
+            </FloatingLabel>
         </div>
     )
 }
