@@ -1,26 +1,34 @@
 import json
 import logging
+from uuid import UUID
 
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from order.adapters.django_order_repository import DjangoOrderRepository
+from order.services.place_order import PlaceOrderUseCase
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-
-from ..adapters.django_order_repository import DjangoOrderRepository
-from ..services.place_order import PlaceOrderUseCase
 
 logger = logging.getLogger("order")
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class OrderView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         data = json.loads(request.body)
 
-        direction = data.get("direction", "")
-        limit = data.get("limit", None)
-        quantity = int(data.get("quantity", 0))
+        client_id = UUID("4f3251cca4f54b2e9e244189b737c8ed")
         symbol = data.get("symbol", "")
+        order_type = data.get("order_type", "")
+        order_style = data.get("order_style", "")
+        order_duration = data.get("order_duration", "")
+        price = data.get("price", None)
+        end_date = data.get("end_date", None)
+        quantity = data.get("quantity", 0)
+
         idempotency_key = request.headers.get("Idempotency-Key")
 
         use_case = PlaceOrderUseCase(
@@ -28,12 +36,15 @@ class OrderView(APIView):
         )
 
         result = use_case.execute(
-            email=request.user.email,
-            direction=direction,
-            limit=limit,
-            quantity=quantity,
+            client_id=client_id,
             symbol=symbol,
-            idempotency_key=idempotency_key,
+            order_type=order_type,
+            order_style=order_style,
+            order_duration=order_duration,
+            quantity=quantity,
+            idempotency_key=UUID(idempotency_key),
+            price=price,
+            end_date=end_date,
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
@@ -44,5 +55,7 @@ class OrderView(APIView):
             DjangoOrderRepository(),
         )
 
-        result = use_case.get_orders(request.user.email)
+        client_id = UUID("4f3251cca4f54b2e9e244189b737c8ed")
+
+        result = use_case.get_orders(client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)

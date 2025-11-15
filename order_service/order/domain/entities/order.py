@@ -94,6 +94,76 @@ class Order:
         self.updated_at = updated_at
         self.executed_at = executed_at
 
+        self.validate_data()
+
+    def validate_data(self) -> None:
+        if self.quantity < 1:
+            raise OrderInvalidException(
+                user_message="The order quantity must be at least 1.",
+                log_message=f"Order quantity {self.quantity} is invalid.",
+                error_code=400,
+            )
+
+        if self.order_type not in ["BUY", "SELL"]:
+            raise OrderInvalidException(
+                user_message="The order type is invalid.",
+                log_message=f"Order type {self.order_type} is invalid.",
+                error_code=400,
+            )
+
+        if self.order_style not in ["MARKET", "LIMIT"]:
+            raise OrderInvalidException(
+                user_message="The order style is invalid.",
+                log_message=f"Order style {self.order_style} is invalid.",
+                error_code=400,
+            )
+
+        if self.order_duration not in ["DAY", "GTC", "GTD", "IOC", "FOK"]:
+            raise OrderInvalidException(
+                user_message="The order duration is invalid.",
+                log_message=f"Order duration {self.order_duration} is invalid.",
+                error_code=400,
+            )
+
+        if self.order_style == "LIMIT":
+            if self.price is None or self.price <= Decimal("0.00"):
+                raise OrderInvalidException(
+                    user_message="The limit order must have a valid price.",
+                    log_message=f"Limit order has invalid price {self.price}.",
+                    error_code=400,
+                )
+
+        if self.order_style == "MARKET":
+            if self.price is not None:
+                raise OrderInvalidException(
+                    user_message="The market order should not have a price.",
+                    log_message=f"Market order has unexpected price {self.price}.",
+                    error_code=400,
+                )
+
+        if self.quantity_executed > self.quantity:
+            raise OrderInvalidException(
+                user_message="The executed quantity cannot exceed the order quantity.",
+                log_message=f"Executed quantity {self.quantity_executed} exceeds order quantity {self.quantity}.",
+                error_code=400,
+            )
+
+        if self.order_duration == "GTD":
+            if self.end_date is None:
+                raise OrderInvalidException(
+                    user_message="The GTD order must have an end date.",
+                    log_message="GTD order missing end date.",
+                    error_code=400,
+                )
+
+        if self.order_duration != "GTD":
+            if self.end_date is not None:
+                raise OrderInvalidException(
+                    user_message="Only GTD orders can have an end date.",
+                    log_message="Non-GTD order has an end date specified.",
+                    error_code=400,
+                )
+
     def price_is_acceptable(
         self, offered_price: Decimal, market_price: Decimal
     ) -> bool:

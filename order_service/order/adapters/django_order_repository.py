@@ -53,18 +53,16 @@ class DjangoOrderRepository(OrderRepository):
             super().get_order_from_dto(order_dto) for order_dto in matching_order_dtos
         ]
 
-    def get_orders_by_client(self, email: str) -> list[Order]:
-        redis_orders = redis_get_orders(email=email)
+    def get_orders_by_client(self, client_id: UUID) -> list[Order]:
+        redis_orders = self.redis.get_orders_by_client(client_id=client_id)
         if redis_orders:
             return redis_orders
 
-        order_dtos = self.dao.get_orders_by_client(email=email)
-        for order_dto in order_dtos:
-            order_dto.stock = Stock(symbol=order_dto.stock)
+        order_dtos = self.dao.get_orders_by_client(client_id=client_id)
 
         orders = [
             OrderRepository.get_order_from_dto(order_dto) for order_dto in order_dtos
         ]
 
-        redis_set_orders(email=email, orders=orders)
+        self.redis.set_orders_by_client(client_id=client_id, orders=orders)
         return orders

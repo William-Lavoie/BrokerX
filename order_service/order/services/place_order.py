@@ -45,135 +45,62 @@ class PlaceOrderUseCase:
         symbol: str,
         order_type: str,
         order_style: str,
+        order_duration: str,
         quantity: int,
         idempotency_key: UUID,
         price: Optional[Decimal] = None,
+        end_date: Optional[str] = None,
     ) -> PlaceOrderUseCaseResult:
 
-        if quantity < 1:
-            logger.warning(
-                f"Client {client_id} tried placing an order for {symbol} with {quantity} shares."
-            )
-            return PlaceOrderUseCaseResult(
-                success=False,
-                message="You have entered invalid data",
-                code=422,
-            )
-
-        if (order_type not in ["BUY", "SELL"]) or (
-            order_style not in ["MARKET", "LIMIT"]
-        ):
-            logger.warning(
-                f"Client {client_id} tried placing an order for {symbol} with invalid order type {order_type} or order style {order_style}."
-            )
-            return PlaceOrderUseCaseResult(
-                success=False,
-                message="You have entered invalid data",
-                code=422,
-            )
-
-        if order_style == "LIMIT" and (price is None or price <= Decimal("0.00")):
-            logger.warning(
-                f"Client {client_id} tried placing a LIMIT order for {symbol} without a valid price."
-            )
-            return PlaceOrderUseCaseResult(
-                success=False,
-                message="You have entered invalid data",
-                code=422,
-            )
-
         try:
-
-            if order_type == "SELL":
-                pass
-
-            elif order_type == "BUY":
-                wallet_dto: WalletDTO = self.wallet_repository.get_balance(
-                    email=client.email
-                )
-                if not client.can_buy_shares(
-                    stock=stock,
-                    quantity=quantity,
-                    limit=limit,
-                    balance=wallet_dto.balance,
-                ):
-                    logger.warning(
-                        f"Client {email} tried to place a buy order with {quantity} shares."
-                    )
-                    return PlaceOrderUseCaseResult(
-                        success=False,
-                        message="You do not have enough funds.",
-                        code=412,
-                    )
-            order: Order = self.order_repository.add_order(
-                client=client,
-                stock=stock,
-                direction=direction,
-                limit=limit,
-                initial_quantity=quantity,
-                idempotency_key=idempotency_key,
+            order = Order(
+                client_id=client_id,
+                symbol=symbol,
+                order_type=order_type,
+                order_style=order_style,
+                order_duration=order_duration,
+                quantity=quantity,
+                price=price,
+                end_date=end_date,
             )
 
-            order_matching_use_case = OrderMatchingUseCase(
-                self.client_repository, self.stock_repository, self.order_repository
-            )
+            # TODO: call wallet
+            # TODO: call stocks
 
-            thread = threading.Thread(
-                target=order_matching_use_case.execute, args=(order,)
+            self.order_repository.add_order(
+                order=order, idempotency_key=idempotency_key
             )
-            thread.start()
-
             return PlaceOrderUseCaseResult(
-                success=True,
                 message="The order was placed successfully.",
                 code=201,
+                orders=[order],
             )
 
-        except StockInvalidException as stock_exception:
+        except OrderInvalidException as order_invalid_exception:
             logger.error(
-                f"StockInvalidException in PlaceOrderUseCase for symbol {symbol}: {stock_exception.log_message} {stock_exception.error_code}",
+                f"OrderInvalidException in PlaceOrderUseCase for client_id {client_id}: {order_invalid_exception.log_message}",
                 exc_info=True,
             )
             return PlaceOrderUseCaseResult(
-                success=False,
-                message=stock_exception.user_message,
-                code=stock_exception.error_code,
-            )
-
-        except OrderInvalidException as order_exception:
-            logger.error(
-                f"OrderInvalidException in PlaceOrderUseCase for symbol {symbol}, direction {direction}, limit {limit}, quantity {quantity} : {order_exception.log_message}",
-                exc_info=True,
-            )
-            return PlaceOrderUseCaseResult(
-                success=False,
-                message=order_exception.user_message,
-                code=order_exception.error_code,
+                message=order_invalid_exception.user_message,
+                code=order_invalid_exception.error_code,
             )
 
         except DataAccessException as data_access_exception:
             return PlaceOrderUseCaseResult(
-                success=False,
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,
             )
 
-    def get_orders(self, email: str):
+    def get_orders(self, client_id: str):
         try:
-            orders = self.order_repository.get_orders_by_client(email=email)
+            orders = self.order_repository.get_orders_by_client(client_id=client_id)
             return PlaceOrderUseCaseResult(
-                success=True,
                 code=200,
-                message="Order fetched successfully",
+                message="Orders fetched successfully",
                 orders=orders,
             )
 
-        except ClientInvalidException as client_exception:
-            return PlaceOrderUseCaseResult(
-                success=False,
-                message=client_exception.user_message,
-                code=client_exception.error_code,
-            )
         except DataAccessException as data_access_exception:
             return PlaceOrderUseCaseResult(
                 success=False,

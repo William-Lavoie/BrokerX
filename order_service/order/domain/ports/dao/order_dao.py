@@ -29,5 +29,5 @@ class OrderDAO:
         pass
 
     @abstractmethod
-    def get_orders_by_client(self, email: str) -> list[OrderDTO]:
+    def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
         pass

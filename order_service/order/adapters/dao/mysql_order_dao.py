@@ -132,11 +132,20 @@ class MySQLOrderDAO(OrderDAO):
                 OrderDTO(
                     success=True,
                     code=200,
-                    direction=order.direction,
-                    limit=order.limit,
-                    initial_quantity=order.initial_quantity,
-                    remaining_quantity=order.remaining_quantity,
                     order_id=order.order_id,
+                    client_id=order.client_id,
+                    symbol=order.stock_symbol,
+                    order_type=order.order_type,
+                    order_style=order.order_style,
+                    order_duration=order.order_duration,
+                    quantity=order.quantity,
+                    quantity_executed=order.quantity_executed,
+                    price=order.price,
+                    end_date=order.order_end_date,
+                    status=order.status,
+                    created_at=order.created_at,
+                    updated_at=order.updated_at,
+                    executed_at=order.executed_at,
                 )
                 for order in orders
             ]
