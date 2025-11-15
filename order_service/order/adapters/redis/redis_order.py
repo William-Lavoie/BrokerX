@@ -3,13 +3,12 @@ import logging
 from decimal import Decimal
 from typing import Optional
 
+from order.domain.entities.order import Order
 from redis import RedisError
 
 from order_service.redis import redis_client
 
-from ...domain.entities.order import Order
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("redis")
 
 
 def redis_set_orders(email: str, orders: list[Order]):

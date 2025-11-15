@@ -1,21 +1,14 @@
 import json
 import logging
-from decimal import ROUND_HALF_UP, Decimal
 
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from ..adapters.django_client_repository import DjangoClientRepository
 from ..adapters.django_order_repository import DjangoOrderRepository
-from ..adapters.django_stock_repository import DjangoStockRepository
-from ..adapters.django_transaction_repository import DjangoTransactionRepository
-from ..adapters.django_wallet_repository import DjangoWalletRepository
-from ..adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from ..services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 from ..services.place_order import PlaceOrderUseCase
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("order")
 
 
 class OrderView(APIView):
@@ -31,10 +24,7 @@ class OrderView(APIView):
         idempotency_key = request.headers.get("Idempotency-Key")
 
         use_case = PlaceOrderUseCase(
-            DjangoClientRepository(),
-            DjangoStockRepository(),
             DjangoOrderRepository(),
-            DjangoWalletRepository(),
         )
 
         result = use_case.execute(
@@ -51,10 +41,7 @@ class OrderView(APIView):
     def get(self, request):
 
         use_case = PlaceOrderUseCase(
-            DjangoClientRepository(),
-            DjangoStockRepository(),
             DjangoOrderRepository(),
-            DjangoWalletRepository(),
         )
 
         result = use_case.get_orders(request.user.email)

@@ -1,21 +1,24 @@
 from abc import abstractmethod
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from ....domain.ports.order_repository import OrderDTO
+from order.domain.ports.order_repository import OrderDTO
 
 
 class OrderDAO:
     @abstractmethod
     def add_order(
         self,
-        email: str,
+        client_id: UUID,
         symbol: str,
-        direction: str,
-        initial_quantity: int,
+        order_type: str,
+        order_style: str,
+        quantity: int,
         idempotency_key: UUID,
-        limit: Optional[Decimal],
+        end_date: Optional[datetime],
+        price: Optional[Decimal] = None,
     ) -> OrderDTO:
         pass
 

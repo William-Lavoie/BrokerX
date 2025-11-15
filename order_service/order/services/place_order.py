@@ -1,8 +1,8 @@
 import logging
 import threading
-import uuid
 from decimal import Decimal
 from typing import Optional
+from uuid import UUID
 
 from order.domain.entities.order import Order, OrderInvalidException
 from order.domain.ports.order_repository import OrderRepository
@@ -16,12 +16,11 @@ logger = logging.getLogger("order")
 class PlaceOrderUseCaseResult(UseCaseResult):
     def __init__(
         self,
-        success: bool,
         message: str,
         code: int,
         orders: Optional[list[Order]] = None,
     ):
-        super().__init__(success=success, message=message, code=code)
+        super().__init__(message=message, code=code)
         self.orders: Optional[list[Order]] = orders
 
     def to_dict(self):
@@ -42,39 +41,53 @@ class PlaceOrderUseCase:
 
     def execute(
         self,
-        email: str,
-        client_id: str,
-        direction: str,
-        limit: Optional[Decimal],
-        quantity: int,
+        client_id: UUID,
         symbol: str,
-        idempotency_key: uuid.UUID,
+        order_type: str,
+        order_style: str,
+        quantity: int,
+        idempotency_key: UUID,
+        price: Optional[Decimal] = None,
     ) -> PlaceOrderUseCaseResult:
 
-        if quantity < 1 or (limit < Decimal("0.01")):
+        if quantity < 1:
             logger.warning(
-                f"Client {email} tried placing an order for {symbol} with {quantity} shares with direction {direction} and limit {limit}."
+                f"Client {client_id} tried placing an order for {symbol} with {quantity} shares."
             )
             return PlaceOrderUseCaseResult(
                 success=False,
                 message="You have entered invalid data",
                 code=422,
             )
+
+        if (order_type not in ["BUY", "SELL"]) or (
+            order_style not in ["MARKET", "LIMIT"]
+        ):
+            logger.warning(
+                f"Client {client_id} tried placing an order for {symbol} with invalid order type {order_type} or order style {order_style}."
+            )
+            return PlaceOrderUseCaseResult(
+                success=False,
+                message="You have entered invalid data",
+                code=422,
+            )
+
+        if order_style == "LIMIT" and (price is None or price <= Decimal("0.00")):
+            logger.warning(
+                f"Client {client_id} tried placing a LIMIT order for {symbol} without a valid price."
+            )
+            return PlaceOrderUseCaseResult(
+                success=False,
+                message="You have entered invalid data",
+                code=422,
+            )
+
         try:
 
-            if direction == "S":
+            if order_type == "SELL":
+                pass
 
-                if not client.can_sell_shares(symbol=symbol, quantity=quantity):
-                    logger.warning(
-                        f"Client {email} tried to place a sell order with {quantity} shares."
-                    )
-                    return PlaceOrderUseCaseResult(
-                        success=False,
-                        message="You do not have enough shares to sell.",
-                        code=412,
-                    )
-
-            elif direction == "buy":
+            elif order_type == "BUY":
                 wallet_dto: WalletDTO = self.wallet_repository.get_balance(
                     email=client.email
                 )

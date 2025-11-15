@@ -29,7 +29,7 @@ SECRET_KEY = "django-insecure-749)6zax_8!7@$f74ba*rjmzrh5p6=!32anl1u6!7up$-8n%o$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list = ["localhost"]
+ALLOWED_HOSTS: list = ["localhost", "order-app"]
 
 
 # Application definition

@@ -25,23 +25,25 @@ class DjangoOrderRepository(OrderRepository):
         self,
         client_id: UUID,
         symbol: str,
-        direction: str,
-        initial_quantity: int,
+        order_type: str,
+        order_style: str,
+        quantity: int,
         idempotency_key: UUID,
-        limit: Optional[Decimal] = None,
+        price: Optional[Decimal] = None,
     ) -> Order:
         order_dto: OrderDTO = self.dao.add_order(
             client_id=client_id,
             symbol=symbol,
-            direction=direction,
-            initial_quantity=initial_quantity,
+            order_type=order_type,
+            order_style=order_style,
+            quantity=quantity,
             idempotency_key=idempotency_key,
-            limit=limit,
+            price=price,
         )
 
         if not order_dto.success:
             raise DataAccessException(
-                user_message=f"An unexpected error occurred when trying to access {}"
+                user_message=f"An unexpected error occurred when trying to place the order."
             )
 
         order = super().get_order_from_dto(order_dto)
