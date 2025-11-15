@@ -4,7 +4,6 @@ from uuid import UUID
 
 import pytest
 from order.adapters.dao.mysql_order_dao import MySQLOrderDAO
-from order.domain.ports.order_repository import OrderDTO
 from order.models import Order
 
 pytestmark = pytest.mark.django_db
@@ -26,7 +25,7 @@ def test_add_order_market():
     assert order_dto.success
     assert order_dto.code == 201
     assert order_dto.client_id == UUID("6456e984-de35-408d-9d71-503d1f266ce2")
-    assert order_dto.stock_symbol == "AAPL"
+    assert order_dto.symbol == "AAPL"
     assert order_dto.order_type == "BUY"
     assert order_dto.order_style == "MARKET"
     assert order_dto.order_duration == "DAY"
@@ -70,7 +69,7 @@ def test_add_order_limit():
     assert order_dto.success
     assert order_dto.code == 201
     assert order_dto.client_id == UUID("6456e984-de35-408d-9d71-503d1f266ce2")
-    assert order_dto.stock_symbol == "AAPL"
+    assert order_dto.symbol == "AAPL"
     assert order_dto.order_type == "BUY"
     assert order_dto.order_style == "LIMIT"
     assert order_dto.order_duration == "GTC"
@@ -115,7 +114,7 @@ def test_add_order_GTD():
     assert order_dto.success
     assert order_dto.code == 201
     assert order_dto.client_id == UUID("6456e984-de35-408d-9d71-503d1f266ce2")
-    assert order_dto.stock_symbol == "AAPL"
+    assert order_dto.symbol == "AAPL"
     assert order_dto.order_type == "BUY"
     assert order_dto.order_style == "LIMIT"
     assert order_dto.order_duration == "GTD"

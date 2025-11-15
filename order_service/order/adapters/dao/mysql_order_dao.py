@@ -7,8 +7,8 @@ from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
+from order.domain.entities.order import OrderDTO
 from order.domain.ports.dao.order_dao import OrderDAO
-from order.domain.ports.order_repository import OrderDTO
 from order.models import Order, OrderAudit
 
 logger = logging.getLogger("mysql")
@@ -54,7 +54,7 @@ class MySQLOrderDAO(OrderDAO):
                     code=code,
                     order_id=order.order_id,
                     client_id=order.client_id,
-                    stock_symbol=order.stock_symbol,
+                    symbol=order.stock_symbol,
                     order_type=order.order_type,
                     order_style=order.order_style,
                     order_duration=order.order_duration,

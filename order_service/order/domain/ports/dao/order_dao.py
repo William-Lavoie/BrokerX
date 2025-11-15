@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from order.domain.ports.order_repository import OrderDTO
+from order.domain.entities.order import OrderDTO
 
 
 class OrderDAO:
