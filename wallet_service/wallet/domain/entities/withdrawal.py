@@ -3,18 +3,14 @@ from enum import Enum
 from xmlrpc.client import DateTime
 
 
-class TransactionStatus(Enum):
-    COMPLETED = "C"
-    PENDING = "P"
-    REJECTED = "R"
-    FAILED = "F"
+class WithdrawalStatus(Enum):
+    COMPLETED = "COMPLETED"
+    PENDING = "PENDING"
+    REJECTED = "REJECTED"
+    FAILED = "FAILED"
 
 
-class TransactionType(Enum):
-    DEPOSIT = "Deposit"
-
-
-class Transaction:
+class Withdrawal:
     def __init__(
         self,
         amount: Decimal,
@@ -28,4 +24,4 @@ class Transaction:
         self.message: str = message
 
     def has_been_processed(self) -> bool:
-        return self.status != TransactionStatus.PENDING.value
+        return self.status != WithdrawalStatus.PENDING.value

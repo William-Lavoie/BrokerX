@@ -16,7 +16,7 @@ class Wallet(models.Model):
     )
 
 
-class Transaction(models.Model):
+class Withdrawal(models.Model):
     client_id = models.UUIDField(editable=False, db_index=True)
     amount = models.DecimalField(
         max_digits=8, decimal_places=2, validators=[MaxValueValidator(0)]
@@ -26,11 +26,11 @@ class Transaction(models.Model):
     status = models.CharField(
         max_length=20,
         choices=[
-            ("C", "Completed"),
-            ("P", "Pending"),
-            ("R", "Rejected"),
-            ("F", "Failed"),
+            ("COMPLETED", "Completed"),
+            ("PENDING", "Pending"),
+            ("REJECTED", "Rejected"),
+            ("FAILED", "Failed"),
         ],
-        default="P",
+        default="PENDING",
     )
     message = models.CharField(max_length=300, blank=True)

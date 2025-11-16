@@ -1,16 +1,16 @@
 from decimal import Decimal
 
 import pytest
-from wallet.adapters.dao.mysql_transaction_dao import MySQLTransactionDAO
+from wallet.adapters.dao.mysql_withdrawal_dao import MySQLWithdrawalDAO
 
 pytestmark = pytest.mark.django_db
 
-from wallet.models import Transaction
+from wallet.models import Withdrawal
 
 
 @pytest.fixture(autouse=True)
 def setup_function(db):
-    Transaction.objects.create(
+    Withdrawal.objects.create(
         client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("10.50"),
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6",
@@ -19,10 +19,10 @@ def setup_function(db):
     yield
 
 
-def test_write_transaction():
-    dao = MySQLTransactionDAO()
+def test_write_withdrawal():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.write_transaction(
+    result = dao.write_withdrawal(
         client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("20.99"),
         idempotency_key="43b80e5d-ae6c-4789-a696-2fd81db4296e",
@@ -31,28 +31,28 @@ def test_write_transaction():
     assert result.success
     assert result.code == 201
     assert result.amount.compare(Decimal("20.99")) == 0
-    assert result.status == "P"
+    assert result.status == "PENDING"
     assert not result.message
 
-    saved_transaction = Transaction.objects.filter(
+    saved_withdrawal = Withdrawal.objects.filter(
         idempotency_key="43b80e5d-ae6c-4789-a696-2fd81db4296e"
     )
 
-    assert saved_transaction.count() == 1
+    assert saved_withdrawal.count() == 1
 
-    saved_transaction = saved_transaction.first()
+    saved_withdrawal = saved_withdrawal.first()
 
-    assert saved_transaction.amount.compare(Decimal("20.99")) == 0
-    assert saved_transaction.status == "P"
+    assert saved_withdrawal.amount.compare(Decimal("20.99")) == 0
+    assert saved_withdrawal.status == "PENDING"
     assert (
-        str(saved_transaction.idempotency_key) == "43b80e5d-ae6c-4789-a696-2fd81db4296e"
+        str(saved_withdrawal.idempotency_key) == "43b80e5d-ae6c-4789-a696-2fd81db4296e"
     )
 
 
-def test_write_transaction_same_uuid():
-    dao = MySQLTransactionDAO()
+def test_write_withdrawal_same_uuid():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.write_transaction(
+    result = dao.write_withdrawal(
         client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("20.99"),
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6",
@@ -61,20 +61,20 @@ def test_write_transaction_same_uuid():
     assert result.success
     assert result.code == 200
     assert result.amount.compare(Decimal("10.50")) == 0
-    assert result.status == "P"
+    assert result.status == "PENDING"
     assert result.message == "This is a test"
 
-    saved_transaction = Transaction.objects.filter(
+    saved_withdrawal = Withdrawal.objects.filter(
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6"
     )
 
-    assert saved_transaction.count() == 1
+    assert saved_withdrawal.count() == 1
 
 
-def test_write_transaction_no_user():
-    dao = MySQLTransactionDAO()
+def test_write_withdrawal_no_user():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.write_transaction(
+    result = dao.write_withdrawal(
         client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal("20.99"),
         idempotency_key="be3fcd15-9012-4666-8803-fcb2d5686f60",
@@ -85,10 +85,10 @@ def test_write_transaction_no_user():
     assert Decimal(result.amount) == Decimal("20.99")
 
 
-def test_write_transaction_bad_uuid():
-    dao = MySQLTransactionDAO()
+def test_write_withdrawal_bad_uuid():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.write_transaction(
+    result = dao.write_withdrawal(
         client_id="28877641-1cb6-4d40-971d-e7e9866f9a9f",
         amount=Decimal(20.99),
         idempotency_key="not a uuid",
@@ -98,67 +98,67 @@ def test_write_transaction_bad_uuid():
     assert result.code == 400
 
 
-def test_validate_transaction():
-    dao = MySQLTransactionDAO()
+def test_validate_withdrawal():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_transaction("e4b88817-a42a-4450-87de-fb1f734d57a6")
+    result = dao.validate_withdrawal("e4b88817-a42a-4450-87de-fb1f734d57a6")
 
     assert result.success
     assert result.code == 200
 
-    saved_transaction = Transaction.objects.get(
+    saved_withdrawal = Withdrawal.objects.get(
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6"
     )
 
-    assert saved_transaction.status == "C"
+    assert saved_withdrawal.status == "COMPLETED"
 
 
-def test_validate_transaction_no_transaction():
-    dao = MySQLTransactionDAO()
+def test_validate_withdrawal_no_withdrawal():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_transaction("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
+    result = dao.validate_withdrawal("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
 
     assert not result.success
     assert result.code == 404
 
 
-def test_validate_transaction_invalid_uuid():
-    dao = MySQLTransactionDAO()
+def test_validate_withdrawal_invalid_uuid():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_transaction("e4efw57a6")
+    result = dao.validate_withdrawal("e4efw57a6")
 
     assert not result.success
     assert result.code == 400
 
 
-def test_fail_transaction():
-    dao = MySQLTransactionDAO()
+def test_fail_withdrawal():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.fail_transaction("e4b88817-a42a-4450-87de-fb1f734d57a6")
+    result = dao.fail_withdrawal("e4b88817-a42a-4450-87de-fb1f734d57a6")
 
     assert result.success
     assert result.code == 200
 
-    saved_transaction = Transaction.objects.get(
+    saved_withdrawal = Withdrawal.objects.get(
         idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6"
     )
 
-    assert saved_transaction.status == "F"
+    assert saved_withdrawal.status == "FAILED"
 
 
-def test_fail_transaction_no_transaction():
-    dao = MySQLTransactionDAO()
+def test_fail_withdrawal_no_withdrawal():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.fail_transaction("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
+    result = dao.fail_withdrawal("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
 
     assert not result.success
     assert result.code == 404
 
 
-def test_fail_transaction_invalid_uuid():
-    dao = MySQLTransactionDAO()
+def test_fail_withdrawal_invalid_uuid():
+    dao = MySQLWithdrawalDAO()
 
-    result = dao.fail_transaction("e4efw57a6")
+    result = dao.fail_withdrawal("e4efw57a6")
 
     assert not result.success
     assert result.code == 400

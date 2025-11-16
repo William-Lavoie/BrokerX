@@ -8,28 +8,27 @@ from wallet.adapters.result import Result
 
 
 @dataclass
-class TransactionDTO(Result):
+class WithdrawalDTO(Result):
     status: str = ""
     amount: Decimal = Decimal(0.0)
     created_at: datetime = field(default_factory=datetime.now)
     message: str = ""
 
 
-class TransactionRepository:
+class WithdrawalRepository:
     @abstractmethod
-    def write_transaction(
+    def write_withdrawal(
         self,
         client_id: UUID,
         amount: Decimal,
         idempotency_key: UUID,
-    ) -> TransactionDTO:
-        """By default a transaction is set to pending"""
+    ) -> WithdrawalDTO:
         pass
 
     @abstractmethod
-    def validate_transaction(self, idempotency_key: UUID) -> TransactionDTO:
+    def validate_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
         pass
 
     @abstractmethod
-    def fail_transaction(self, idempotency_key: UUID) -> TransactionDTO:
+    def fail_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
         pass

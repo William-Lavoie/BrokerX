@@ -1,8 +1,8 @@
 from decimal import Decimal
 
 import pytest
-from wallet.adapters.django_transaction_repository import DjangoTransactionRepository
 from wallet.adapters.django_wallet_repository import DjangoWalletRepository
+from wallet.adapters.django_withdrawal_repository import DjangoWithdrawalRepository
 from wallet.adapters.mock_payment_service_repository import MockPaymentServiceRepository
 from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 
@@ -14,7 +14,7 @@ def test_execute_success():
     use_case = AddFundsToWalletUseCase(
         MockPaymentServiceRepository(),
         DjangoWalletRepository(),
-        DjangoTransactionRepository(),
+        DjangoWithdrawalRepository(),
     )
 
     result = use_case.execute(
@@ -25,8 +25,8 @@ def test_execute_success():
     )
 
     assert result.success
-    assert result.code == 200
+    assert result.code == 201
     assert (
-        result.message == "The money has been successfully deposited into your account"
+        result.message == "The money has been successfully deposited into your account."
     )
     assert result.balance == Decimal("10.3")

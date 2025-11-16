@@ -11,10 +11,10 @@ class Wallet:
     ):
         self.balance: Decimal = balance
 
-    def can_add_funds(self, amount: Decimal):
+    def can_add_funds(self, amount: Decimal) -> bool:
         return Decimal(self.balance) + amount <= self.MAX_WALLET_BALANCE
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return copy.copy(self.__dict__)
 
     @classmethod

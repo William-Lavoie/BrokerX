@@ -30,3 +30,11 @@ class DjangoWalletRepository(WalletRepository):
         wallet_dto = self.dao.get_balance(client_id)
         self.redis.set_wallet_balance(client_id, wallet_dto.balance)
         return wallet_dto
+
+    def get_usable_balance(self, client_id: UUID) -> WalletDTO:
+        pass
+
+    def reserve_funds(self, client_id: UUID, amount: Decimal) -> bool:
+        wallet_dto = self.dao.reserve_funds(client_id, amount)
+
+        return wallet_dto.success

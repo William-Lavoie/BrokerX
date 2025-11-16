@@ -6,7 +6,7 @@ from wallet.domain.ports.dao.wallet_dao import WalletDTO
 from wallet.domain.ports.payment_service_repository import (
     PaymentServiceRepositoryResponse,
 )
-from wallet.domain.ports.transaction_repository import TransactionDTO
+from wallet.domain.ports.withdrawal_repository import WithdrawalDTO
 from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 
 pytestmark = pytest.mark.django_db
@@ -15,13 +15,11 @@ pytestmark = pytest.mark.django_db
 def test_execute_success():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
-    mock_transaction = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
-        success=True, code=200, status="P", amount=Decimal("10.0")
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
+        success=True, code=201, status="PENDING", amount=Decimal("10.0")
     )
-    mock_transaction.has_been_processed.return_value = True
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
@@ -29,16 +27,16 @@ def test_execute_success():
         success=True, code=201, balance=Decimal("34.58")
     )
     mock_wallet_repo.add_funds.return_value = WalletDTO(
-        success=True, code=200, balance=Decimal("44.58")
+        success=True, code=201, balance=Decimal("44.58")
     )
-    mock_transaction_repo.validate_transaction_return_value = TransactionDTO(
+    mock_withdrawal_repo.validate_withdrawal_return_value = WithdrawalDTO(
         success=True, code=200
     )
 
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(
@@ -49,9 +47,9 @@ def test_execute_success():
     )
 
     assert result.success
-    assert result.code == 200
+    assert result.code == 201
     assert (
-        result.message == "The money has been successfully deposited into your account"
+        result.message == "The money has been successfully deposited into your account."
     )
     assert result.balance == Decimal("44.58")
 
@@ -59,16 +57,16 @@ def test_execute_success():
 def test_execute_already_processed():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
         success=True, code=200, status="C", amount=Decimal("10.0")
     )
 
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(
@@ -80,19 +78,17 @@ def test_execute_already_processed():
 
     assert result.success
     assert result.code == 200
-    assert result.message == "This transaction has already been processed"
+    assert result.message == "This withdrawal has already been processed"
 
 
 def test_execute_payment_service_error():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
-    mock_transaction = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
-        success=True, code=200, status="P", amount=Decimal("10.0")
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
+        success=True, code=201, status="PENDING", amount=Decimal("10.0")
     )
-    mock_transaction.has_been_processed.return_value = True
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=False, code=500)
     )
@@ -100,7 +96,7 @@ def test_execute_payment_service_error():
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(
@@ -121,13 +117,11 @@ def test_execute_payment_service_error():
 def test_execute_cannot_add_funds():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
-    mock_transaction = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
-        success=True, code=200, status="P", amount=Decimal("10.0")
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
+        success=True, code=201, status="PENDING", amount=Decimal("10.0")
     )
-    mock_transaction.has_been_processed.return_value = True
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
@@ -138,7 +132,7 @@ def test_execute_cannot_add_funds():
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(
@@ -156,13 +150,11 @@ def test_execute_cannot_add_funds():
 def test_execute_add_funds_error():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
-    mock_transaction = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
-        success=True, code=200, status="P", amount=Decimal("10.0")
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
+        success=True, code=201, status="PENDING", amount=Decimal("10.0")
     )
-    mock_transaction.has_been_processed.return_value = True
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
@@ -174,7 +166,7 @@ def test_execute_add_funds_error():
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(
@@ -192,16 +184,14 @@ def test_execute_add_funds_error():
     )
 
 
-def test_execute_fail_transaction():
+def test_execute_fail_withdrawal():
     mock_payment_service_repo = MagicMock()
     mock_wallet_repo = MagicMock()
-    mock_transaction_repo = MagicMock()
-    mock_transaction = MagicMock()
+    mock_withdrawal_repo = MagicMock()
 
-    mock_transaction_repo.write_transaction.return_value = TransactionDTO(
-        success=True, code=200, status="P", amount=Decimal("10.0")
+    mock_withdrawal_repo.write_withdrawal.return_value = WithdrawalDTO(
+        success=True, code=201, status="PENDING", amount=Decimal("10.0")
     )
-    mock_transaction.has_been_processed.return_value = True
     mock_payment_service_repo.withdraw_funds.return_value = (
         PaymentServiceRepositoryResponse(success=True, code=200)
     )
@@ -211,14 +201,14 @@ def test_execute_fail_transaction():
     mock_wallet_repo.add_funds.return_value = WalletDTO(
         success=True, code=200, balance=Decimal("44.58")
     )
-    mock_transaction_repo.validate_transaction.return_value = TransactionDTO(
+    mock_withdrawal_repo.validate_withdrawal.return_value = WithdrawalDTO(
         success=False, code=500
     )
 
     use_case = AddFundsToWalletUseCase(
         payment_service_repository=mock_payment_service_repo,
         wallet_repository=mock_wallet_repo,
-        transaction_repository=mock_transaction_repo,
+        withdrawal_repository=mock_withdrawal_repo,
     )
 
     result = use_case.execute(

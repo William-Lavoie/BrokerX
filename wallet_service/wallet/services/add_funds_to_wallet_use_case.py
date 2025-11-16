@@ -2,21 +2,17 @@ import logging
 from decimal import Decimal
 from uuid import UUID
 
-from wallet.domain.entities.transaction import Transaction
-from wallet.domain.entities.wallet import Wallet
-from wallet.domain.ports.dao.wallet_dao import WalletDTO
-from wallet.domain.ports.transaction_repository import (
-    TransactionDTO,
-    TransactionRepository,
-)
-from wallet.domain.ports.wallet_repository import WalletRepository
-
-from wallet_service.use_case_results import UseCaseResult
-
-from ..adapters.mock_payment_service_repository import (
+from wallet.adapters.mock_payment_service_repository import (
     PaymentServiceRepository,
     PaymentServiceRepositoryResponse,
 )
+from wallet.domain.entities.wallet import Wallet
+from wallet.domain.entities.withdrawal import Withdrawal
+from wallet.domain.ports.dao.wallet_dao import WalletDTO
+from wallet.domain.ports.wallet_repository import WalletRepository
+from wallet.domain.ports.withdrawal_repository import WithdrawalRepository
+
+from wallet_service.use_case_results import UseCaseResult
 
 logger = logging.getLogger("wallet")
 
@@ -43,35 +39,35 @@ class AddFundsToWalletUseCase:
         self,
         payment_service_repository: PaymentServiceRepository,
         wallet_repository: WalletRepository,
-        transaction_repository: TransactionRepository,
+        withdrawal_repository: WithdrawalRepository,
     ):
         self.payment_service_repository = payment_service_repository
         self.wallet_repository = wallet_repository
-        self.transaction_repository = transaction_repository
+        self.withdrawal_repository = withdrawal_repository
 
     def execute(
         self, client_id: UUID, email: str, amount: Decimal, idempotency_key: UUID
     ) -> AddFundsToWalletUseCaseResult:
 
-        transaction_dto: TransactionDTO = self.transaction_repository.write_transaction(
+        withdrawal_dto = self.withdrawal_repository.write_withdrawal(
             client_id=client_id,
             amount=amount,
             idempotency_key=idempotency_key,
         )
 
-        transaction = Transaction(
-            amount=transaction_dto.amount,
-            created_at=transaction_dto.created_at,
-            status=transaction_dto.status,
-            message=transaction_dto.message,
-        )
-
-        if transaction.has_been_processed():
+        if withdrawal_dto.code == 200:
             return AddFundsToWalletUseCaseResult(
                 success=True,
-                message="This transaction has already been processed",
+                message="This withdrawal has already been processed",
                 code=200,
             )
+
+        withdrawal = Withdrawal(
+            amount=withdrawal_dto.amount,
+            created_at=withdrawal_dto.created_at,
+            status=withdrawal_dto.status,
+            message=withdrawal_dto.message,
+        )
 
         payment_service_response: PaymentServiceRepositoryResponse = (
             self.payment_service_repository.withdraw_funds(email, amount)
@@ -104,16 +100,16 @@ class AddFundsToWalletUseCase:
 
         wallet.balance = result_wallet.balance
 
-        if self.transaction_repository.validate_transaction(idempotency_key).success:
+        if self.withdrawal_repository.validate_withdrawal(idempotency_key).success:
             return AddFundsToWalletUseCaseResult(
                 success=True,
-                message="The money has been successfully deposited into your account",
-                code=200,
+                message="The money has been successfully deposited into your account.",
+                code=201,
                 balance=wallet.balance,
             )
 
         else:
-            self.transaction_repository.fail_transaction(idempotency_key)
+            self.withdrawal_repository.fail_withdrawal(idempotency_key)
             return AddFundsToWalletUseCaseResult(
                 success=False,
                 message="There was an error while trying to process your deposit. Please try again.",
