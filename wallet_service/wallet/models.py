@@ -34,3 +34,17 @@ class Withdrawal(models.Model):
         default="PENDING",
     )
     message = models.CharField(max_length=300, blank=True)
+
+
+class WalletAudit(models.Model):
+    ACTIONS = [
+        ("CREATE_WITHDRAWAL", "Withdraw Funds"),
+        ("UPDATE_WITHDRAWAL_STATUS", "Update Withdrawal Status"),
+    ]
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, blank=True, null=True)
+    withdrawal = models.ForeignKey(
+        Withdrawal, on_delete=models.CASCADE, null=True, blank=True
+    )
+    action = models.CharField(max_length=50, choices=ACTIONS)
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+    metadata = models.JSONField(default=dict, blank=True)

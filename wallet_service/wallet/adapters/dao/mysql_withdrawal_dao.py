@@ -7,7 +7,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from wallet.domain.ports.dao.withdrawal_dao import WithdrawalDAO
 from wallet.domain.ports.withdrawal_repository import WithdrawalDTO
-from wallet.models import Withdrawal
+from wallet.models import WalletAudit, Withdrawal
 
 logger = logging.getLogger("mysql")
 
@@ -24,6 +24,17 @@ class MySQLWithdrawalDAO(WithdrawalDAO):
                     defaults={"amount": amount},
                 )
                 code = 201 if created else 200
+
+                if created:
+                    WalletAudit.objects.create(
+                        wallet=None,
+                        withdrawal=withdrawal,
+                        action="CREATE_WITHDRAWAL",
+                        metadata={
+                            "client_id": str(client_id),
+                            "amount": str(amount),
+                        },
+                    )
 
                 return WithdrawalDTO(
                     success=True,
@@ -45,6 +56,17 @@ class MySQLWithdrawalDAO(WithdrawalDAO):
 
                 withdrawal.status = new_status
                 withdrawal.save()
+
+                WalletAudit.objects.create(
+                    wallet=None,
+                    withdrawal=withdrawal,
+                    action="UPDATE_WITHDRAWAL_STATUS",
+                    metadata={
+                        "client_id": str(withdrawal.client_id),
+                        "new_status": new_status,
+                    },
+                )
+
                 return WithdrawalDTO(success=True, code=200)
 
         except ObjectDoesNotExist:
