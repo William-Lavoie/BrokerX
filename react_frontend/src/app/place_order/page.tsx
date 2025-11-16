@@ -7,10 +7,26 @@ import { FloatingLabel, Form } from "react-bootstrap";
 export default function Wallet() {
 
     const token = localStorage.getItem("access_token");
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [orderType, setOrderType] = useState("MARKET");
     const [orderDuration, setOrderDuration] = useState("DAY");
 
+    interface Order {
+        order_id?: string;
+        client_id?: string;
+        symbol: string;
+        order_type: string;
+        order_style: string[] | string;
+        order_duration: string;
+        quantity: number;
+        quantity_executed: number;
+        price?: number | string;
+        end_date?: string;
+        status: string;
+        created_at?: string;
+        updated_at?: string;
+        executed_at?: string;
+    }
     useEffect(() => {
         fetch("http://localhost:8002/order", {
         headers: {
@@ -154,16 +170,39 @@ export default function Wallet() {
 
                 <button>Submit</button>
             </form>
+
             <h2 className="text-lg font-bold mb-2">Your Orders</h2>
             {orders.length === 0 && <p>No orders found.</p>}
             <ul>
-                {orders.map((order, i) => (
-                <li key={i} className="border p-2 mb-2 rounded flex justify-between">
-                    <span>{order["symbol"]}</span>
-                    <span>{order["direction"]}</span>
-                    <span>Qty: {order["initial_quantity"]}</span>
+            {orders.map((order, i) => (
+                <li
+                key={i}
+                className="border p-3 mb-3 rounded bg-white shadow-sm"
+                >
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div><strong>Order ID:</strong> {order.order_id}</div>
+                    <div><strong>Client ID:</strong> {order.client_id}</div>
+
+                    <div><strong>Symbol:</strong> {order.symbol}</div>
+                    <div><strong>Order Type:</strong> {order.order_type}</div>
+
+                    <div><strong>Order Style:</strong> {Array.isArray(order.order_style) ? order.order_style.join(", ") : order.order_style}</div>
+                    <div><strong>Duration:</strong> {order.order_duration}</div>
+
+                    <div><strong>Quantity:</strong> {order.quantity}</div>
+                    <div><strong>Executed Qty:</strong> {order.quantity_executed}</div>
+
+                    <div><strong>Price:</strong> {order.price}</div>
+                    <div><strong>End Date:</strong> {order.end_date}</div>
+
+                    <div><strong>Status:</strong> {order.status}</div>
+                    <div><strong>Created At:</strong> {order.created_at}</div>
+
+                    <div><strong>Updated At:</strong> {order.updated_at}</div>
+                    <div><strong>Executed At:</strong> {order.executed_at}</div>
+                </div>
                 </li>
-                ))}
+            ))}
             </ul>
         </>
     )

@@ -62,9 +62,7 @@ class DjangoOrderRepository(OrderRepository):
 
         order_dtos = self.dao.get_orders_by_client(client_id=client_id)
 
-        orders = [
-            OrderRepository.get_order_from_dto(order_dto) for order_dto in order_dtos
-        ]
+        orders = [order_dto.get_order_from_dto() for order_dto in order_dtos]
 
         self.redis.set_orders_by_client(client_id=client_id, orders=orders)
         return orders

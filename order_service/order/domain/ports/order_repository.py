@@ -10,9 +10,9 @@ class OrderRepository:
         pass
 
     @abstractmethod
-    def find_matching_orders(order: Order) -> list[Order]:
+    def find_matching_orders(self, order: Order) -> list[Order]:
         pass
 
     @abstractmethod
-    def get_orders_by_client(client_id: UUID) -> list[Order]:
+    def get_orders_by_client(self, client_id: UUID) -> list[Order]:
         pass

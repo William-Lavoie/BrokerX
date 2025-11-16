@@ -41,6 +41,7 @@ class RedisOrder:
 
         except RedisError as re:
             logger.error(f"Redis error occurred while fetching order {client_id}: {re}")
+            return None
 
     def redis_get_orders_by_stock(self, symbol: str) -> Optional[list[Order]]:
         try:
@@ -55,6 +56,7 @@ class RedisOrder:
 
         except RedisError as re:
             logger.error(f"Redis error occurred while fetching order {symbol}: {re}")
+            return None
 
     def set_order(self, client_id: UUID, order: Order):
         try:

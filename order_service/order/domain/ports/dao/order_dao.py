@@ -15,6 +15,7 @@ class OrderDAO:
         symbol: str,
         order_type: str,
         order_style: str,
+        order_duration: str,
         quantity: int,
         idempotency_key: UUID,
         end_date: Optional[datetime],

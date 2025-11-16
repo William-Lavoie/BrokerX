@@ -21,8 +21,8 @@ class OrderDTO(Result):
     price: Optional[Decimal] = Decimal("0.00")
     end_date: Optional[datetime] = None
     status: str = "PENDING"
-    created_at: datetime = None
-    updated_at: datetime = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     executed_at: Optional[datetime] = None
 
     def to_dict(self):
@@ -44,8 +44,28 @@ class OrderDTO(Result):
                 data["end_date"] = self.end_date.isoformat()
         return data
 
+    def get_order_from_dto(self) -> "Order":
+        order = Order(
+            order_id=self.order_id,
+            client_id=self.client_id,
+            symbol=self.symbol,
+            order_type=self.order_type,
+            order_style=self.order_style,
+            order_duration=self.order_duration,
+            quantity=self.quantity,
+            quantity_executed=self.quantity_executed,
+            price=self.price,
+            end_date=self.end_date,
+            status=self.status,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            executed_at=self.executed_at,
+        )
+        return order
+
 
 class OrderInvalidException(Exception):
+
     def __init__(
         self,
         user_message: str = "The order could not be placed.",
@@ -74,8 +94,8 @@ class Order:
         price: Optional[Decimal] = None,
         end_date: Optional[datetime] = None,
         status: str = "NOT_PROCESSED",
-        created_at: datetime = None,
-        updated_at: datetime = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
         executed_at: Optional[datetime] = None,
     ):
 
@@ -164,11 +184,6 @@ class Order:
                     error_code=400,
                 )
 
-    def price_is_acceptable(
-        self, offered_price: Decimal, market_price: Decimal
-    ) -> bool:
-        return self.limit is None and offered_price == market_price
-
     def to_dict(self):
         return {
             "order_id": str(self.order_id) if self.order_id else None,
@@ -206,12 +221,34 @@ class Order:
     @classmethod
     def from_dict(cls, data: dict):
         return cls(
-            symbol=data.get("symbol"),
-            client_id=data.get("client_id"),
-            direction=data.get("direction", ""),
-            initial_quantity=data.get("initial_quantity", 0),
-            remaining_quantity=data.get("remaining_quantity", 0),
-            order_id=data.get("order_id", ""),
-            created_at=data.get("created_at", ""),
-            updated_at=data.get("created_at"),
+            client_id=UUID(data["client_id"]),
+            symbol=data["symbol"],
+            order_type=data["order_type"],
+            order_style=data["order_style"],
+            order_duration=data["order_duration"],
+            quantity=data["quantity"],
+            order_id=UUID(data["order_id"]) if data.get("order_id") else None,
+            quantity_executed=data.get("quantity_executed", 0),
+            price=Decimal(data["price"]) if data.get("price") is not None else None,
+            end_date=(
+                datetime.fromisoformat(data["end_date"])
+                if data.get("end_date")
+                else None
+            ),
+            status=data.get("status", "NOT_PROCESSED"),
+            created_at=(
+                datetime.fromisoformat(data["created_at"])
+                if data.get("created_at")
+                else None
+            ),
+            updated_at=(
+                datetime.fromisoformat(data["updated_at"])
+                if data.get("updated_at")
+                else None
+            ),
+            executed_at=(
+                datetime.fromisoformat(data["executed_at"])
+                if data.get("executed_at")
+                else None
+            ),
         )
