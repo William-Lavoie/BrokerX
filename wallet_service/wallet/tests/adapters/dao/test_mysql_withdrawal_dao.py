@@ -98,10 +98,10 @@ def test_write_withdrawal_bad_uuid():
     assert result.code == 400
 
 
-def test_validate_withdrawal():
+def test_update_status():
     dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_withdrawal("e4b88817-a42a-4450-87de-fb1f734d57a6")
+    result = dao.update_status("e4b88817-a42a-4450-87de-fb1f734d57a6", "COMPLETED")
 
     assert result.success
     assert result.code == 200
@@ -113,52 +113,19 @@ def test_validate_withdrawal():
     assert saved_withdrawal.status == "COMPLETED"
 
 
-def test_validate_withdrawal_no_withdrawal():
+def test_update_status_no_withdrawal():
     dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_withdrawal("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
+    result = dao.update_status("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c", "COMPLETED")
 
     assert not result.success
     assert result.code == 404
 
 
-def test_validate_withdrawal_invalid_uuid():
+def test_update_status_invalid_uuid():
     dao = MySQLWithdrawalDAO()
 
-    result = dao.validate_withdrawal("e4efw57a6")
-
-    assert not result.success
-    assert result.code == 400
-
-
-def test_fail_withdrawal():
-    dao = MySQLWithdrawalDAO()
-
-    result = dao.fail_withdrawal("e4b88817-a42a-4450-87de-fb1f734d57a6")
-
-    assert result.success
-    assert result.code == 200
-
-    saved_withdrawal = Withdrawal.objects.get(
-        idempotency_key="e4b88817-a42a-4450-87de-fb1f734d57a6"
-    )
-
-    assert saved_withdrawal.status == "FAILED"
-
-
-def test_fail_withdrawal_no_withdrawal():
-    dao = MySQLWithdrawalDAO()
-
-    result = dao.fail_withdrawal("5b0d7fcd-f460-413c-bcc6-4d3dcdb29c3c")
-
-    assert not result.success
-    assert result.code == 404
-
-
-def test_fail_withdrawal_invalid_uuid():
-    dao = MySQLWithdrawalDAO()
-
-    result = dao.fail_withdrawal("e4efw57a6")
+    result = dao.update_status("e4efw57a6", "COMPLETED")
 
     assert not result.success
     assert result.code == 400

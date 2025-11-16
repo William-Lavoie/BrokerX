@@ -29,7 +29,7 @@ def test_execute_success():
     mock_wallet_repo.add_funds.return_value = WalletDTO(
         success=True, code=201, balance=Decimal("44.58")
     )
-    mock_withdrawal_repo.validate_withdrawal_return_value = WithdrawalDTO(
+    mock_withdrawal_repo.update_status_return_value = WithdrawalDTO(
         success=True, code=200
     )
 
@@ -201,7 +201,7 @@ def test_execute_fail_withdrawal():
     mock_wallet_repo.add_funds.return_value = WalletDTO(
         success=True, code=200, balance=Decimal("44.58")
     )
-    mock_withdrawal_repo.validate_withdrawal.return_value = WithdrawalDTO(
+    mock_withdrawal_repo.update_status.return_value = WithdrawalDTO(
         success=False, code=500
     )
 

@@ -30,6 +30,7 @@ class WalletView(APIView):
         use_case = AddFundsToWalletUseCase(
             MockPaymentServiceRepository(),
             DjangoWalletRepository(),
+            DjangoWithdrawalRepository(),
         )
 
         uuid = "4f3251cca4f54b2e9e244189b737c8ed"

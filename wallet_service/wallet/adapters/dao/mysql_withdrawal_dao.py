@@ -15,7 +15,7 @@ logger = logging.getLogger("mysql")
 class MySQLWithdrawalDAO(WithdrawalDAO):
     def write_withdrawal(
         self, client_id: UUID, amount: Decimal, idempotency_key: UUID
-    ) -> WithdrawalDAO:
+    ) -> WithdrawalDTO:
         try:
             with transaction.atomic():
                 withdrawal, created = Withdrawal.objects.get_or_create(
@@ -38,29 +38,12 @@ class MySQLWithdrawalDAO(WithdrawalDAO):
             logger.error(f"Validation error: {e}")
             return WithdrawalDTO(success=False, code=400)
 
-    def validate_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
+    def update_status(self, idempotency_key: UUID, new_status: str) -> WithdrawalDTO:
         try:
             with transaction.atomic():
                 withdrawal = Withdrawal.objects.get(idempotency_key=idempotency_key)
 
-                withdrawal.status = "COMPLETED"
-                withdrawal.save()
-                return WithdrawalDTO(success=True, code=200)
-
-        except ObjectDoesNotExist:
-            logger.error(f"There is no withdrawal with the uuid {idempotency_key}")
-            return WithdrawalDTO(success=False, code=404)
-
-        except ValidationError as e:
-            logger.error(f"Validation error: {e}")
-            return WithdrawalDTO(success=False, code=400)
-
-    def fail_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
-        try:
-            with transaction.atomic():
-                withdrawal = Withdrawal.objects.get(idempotency_key=idempotency_key)
-
-                withdrawal.status = "FAILED"
+                withdrawal.status = new_status
                 withdrawal.save()
                 return WithdrawalDTO(success=True, code=200)
 

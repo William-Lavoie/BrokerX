@@ -20,8 +20,5 @@ class DjangoWithdrawalRepository(WithdrawalRepository):
             client_id=client_id, amount=amount, idempotency_key=idempotency_key
         )
 
-    def validate_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
-        return self.dao.validate_withdrawal(idempotency_key)
-
-    def fail_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
-        return self.dao.fail_withdrawal(idempotency_key)
+    def update_status(self, idempotency_key: UUID, status: str) -> WithdrawalDTO:
+        return self.dao.update_status(idempotency_key, status)

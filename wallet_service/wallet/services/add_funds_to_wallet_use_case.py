@@ -2,6 +2,7 @@ import logging
 from decimal import Decimal
 from uuid import UUID
 
+from django.db import transaction
 from wallet.adapters.mock_payment_service_repository import (
     PaymentServiceRepository,
     PaymentServiceRepositoryResponse,
@@ -74,6 +75,7 @@ class AddFundsToWalletUseCase:
         )
 
         if not payment_service_response.success:
+            self.withdrawal_repository.update_status(idempotency_key, "FAILED")
             return AddFundsToWalletUseCaseResult(
                 success=False,
                 message="There was an error with the payment service. The deposit was not processed.",
@@ -84,6 +86,7 @@ class AddFundsToWalletUseCase:
         wallet = Wallet(balance=wallet_dto.balance)
 
         if not wallet.can_add_funds(amount):
+            self.withdrawal_repository.update_status(idempotency_key, "REJECTED")
             return AddFundsToWalletUseCaseResult(
                 success=False,
                 message="You cannot have more than 10,000.00$ in your wallet.",
@@ -92,6 +95,7 @@ class AddFundsToWalletUseCase:
 
         result_wallet: WalletDTO = self.wallet_repository.add_funds(client_id, amount)
         if not result_wallet.success:
+            self.withdrawal_repository.update_status(idempotency_key, "FAILED")
             return AddFundsToWalletUseCaseResult(
                 success=False,
                 message="There was an error adding the money into your virtual wallet.",
@@ -100,7 +104,9 @@ class AddFundsToWalletUseCase:
 
         wallet.balance = result_wallet.balance
 
-        if self.withdrawal_repository.validate_withdrawal(idempotency_key).success:
+        if self.withdrawal_repository.update_status(
+            idempotency_key, "COMPLETED"
+        ).success:
             return AddFundsToWalletUseCaseResult(
                 success=True,
                 message="The money has been successfully deposited into your account.",
@@ -109,7 +115,7 @@ class AddFundsToWalletUseCase:
             )
 
         else:
-            self.withdrawal_repository.fail_withdrawal(idempotency_key)
+            self.withdrawal_repository.update_status(idempotency_key, "FAILED")
             return AddFundsToWalletUseCaseResult(
                 success=False,
                 message="There was an error while trying to process your deposit. Please try again.",

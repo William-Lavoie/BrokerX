@@ -31,7 +31,7 @@ export default function Wallet() {
             const idempotencyKey = crypto.randomUUID();
 
             const response = await fetch("http://localhost:8003/wallet", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",

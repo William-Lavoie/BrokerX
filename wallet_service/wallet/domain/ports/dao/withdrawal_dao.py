@@ -13,9 +13,5 @@ class WithdrawalDAO:
         pass
 
     @abstractmethod
-    def validate_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
-        pass
-
-    @abstractmethod
-    def fail_withdrawal(self, idempotency_key: UUID) -> WithdrawalDTO:
+    def update_status(self, idempotency_key: UUID, new_status: str) -> WithdrawalDTO:
         pass

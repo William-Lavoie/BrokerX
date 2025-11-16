@@ -30,29 +30,17 @@ def test_write_withdrawal():
     )
 
 
-def test_validate_withdrawal():
+def test_update_status():
     mock_dao = MagicMock()
-    mock_dao.validate_withdrawal.return_value = WithdrawalDTO(success=True, code=200)
+    mock_dao.update_status.return_value = WithdrawalDTO(success=True, code=200)
 
     repo = DjangoWithdrawalRepository(dao=mock_dao)
 
-    withdrawal_dto = repo.validate_withdrawal("abcdefghijklmnopqrstuvwxyz")
+    withdrawal_dto = repo.update_status("abcdefghijklmnopqrstuvwxyz", "COMPLETED")
 
     assert withdrawal_dto.success
     assert withdrawal_dto.code == 200
 
-    mock_dao.validate_withdrawal.assert_called_once_with("abcdefghijklmnopqrstuvwxyz")
-
-
-def test_fail_withdrawal():
-    mock_dao = MagicMock()
-    mock_dao.fail_withdrawal.return_value = WithdrawalDTO(success=True, code=200)
-
-    repo = DjangoWithdrawalRepository(dao=mock_dao)
-
-    withdrawal_dto = repo.fail_withdrawal("abcdefghijklmnopqrstuvwxyz")
-
-    assert withdrawal_dto.success
-    assert withdrawal_dto.code == 200
-
-    mock_dao.fail_withdrawal.assert_called_once_with("abcdefghijklmnopqrstuvwxyz")
+    mock_dao.update_status.assert_called_once_with(
+        "abcdefghijklmnopqrstuvwxyz", "COMPLETED"
+    )
