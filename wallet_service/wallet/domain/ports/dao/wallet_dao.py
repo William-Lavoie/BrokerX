@@ -19,3 +19,11 @@ class WalletDAO:
     @abstractmethod
     def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
         pass
+
+    @abstractmethod
+    def get_reserved_funds(self, client_id: UUID) -> Decimal:
+       pass
+
+    @abstractmethod
+    def reserve_funds(self, client_id: UUID, amount: Decimal, order_id: UUID) -> WalletDTO:
+       pass

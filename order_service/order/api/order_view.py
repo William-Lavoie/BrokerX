@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from order.adapters.django_order_repository import DjangoOrderRepository
 from order.services.place_order import PlaceOrderUseCase
+from order.adapters.wallet_service import WalletService
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -45,6 +46,7 @@ class OrderView(APIView):
 
         use_case = PlaceOrderUseCase(
             DjangoOrderRepository(),
+            WalletService()
         )
 
         result = use_case.execute(

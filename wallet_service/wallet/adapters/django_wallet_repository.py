@@ -13,6 +13,7 @@ class DjangoWalletRepository(WalletRepository):
         self.dao = dao if dao is not None else MySQLWalletDAO()
         self.redis = redis if redis is not None else RedisWallet()
 
+
     def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
         wallet_dto = self.dao.add_funds(client_id, amount)
         if wallet_dto.success:
@@ -21,6 +22,7 @@ class DjangoWalletRepository(WalletRepository):
             )
 
         return wallet_dto
+
 
     def get_balance(self, client_id: UUID) -> WalletDTO:
         redis_balance = self.redis.get_wallet_balance(client_id=client_id)
@@ -31,10 +33,13 @@ class DjangoWalletRepository(WalletRepository):
         self.redis.set_wallet_balance(client_id, wallet_dto.balance)
         return wallet_dto
 
-    def get_usable_balance(self, client_id: UUID) -> WalletDTO:
-        pass
 
-    def reserve_funds(self, client_id: UUID, amount: Decimal) -> bool:
-        wallet_dto = self.dao.reserve_funds(client_id, amount)
+    def get_effective_balance(self, client_id: UUID) -> Decimal:
+        balance = self.get_balance(client_id).balance
+        reserved_funds = self.dao.get_reserved_funds(client_id)
 
-        return wallet_dto.success
+        return balance - reserved_funds
+
+
+    def reserve_funds(self, client_id: UUID, amount: Decimal, order_id: UUID) -> WalletDTO:
+        return self.dao.reserve_funds(client_id=client_id, amount=amount, order_id=order_id)

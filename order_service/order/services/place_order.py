@@ -1,5 +1,5 @@
+from datetime import datetime
 import logging
-import threading
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
@@ -8,6 +8,7 @@ from order.domain.entities.order import Order, OrderInvalidException
 from order.domain.ports.order_repository import OrderRepository
 
 from order_service.exceptions import DataAccessException
+from order.domain.ports.wallet_repository import WalletException, WalletRepository
 from order_service.use_case_results import UseCaseResult
 
 logger = logging.getLogger("order")
@@ -36,8 +37,10 @@ class PlaceOrderUseCase:
     def __init__(
         self,
         order_repository: OrderRepository,
+        wallet_repository: Optional[WalletRepository] = None
     ):
         self.order_repository = order_repository
+        self.wallet_repository = wallet_repository
 
     def execute(
         self,
@@ -49,12 +52,13 @@ class PlaceOrderUseCase:
         quantity: int,
         idempotency_key: UUID,
         price: Optional[Decimal] = None,
-        end_date: Optional[str] = None,
+        end_date: Optional[datetime] = None,
     ) -> PlaceOrderUseCaseResult:
 
         try:
             order = Order(
                 client_id=client_id,
+                order_id=idempotency_key,
                 symbol=symbol,
                 order_type=order_type,
                 order_style=order_style,
@@ -64,12 +68,14 @@ class PlaceOrderUseCase:
                 end_date=end_date,
             )
 
-            # TODO: call wallet
             # TODO: call stocks
+
+            self.wallet_repository.reserve_funds(order=order)
 
             self.order_repository.add_order(
                 order=order, idempotency_key=idempotency_key
             )
+
             return PlaceOrderUseCaseResult(
                 message="The order was placed successfully.",
                 code=201,
@@ -84,6 +90,13 @@ class PlaceOrderUseCase:
             return PlaceOrderUseCaseResult(
                 message=order_invalid_exception.user_message,
                 code=order_invalid_exception.error_code,
+            )
+
+        except WalletException as wallet_exception:
+            logger.error(wallet_exception.log_message, exc_info=True)
+            return PlaceOrderUseCaseResult(
+                message=wallet_exception.user_message,
+                code=wallet_exception.error_code,
             )
 
         except DataAccessException as data_access_exception:

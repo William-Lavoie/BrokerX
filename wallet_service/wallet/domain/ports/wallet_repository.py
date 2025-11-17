@@ -13,3 +13,11 @@ class WalletRepository:
     @abstractmethod
     def get_balance(self, client_id: UUID) -> WalletDTO:
         pass
+
+    @abstractmethod
+    def get_effective_balance(self, client_id: UUID) -> Decimal:
+        pass
+
+    @abstractmethod
+    def reserve_funds(self, client_id: UUID, amount: Decimal) -> bool:
+        pass

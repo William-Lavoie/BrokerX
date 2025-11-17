@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from wallet.adapters.django_wallet_repository import DjangoWalletRepository
+from wallet.services.reserve_funds_use_case import ReserveFundsUseCase
 
 logger = logging.getLogger("wallet")
 
@@ -22,13 +23,13 @@ class WalletReserveView(APIView):
         amount = Decimal(data.get("amount")).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
-        idempotency_key = request.headers.get("Idempotency-Key")
         client_id = data.get("client_id")
+        order_id = data.get("order_id")
 
         use_case = ReserveFundsUseCase(
             DjangoWalletRepository(),
         )
 
-        result = use_case.execute(client_id, amount, idempotency_key)
+        result = use_case.reserve_funds(client_id=client_id, amount=amount, order_id=order_id)
 
         return JsonResponse(data=result.to_dict(), status=result.code)

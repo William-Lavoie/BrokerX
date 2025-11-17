@@ -2,7 +2,6 @@ import logging
 from decimal import Decimal
 from uuid import UUID
 
-from wallet.domain.ports.dao.wallet_dao import WalletDTO
 from wallet.domain.ports.wallet_repository import WalletRepository
 
 from wallet_service.use_case_results import UseCaseResult
@@ -11,51 +10,47 @@ from wallet_service.use_case_results import UseCaseResult
 logger = logging.getLogger("wallet")
 
 
-class ReserveFundsUseCaseResult:
+class ReserveFundsUseCase:
     def __init__(
         self,
         wallet_repository: WalletRepository,
-        transaction_repository: TransactionRepository,
     ):
         self.wallet_repository = wallet_repository
-        self.transaction_repository = transaction_repository
 
-    def execute(
+    def reserve_funds(
         self, client_id: UUID, amount: Decimal, order_id: UUID
     ) -> UseCaseResult:
         try:
 
-            wallet_dto: WalletDTO = self.wallet_repository.get_balance(
+            amount_available: Decimal = self.wallet_repository.get_effective_balance(
                 client_id=client_id
             )
 
-            if wallet_dto.balance < amount:
+            if amount_available < amount:
                 return UseCaseResult(
                     success=False,
                     message="Insufficient funds.",
                     code=400,
                 )
 
-            # Deduct the reserved amount from the wallet balance
-            new_balance = wallet_dto.balance - amount
-            self.wallet_repository.update_wallet_balance(
-                client_id=client_id, new_balance=new_balance
+            wallet_dto = self.wallet_repository.reserve_funds(
+                client_id=client_id, order_id=order_id, amount=amount
             )
 
-            # Record the reservation transaction
-            transaction_dto: TransactionDTO = (
-                self.transaction_repository.write_transaction(
-                    client_id=client_id,
-                    amount=-amount,
-                    idempotency_key=order_id,
+            if wallet_dto.code == 201:
+                return UseCaseResult(
+                    success=True,
+                    message="Funds reserved successfully.",
+                    code=200,
                 )
-            )
 
-            return UseCaseResult(
-                success=True,
-                message="Funds reserved successfully.",
-                code=200,
-            )
+            elif wallet_dto.code == 409:
+                return UseCaseResult(
+                    success=True,
+                    message=f"Funds have already been reserved by client {client_id} for the order {order_id}.",
+                    code=409,
+                )
+
         except Exception as e:
             logger.error(f"Error reserving funds: {e}")
             return UseCaseResult(
