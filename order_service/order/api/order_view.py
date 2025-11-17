@@ -44,10 +44,7 @@ class OrderView(APIView):
 
         idempotency_key = request.headers.get("Idempotency-Key")
 
-        use_case = PlaceOrderUseCase(
-            DjangoOrderRepository(),
-            WalletService()
-        )
+        use_case = PlaceOrderUseCase(DjangoOrderRepository(), WalletService())
 
         result = use_case.execute(
             client_id=client_id,

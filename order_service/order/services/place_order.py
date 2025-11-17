@@ -37,7 +37,7 @@ class PlaceOrderUseCase:
     def __init__(
         self,
         order_repository: OrderRepository,
-        wallet_repository: Optional[WalletRepository] = None
+        wallet_repository: Optional[WalletRepository] = None,
     ):
         self.order_repository = order_repository
         self.wallet_repository = wallet_repository

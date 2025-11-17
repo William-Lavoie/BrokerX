@@ -19,10 +19,12 @@ class WalletService(WalletRepository):
         )
 
         if response.status_code != 200:
-            raise WalletException(user_message=response.json().get("message", "An unexpected error occured."), log_message=f"WalletException for client {order.client_id}: {response.text}", error_code=400)
-
+            raise WalletException(
+                user_message=response.json().get(
+                    "message", "An unexpected error occured."
+                ),
+                log_message=f"WalletException for client {order.client_id}: {response.text}",
+                error_code=400,
+            )
 
         return response.status_code
-
-
-

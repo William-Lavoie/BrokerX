@@ -46,9 +46,10 @@ class ReservedFunds(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint("client_id", "order_id", name="unique_reservation_per_order")
+            models.UniqueConstraint(
+                "client_id", "order_id", name="unique_reservation_per_order"
+            )
         ]
-
 
 
 class WalletAudit(models.Model):

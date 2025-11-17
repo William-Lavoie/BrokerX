@@ -30,6 +30,8 @@ class WalletReserveView(APIView):
             DjangoWalletRepository(),
         )
 
-        result = use_case.reserve_funds(client_id=client_id, amount=amount, order_id=order_id)
+        result = use_case.reserve_funds(
+            client_id=client_id, amount=amount, order_id=order_id
+        )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
