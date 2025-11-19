@@ -10,6 +10,7 @@ from order.domain.ports.order_repository import OrderRepository
 from order_service.exceptions import DataAccessException
 from order.domain.ports.wallet_repository import WalletException, WalletRepository
 from order_service.use_case_results import UseCaseResult
+from stock_service.stock.domain.ports.stock_repository import StockRepository
 
 logger = logging.getLogger("order")
 
@@ -37,9 +38,11 @@ class PlaceOrderUseCase:
     def __init__(
         self,
         order_repository: OrderRepository,
+        stock_repository: Optional[StockRepository] = None,
         wallet_repository: Optional[WalletRepository] = None,
     ):
         self.order_repository = order_repository
+        self.stock_repository = stock_repository
         self.wallet_repository = wallet_repository
 
     def execute(
@@ -68,8 +71,7 @@ class PlaceOrderUseCase:
                 end_date=end_date,
             )
 
-            # TODO: call stocks
-
+            self.stock_repository.update_top_of_book(order=order)
             self.wallet_repository.reserve_funds(order=order)
 
             self.order_repository.add_order(
@@ -100,6 +102,7 @@ class PlaceOrderUseCase:
             )
 
         except DataAccessException as data_access_exception:
+            self.wallet_repository.release_funds()
             return PlaceOrderUseCaseResult(
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,

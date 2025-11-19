@@ -15,6 +15,8 @@ def setup_function(db):
         name="Apple Inc.",
         exchange="NASDAQ",
         currency="USD",
+        limit_price_band=Decimal("5.00"),
+        tick_size=Decimal("0.01"),
         last_price=Decimal("175.35"),
         open_price=Decimal("174.00"),
         high_price=Decimal("176.20"),
@@ -40,6 +42,8 @@ def test_get_stock_by_symbol():
     assert stock_dto.name == "Apple Inc."
     assert stock_dto.exchange == "NASDAQ"
     assert stock_dto.currency == "USD"
+    assert stock_dto.band == Decimal("5.00")
+    assert stock_dto.tick_size == Decimal("0.01")
     assert stock_dto.last_price == Decimal("175.35")
     assert stock_dto.open_price == Decimal("174.00")
     assert stock_dto.high_price == Decimal("176.20")

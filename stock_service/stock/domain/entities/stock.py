@@ -24,6 +24,8 @@ class Stock:
         name: Optional[str] = None,
         exchange: Optional[str] = "",
         currency: Optional[str] = "CAD",
+        band: Optional[Decimal] = Decimal("5.00"),
+        tick_size: Optional[Decimal] = Decimal("0.01"),
         last_price: Optional[Decimal] = Decimal("0.00"),
         open_price: Optional[Decimal] = Decimal("0.00"),
         high_price: Optional[Decimal] = Decimal("0.00"),
@@ -45,6 +47,8 @@ class Stock:
         self.name = name
         self.exchange = exchange
         self.currency = currency
+        self.band = band
+        self.tick_size = tick_size
 
         # Prices
         self.last_price = last_price
@@ -65,16 +69,54 @@ class Stock:
 
         self.active = active
 
-    def to_dict(self):
+    def validate_order(self, quantity: int, type: str, price: Optional[Decimal]) -> None:
+
+        # Quantity is larger than the volume
+        if quantity < self.volume:
+            raise StockInvalidException(
+                user_message="The order quantity cannot be greater than the total volume of shares.",
+                log_message=f"Order quantity {quantity} is invalid. Stock has only {self.volume} shares available.",
+                error_code=400,
+            )
+        
+        # Tick size is not respected
+        if price and price.normalize().as_tuple().exponent > self.tick_size.normalize().as_tuple().exponent:
+            raise StockInvalidException(
+                user_message=f"The price cannot be more precise than ${self.tick_size}.",
+                log_message=f"Price {price} is invalid. Tick size is {self.tick_size}.",
+                error_code=400,
+            )
+
+        # Band size
+        price_band = self.band/100
+        if type == "BUY":
+            if price and not (price >= self.ask_price*(1-self.band) and price <= self.ask_price(1+self.band)):
+                raise StockInvalidException(
+                user_message=f"The price cannot differ from the market price by more than {price_band}%.",
+                log_message=f"Order price {price} is invalid for band {self.band}.",
+                error_code=400,
+            )
+
+        elif type == "SELL":
+            if price and not (price >= self.bid_price*(1-self.band) and price <= self.bid_price(1+self.band)):
+                raise StockInvalidException(
+                    user_message=f"The price cannot differ from the market price by more than {price_band}%.",
+                    log_message=f"Order price {price} is invalid for band {self.band}.",
+                    error_code=400,
+                )
+
+    def to_dict(self) -> dict:
         return copy.deepcopy(self.__dict__)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "Stock":
         return cls(
             symbol=data.get("symbol", ""),
             name=data.get("name", ""),
             exchange=data.get("exchange", ""),
             currency=data.get("currency", "CAD"),
+            band=Decimal(str(data.get("band", "5.00"))),
+            tick_size=Decimal(str(data.get("tick_size", "0.01"))),
             last_price=Decimal(str(data.get("last_price", "0.00"))),
             open_price=Decimal(str(data.get("open_price", "0.00"))),
             high_price=Decimal(str(data.get("high_price", "0.00"))),
