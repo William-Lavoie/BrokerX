@@ -31,7 +31,7 @@ class MySQLOrderDAO(OrderDAO):
             with transaction.atomic():
                 created = False
                 order = Order.objects.filter(order_id=idempotency_key).first()
-
+                logger.error(f"price in add stock is {price}")
                 if not order:
                     order = Order(
                         order_id=idempotency_key,

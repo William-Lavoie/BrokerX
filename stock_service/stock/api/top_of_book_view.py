@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import logging
 
@@ -22,6 +23,11 @@ class TopOfBookView(APIView):
         symbol = data.get("symbol", None)
         quantity = data.get("quantity", None)
         price = data.get("price", None)
+        order_type = data.get("order_type", None)
+
+        if price is not None:
+            price = Decimal(price)
+            
         order_type = data.get("order_type", None)
 
         use_case = UpdateTopOfBookUseCase(stock_repository=DjangoStockRepository())

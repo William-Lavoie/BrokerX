@@ -8,12 +8,12 @@ logger = logging.getLogger("order")
 
 
 class WalletService(WalletRepository):
-    def reserve_funds(self, order: Order) -> int:
+    def reserve_funds(self, order: Order) -> None:
         response = requests.post(
             "http://wallet-app:8003/wallet/reserve",
             json={
                 "client_id": str(order.client_id),
-                "amount": float(10.0),
+                "amount": str(order.price),
                 "order_id": str(order.order_id),
             },
         )
@@ -26,5 +26,3 @@ class WalletService(WalletRepository):
                 log_message=f"WalletException for client {order.client_id}: {response.text}",
                 error_code=400,
             )
-
-        return response.status_code

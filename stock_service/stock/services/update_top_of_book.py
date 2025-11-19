@@ -17,7 +17,10 @@ class UpdateTopOfBookUseCaseResult(UseCaseResult):
         self.price = price
 
     def to_dict(self):
-        return super().to_dict()
+        dict = super().to_dict()
+        dict["price"] = str(self.price)
+
+        return dict
 
 class UpdateTopOfBookUseCase:
     def __init__(
@@ -26,10 +29,10 @@ class UpdateTopOfBookUseCase:
     ):
         self.stock_repository = stock_repository
 
-    def update_top_of_book(self, symbol: str, quantity: int, type: str, price: Optional[Decimal]) -> UpdateTopOfBookUseCaseResult:
+    def update_top_of_book(self, symbol: str, quantity: int, type: str, price: Optional[Decimal] = None) -> UpdateTopOfBookUseCaseResult:
         try:
             stock: Stock = self.stock_repository.get_stock_by_symbol(symbol=symbol)
-            stock.validate_order()
+            stock.validate_order(quantity=quantity, type=type, price=price)
             self.stock_repository.update_top_of_book(stock=stock, quantity=quantity, type=type, price=price)
 
             if price is None:

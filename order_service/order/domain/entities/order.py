@@ -114,7 +114,6 @@ class Order:
         self.updated_at = updated_at
         self.executed_at = executed_at
 
-        self.validate_data()
 
     def validate_data(self) -> None:
         if self.quantity < 1:
@@ -176,7 +175,7 @@ class Order:
                     error_code=400,
                 )
             
-            if self.end_date < datetime.now():
+            if self.end_date <= datetime.now().date():
                 raise OrderInvalidException(
                     user_message="The end date must be in the future.",
                     log_message="The GTD order must have an end date later than the current date.",

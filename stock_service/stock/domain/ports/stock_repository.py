@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
+import logging
 from typing import Optional
 
 from stock.adapters.result import Result

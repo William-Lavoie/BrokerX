@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from decimal import Decimal
 
 from order.domain.entities.order import Order
 
@@ -18,7 +19,8 @@ class StockException(Exception):
 
 
 class StockRepository:
+
     @abstractmethod
-    def update_top_of_book(self, order: Order) -> None:
-        
+    def update_top_of_book(self, order: Order) -> Decimal:
+        """Return the price per share"""
         pass

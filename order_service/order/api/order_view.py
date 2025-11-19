@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 import json
 import logging
 from uuid import UUID
@@ -9,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from order.adapters.django_order_repository import DjangoOrderRepository
 from order.services.place_order import PlaceOrderUseCase
 from order.adapters.wallet_service import WalletService
+from order.adapters.stock_service import StockService
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -28,6 +30,12 @@ class OrderView(APIView):
         order_style = data.get("order_style", "")
         order_duration = data.get("order_duration", "")
         price = data.get("price", None)
+
+        if price is not None:
+            price = Decimal(str(price))
+
+        logger.error(f"price: {price}")
+            
         end_date = data.get("end_date", None)
         quantity = data.get("quantity", 0)
 
@@ -45,7 +53,7 @@ class OrderView(APIView):
 
         idempotency_key = request.headers.get("Idempotency-Key")
 
-        use_case = PlaceOrderUseCase(DjangoOrderRepository(), WalletService())
+        use_case = PlaceOrderUseCase(DjangoOrderRepository(), StockService(), WalletService())
 
         result = use_case.execute(
             client_id=client_id,
@@ -55,8 +63,8 @@ class OrderView(APIView):
             order_duration=order_duration,
             quantity=quantity,
             idempotency_key=UUID(idempotency_key),
-            price=price,
-            end_date = datetime.strptime(end_date, "%Y-%m-%d"),
+            price=price if price else None,
+            end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None,
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)

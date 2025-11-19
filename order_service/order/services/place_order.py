@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 from uuid import UUID
 
@@ -9,8 +9,8 @@ from order.domain.ports.order_repository import OrderRepository
 
 from order_service.exceptions import DataAccessException
 from order.domain.ports.wallet_repository import WalletException, WalletRepository
+from order.domain.ports.stock_repository import StockException, StockRepository
 from order_service.use_case_results import UseCaseResult
-from stock_service.stock.domain.ports.stock_repository import StockRepository
 
 logger = logging.getLogger("order")
 
@@ -29,8 +29,7 @@ class PlaceOrderUseCaseResult(UseCaseResult):
         data = super().to_dict()
         if self.orders is not None:
             data["orders"] = [order.to_dict() for order in self.orders]
-        else:
-            data["orders"] = []
+
         return data
 
 
@@ -71,7 +70,18 @@ class PlaceOrderUseCase:
                 end_date=end_date,
             )
 
-            self.stock_repository.update_top_of_book(order=order)
+            order.validate_data()
+
+            base_price = self.stock_repository.update_top_of_book(order=order)
+
+            # Adding 5% to market price to account for volatility
+            if order_style == "MARKET":
+                digits = -base_price.as_tuple().exponent
+                quantizer = Decimal("1").scaleb(-digits)
+
+                # multiply and round
+                order.price = (base_price * Decimal("1.05")).quantize(quantizer, rounding=ROUND_HALF_UP)
+
             self.wallet_repository.reserve_funds(order=order)
 
             self.order_repository.add_order(
@@ -99,6 +109,13 @@ class PlaceOrderUseCase:
             return PlaceOrderUseCaseResult(
                 message=wallet_exception.user_message,
                 code=wallet_exception.error_code,
+            )
+        
+        except StockException as stock_exception:
+            logger.error(stock_exception.log_message, exc_info=True)
+            return PlaceOrderUseCaseResult(
+                message=stock_exception.user_message,
+                code=stock_exception.error_code,
             )
 
         except DataAccessException as data_access_exception:

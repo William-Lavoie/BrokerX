@@ -59,8 +59,6 @@ class Order(models.Model):
             raise ValidationError(
                 "LIMIT orders must have a valid price greater than 0."
             )
-        if self.order_style == "MARKET" and self.price is not None:
-            raise ValidationError("MARKET orders should not have a price specified.")
         if self.quantity_executed > self.quantity:
             raise ValidationError("Quantity executed cannot exceed total quantity.")
         if self.order_duration == "GTD" and self.order_end_date is None:

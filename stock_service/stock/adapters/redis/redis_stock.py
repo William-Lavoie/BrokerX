@@ -16,7 +16,7 @@ class RedisStock:
         try:
             stock_json = json.dumps(
                 stock.to_dict(),
-                default=lambda x: float(x) if isinstance(x, Decimal) else x,
+                default=lambda x: str(x) if isinstance(x, Decimal) else x,
             )
             redis_client.set(f"stock:{stock.symbol}", stock_json)
 
@@ -39,6 +39,8 @@ class RedisStock:
                         for k, v in d.items()
                     },
                 )
+                logger.error(stock_dict)
+
                 return Stock.from_dict(stock_dict)
             else:
                 return None
