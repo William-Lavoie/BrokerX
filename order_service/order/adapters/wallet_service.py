@@ -13,7 +13,7 @@ class WalletService(WalletRepository):
             "http://wallet-app:8003/wallet/reserve",
             json={
                 "client_id": str(order.client_id),
-                "amount": float(1000000.0),
+                "amount": float(10.0),
                 "order_id": str(order.order_id),
             },
         )

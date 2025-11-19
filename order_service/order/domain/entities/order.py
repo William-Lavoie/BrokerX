@@ -169,10 +169,17 @@ class Order:
             )
 
         if self.order_duration == "GTD":
-            if self.end_date is None:
+            if self.end_date is None :
                 raise OrderInvalidException(
                     user_message="The GTD order must have an end date.",
                     log_message="GTD order missing end date.",
+                    error_code=400,
+                )
+            
+            if self.end_date < datetime.now():
+                raise OrderInvalidException(
+                    user_message="The end date must be in the future.",
+                    log_message="The GTD order must have an end date later than the current date.",
                     error_code=400,
                 )
 

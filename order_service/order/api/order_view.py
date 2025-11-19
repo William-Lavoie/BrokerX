@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import logging
 from uuid import UUID
@@ -21,7 +22,7 @@ class OrderView(APIView):
     def post(self, request):
         data = json.loads(request.body)
 
-        client_id = UUID("4f3251cca4f54b2e9e244189b737c8ed")
+        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
         symbol = data.get("symbol", "")
         order_type = data.get("order_type", "")
         order_style = data.get("order_style", "")
@@ -55,7 +56,7 @@ class OrderView(APIView):
             quantity=quantity,
             idempotency_key=UUID(idempotency_key),
             price=price,
-            end_date=end_date,
+            end_date = datetime.strptime(end_date, "%Y-%m-%d"),
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
@@ -66,7 +67,7 @@ class OrderView(APIView):
             DjangoOrderRepository(),
         )
 
-        client_id = UUID("4f3251cca4f54b2e9e244189b737c8ed")
+        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
 
         result = use_case.get_orders(client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)

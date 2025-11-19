@@ -33,8 +33,8 @@ class WalletView(APIView):
             DjangoWithdrawalRepository(),
         )
 
-        uuid = "4f3251cca4f54b2e9e244189b737c8ed"
-        email = "nico@robin.com"
+        uuid = "7a82a0d7197b422c9f884fab0975359a"
+        email = "rocks@xebec.com"
 
         result = use_case.execute(uuid, email, amount, idempotency_key)
 
@@ -49,7 +49,7 @@ class WalletView(APIView):
             DjangoWithdrawalRepository(),
         )
 
-        uuid = "4f3251cca4f54b2e9e244189b737c8ed"
+        uuid = "7a82a0d7197b422c9f884fab0975359a"
         result = use_case.get_balance(uuid)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
