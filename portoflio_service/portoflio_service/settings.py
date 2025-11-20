@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -25,7 +27,7 @@ SECRET_KEY = "django-insecure-cr!^&kij$#%q@bm^q@@am8bnq5!mh!h0*pia=#q-gz4j!k1bm8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list = ["localhost", "portfolio-app"]
 
 
 # Application definition
@@ -37,9 +39,24 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "portfolio",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "corsheaders",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "authorization",
+    "idempotency-key",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -48,6 +65,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": []}
 
 ROOT_URLCONF = "portoflio_service.urls"
 
@@ -74,8 +93,12 @@ WSGI_APPLICATION = "portoflio_service.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("DB_NAME", "portfolio_db"),
+        "USER": os.environ.get("DB_USER", "user"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "pass"),
+        "HOST": os.environ.get("DB_HOST", "mysql"),
+        "PORT": os.environ.get("DB_PORT", "3306"),
     }
 }
 
@@ -120,3 +143,83 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name} : {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "mysql_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "mysql-error.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "redis_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "redis-error.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "portfolio_error_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "portfolio.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+        "access_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "access.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
+    },
+    "loggers": {
+        "django.server": {
+            "handlers": ["console", "access_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "portfolio": {
+            "handlers": ["console", "portfolio_error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "mysql": {
+            "handlers": ["console", "mysql_error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "redis": {
+            "handlers": ["console", "redis_error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "portfolio_error_file"],
+        "level": "WARNING",
+    },
+}
+
+REDIS_CONFIG = {
+    "host": "redis",
+    "port": 6379,
+    "db": 0,
+    "max_connections": 10,
+}
