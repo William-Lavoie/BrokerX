@@ -119,7 +119,7 @@ class PlaceOrderUseCase:
             )
 
         except DataAccessException as data_access_exception:
-            self.wallet_repository.release_funds()
+            self.wallet_repository.release_funds(order_id=order.order_id, client_id=order.client_id)
             return PlaceOrderUseCaseResult(
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,
@@ -136,7 +136,29 @@ class PlaceOrderUseCase:
 
         except DataAccessException as data_access_exception:
             return PlaceOrderUseCaseResult(
-                success=False,
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,
+            )
+
+    def delete_order(self, client_id: UUID, order_id: UUID):
+        try:
+            logger.error(f"delete order client {client_id} et {order_id}")
+            order = self.order_repository.delete_order(client_id=client_id, order_id=order_id)
+            self.wallet_repository.release_funds(order_id=order_id, client_id=client_id)
+            
+        except OrderInvalidException as order_exception:
+            logger.error(order_exception.log_message, exc_info=True)
+            return PlaceOrderUseCaseResult(
+                message=order_exception.user_message,
+                code=order_exception.error_code,
+            )
+     
+        except WalletException as wallet_exception:
+            logger.error(wallet_exception.log_message, exc_info=True)
+
+            self.order_repository.delete_order_rollback(client_id=client_id, order_id=order_id, previous_status=order.status)
+
+            return PlaceOrderUseCaseResult(
+                message=wallet_exception.user_message,
+                code=wallet_exception.error_code,
             )

@@ -35,3 +35,19 @@ class WalletReserveView(APIView):
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
+    
+    def delete(self, request):
+        data = json.loads(request.body)
+
+        client_id = data.get("client_id")
+        order_id = data.get("order_id")
+
+        use_case = ReserveFundsUseCase(
+            DjangoWalletRepository(),
+        )
+
+        result = use_case.release_funds(
+            client_id=client_id, order_id=order_id
+        )
+
+        return JsonResponse(data=result.to_dict(), status=result.code)

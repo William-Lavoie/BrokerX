@@ -4,7 +4,7 @@ from uuid import UUID
 from django.db import transaction
 from order.adapters.dao.mysql_order_dao import MySQLOrderDAO
 from order.adapters.redis.redis_order import RedisOrder
-from order.domain.entities.order import Order, OrderDTO
+from order.domain.entities.order import Order, OrderDTO, OrderInvalidException
 from order.domain.ports.dao.order_dao import OrderDAO
 from order.domain.ports.order_repository import OrderRepository
 
@@ -66,3 +66,18 @@ class DjangoOrderRepository(OrderRepository):
 
         self.redis.set_orders_by_client(client_id=client_id, orders=orders)
         return orders
+    
+    def delete_order(self, client_id: UUID, order_id: UUID) -> Order:
+        order_dto = self.dao.delete_order(client_id, order_id)
+
+        if not order_dto.success:
+            raise OrderInvalidException(
+                user_message="The order could not be deleted.",
+                log_message=f"Order {order_id} could not deleted.",
+                error_code=500,
+            )
+        
+        return order_dto.get_order_from_dto()
+    
+    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
+        self.dao.delete_order_rollback(client_id=client_id, order_id=order_id, previous_status=previous_status)

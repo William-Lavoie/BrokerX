@@ -32,3 +32,12 @@ class OrderDAO:
     @abstractmethod
     def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
         pass
+
+    @abstractmethod
+    def delete_order(self, client_id: UUID, order_id: UUID) -> OrderDTO:
+        pass
+
+    @abstractmethod
+    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
+        pass
+    

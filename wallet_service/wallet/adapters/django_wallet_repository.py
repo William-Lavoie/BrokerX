@@ -43,3 +43,10 @@ class DjangoWalletRepository(WalletRepository):
         return self.dao.reserve_funds(
             client_id=client_id, amount=amount, order_id=order_id
         )
+    
+    def release_funds(
+        self, client_id: UUID, order_id: UUID
+    ) -> WalletDTO:
+        return self.dao.release_funds(
+            client_id=client_id, order_id=order_id
+        ).success

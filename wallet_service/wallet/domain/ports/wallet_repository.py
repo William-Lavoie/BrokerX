@@ -19,5 +19,9 @@ class WalletRepository:
         pass
 
     @abstractmethod
-    def reserve_funds(self, client_id: UUID, amount: Decimal) -> bool:
+    def reserve_funds(self, client_id: UUID, amount: Decimal, order_id: UUID) -> bool:
+        pass
+
+    @abstractmethod
+    def release_funds(self, client_id: UUID, order_id: UUID) -> bool:
         pass

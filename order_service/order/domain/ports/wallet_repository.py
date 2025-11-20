@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from uuid import UUID
 
 from order.domain.entities.order import Order
 
@@ -18,6 +19,11 @@ class WalletException(Exception):
 
 
 class WalletRepository:
+
     @abstractmethod
     def reserve_funds(self, order: Order) -> None:
+        pass
+
+    @abstractmethod
+    def release_funds(self, order_id: UUID, client_id: UUID) -> None:
         pass

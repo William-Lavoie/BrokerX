@@ -50,3 +50,18 @@ class MySQLWalletDAO(WalletDAO):
                 exc_info=True,
             )
             return Wallet(success=False, code=409)
+        
+    def release_funds(
+        self, client_id: UUID, order_id: UUID
+    ) -> WalletDTO:
+        try:
+            with transaction.atomic():
+                ReservedFunds.objects.filter(
+                    client_id=client_id, order_id=order_id
+                ).delete()
+
+                return WalletDTO(success=True, code=200)
+
+        except:
+            logger.error("An unexpected error occured", exc_info=True)
+            return Wallet(success=False, code=500)

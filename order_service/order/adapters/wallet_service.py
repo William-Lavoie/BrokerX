@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 import requests
 from order.domain.entities.order import Order
@@ -25,4 +26,22 @@ class WalletService(WalletRepository):
                 ),
                 log_message=f"WalletException for client {order.client_id}: {response.text}",
                 error_code=400,
+            )
+        
+    def release_funds(self, order_id: UUID, client_id: UUID) -> None:
+        response = requests.delete(
+            "http://wallet-app:8003/wallet/reserve",
+            json={
+                "client_id": str(client_id),
+                "order_id": str(order_id),
+            },
+        )
+
+        if response.status_code != 200:
+            raise WalletException(
+                user_message=response.json().get(
+                    "message", "An unexpected error occured."
+                ),
+                log_message=f"WalletException for client {client_id}: {response.text}",
+                error_code=500,
             )

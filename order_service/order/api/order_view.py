@@ -79,3 +79,20 @@ class OrderView(APIView):
 
         result = use_case.get_orders(client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)
+    
+    def delete(self, request):
+        data = json.loads(request.body)
+        order_id = UUID(data.get("order_id", ""))
+
+        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
+
+        use_case = PlaceOrderUseCase(
+            order_repository=DjangoOrderRepository(), wallet_repository=WalletService()
+        )
+
+        result = use_case.delete_order(order_id=order_id, client_id=client_id)
+        return JsonResponse(data=result.to_dict(), status=result.code)
+
+
+
+

@@ -16,3 +16,12 @@ class OrderRepository:
     @abstractmethod
     def get_orders_by_client(self, client_id: UUID) -> list[Order]:
         pass
+
+    @abstractmethod
+    def delete_order(self, client_id: UUID, order_id: UUID) -> Order:
+        pass
+
+    @abstractmethod
+    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
+        pass
+

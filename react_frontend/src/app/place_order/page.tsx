@@ -98,6 +98,26 @@ export default function Wallet() {
         }
     }
 
+    const handleDelete = (orderId: string | undefined) => {
+        // Remove order from local state
+        setOrders((prevOrders) => prevOrders.filter((o) => o.order_id !== orderId));
+
+        // Optionally, call backend API to delete the order
+        fetch(`http://localhost:8002/order`, {
+            method: "DELETE",
+            headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({"order_id": orderId})
+        })
+        .then((res) => {
+            if (!res.ok) throw new Error("Failed to delete order");
+            console.log(`Order ${orderId} deleted`);
+        })
+        .catch((err) => console.error(err));
+    };
+
 
     return (
         <>
@@ -201,6 +221,13 @@ export default function Wallet() {
                     <div><strong>Updated At:</strong> {order.updated_at}</div>
                     <div><strong>Executed At:</strong> {order.executed_at}</div>
                 </div>
+                  {/* Delete Button */}
+                <button
+                    className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    onClick={() => handleDelete(order.order_id)}
+                >
+                    Delete
+                </button>
                 </li>
             ))}
             </ul>

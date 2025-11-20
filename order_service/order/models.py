@@ -49,6 +49,7 @@ class Order(models.Model):
             ("PENDING", "Pending"),
             ("REJECTED", "Rejected"),
             ("FAILED", "Failed"),
+            ("CANCELLED", "Cancelled"),
         ],
         default="PENDING",
     )
