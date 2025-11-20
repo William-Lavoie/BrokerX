@@ -47,6 +47,7 @@ export function Navbar() {
                 <NavbarButton text="Home" route="/" />
                 <NavbarButton text="Wallet" route="/wallet" />
                 <NavbarButton text="Place Order" route="/place_order" />
+                <NavbarButton text="Portfolio" route="/portfolio" />
 
                 <div className="d-flex items-center">
                     <Form className="d-flex h-1/3" onSubmit={get_stock_info}>

@@ -6,7 +6,7 @@ from django.core.management import execute_from_command_line
 from django.db import connections
 from django.db.utils import OperationalError
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "stock_service.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "portfolio_service.settings")
 
 
 def wait_for_db(retries=10, delay=3):

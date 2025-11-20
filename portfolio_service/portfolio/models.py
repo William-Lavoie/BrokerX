@@ -19,6 +19,7 @@ class Holdings(models.Model):
     )
     symbol = models.CharField(max_length=100, editable=False)
     name = models.CharField(max_length=100, editable=False)
+    quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     buying_price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
