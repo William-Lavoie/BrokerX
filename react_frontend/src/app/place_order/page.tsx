@@ -3,6 +3,7 @@
 import { TextInput } from "@/components/forms";
 import { useEffect, useState } from "react"
 import { FloatingLabel, Form } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 export default function Wallet() {
 
@@ -87,14 +88,29 @@ export default function Wallet() {
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) {
-                throw new Error("");
-            }
-
             const data = await response.json();
 
+            if (!response.ok) {
+                const message = data.message || "Failed to place order. Please try again.";
+                toast.error(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                });
+                return;
+            }
+    
+            setOrders([...orders, ...data.orders]);
+
+            toast.success(data.message || `Order placed successfully!`, {
+                position: "top-right",
+                autoClose: 5000,
+            });
+            
         } catch (error) {
-            console.error(error);
+            toast.error(`There was an unexpected error.`, {
+            position: "top-right",
+            autoClose: 5000,
+        });
         }
     }
 
@@ -111,11 +127,27 @@ export default function Wallet() {
             },
             body: JSON.stringify({"order_id": orderId})
         })
-        .then((res) => {
-            if (!res.ok) throw new Error("Failed to delete order");
-            console.log(`Order ${orderId} deleted`);
+        .then(async (response) => {
+            const data = await response.json();
+
+            if (!response.ok) {
+                const message = data.message || "Failed to place order. Please try again.";
+                toast.error(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                });
+                return;
+            }
+    
+            toast.success(data.message || `Order placed successfully!`, {
+                position: "top-right",
+                autoClose: 5000,
+            });
         })
-        .catch((err) => console.error(err));
+        .catch((err) => toast.error(`There was an unexpected error.`, {
+            position: "top-right",
+            autoClose: 5000,
+        }));
     };
 
 
@@ -128,11 +160,11 @@ export default function Wallet() {
                         label="Symbol"
                         className="mb-3"
                     >
-                        <Form.Control name="symbol" type="text" placeholder="name@example.com" />
+                        <Form.Control name="symbol" type="text" placeholder="name@example.com" required />
                     </FloatingLabel>
 
                     <FloatingLabel controlId="floatingSelect" label="Direction" className="mb-3">
-                        <Form.Select name="direction" aria-label="Direction">
+                        <Form.Select name="direction" aria-label="Direction" required>
                             <option value="BUY">Buy</option>
                             <option value="SELL">Sell</option>
                         </Form.Select>
@@ -143,7 +175,7 @@ export default function Wallet() {
                         label="Quantity"
                         className="mb-3"
                     >
-                        <Form.Control name="quantity" type="number" placeholder="0"/>
+                        <Form.Control name="quantity" type="number" placeholder="0" required/>
                     </FloatingLabel>
 
                 </div>

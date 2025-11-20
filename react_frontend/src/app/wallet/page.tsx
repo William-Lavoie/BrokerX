@@ -2,6 +2,7 @@
 
 import { TextInput } from "@/components/forms";
 import { useEffect, useState } from "react"
+import { toast } from "react-toastify";
 
 export default function Wallet() {
 
@@ -22,34 +23,53 @@ export default function Wallet() {
     }, []);
 
     async function add_funds(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-        event.preventDefault();
-        try {
+    event.preventDefault();
 
-            const form = event.currentTarget;
-            const formData = new FormData(form);
+    try {
+        const form = event.currentTarget;
+        const formData = new FormData(form);
 
-            const idempotencyKey = crypto.randomUUID();
+        const idempotencyKey = crypto.randomUUID();
 
-            const response = await fetch("http://localhost:8003/wallet", {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                    "Idempotency-Key": idempotencyKey,
-                },
-                body: JSON.stringify({"amount": formData.get("amount")}),
+        const response = await fetch("http://localhost:8003/wallet", {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "Idempotency-Key": idempotencyKey,
+            },
+            body: JSON.stringify({ amount: formData.get("amount") }),
+        });
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+            const message = data.message || "Failed to add funds. Please try again.";
+            toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
             });
-
-            if (!response.ok) {
-                throw new Error("");
-            }
-
-            const data = await response.json();
-
-        } catch (error) {
-            console.error(error);
+            return;
         }
+
+        setFunds(data.balance);
+        toast.success(data.message || `Funds added successfully!`, {
+            position: "top-right",
+            autoClose: 5000,
+        });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        console.error(error);
+
+        // Show error toast
+        toast.error(`There was an unexpected error.`, {
+            position: "top-right",
+            autoClose: 5000,
+        });
     }
+}
 
 
     return (

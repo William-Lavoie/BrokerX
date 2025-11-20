@@ -145,6 +145,8 @@ class PlaceOrderUseCase:
             logger.error(f"delete order client {client_id} et {order_id}")
             order = self.order_repository.delete_order(client_id=client_id, order_id=order_id)
             self.wallet_repository.release_funds(order_id=order_id, client_id=client_id)
+
+            return PlaceOrderUseCaseResult(message="The order was successfully cancelled.", code=200)
             
         except OrderInvalidException as order_exception:
             logger.error(order_exception.log_message, exc_info=True)

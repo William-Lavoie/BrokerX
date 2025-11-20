@@ -127,7 +127,7 @@ class MySQLOrderDAO(OrderDAO):
 
     def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
         try:
-            orders = Order.objects.filter(client_id=client_id)
+            orders = Order.objects.filter(client_id=client_id).exclude(status="CANCELLED")
             return [
                 OrderDTO(
                     success=True,
