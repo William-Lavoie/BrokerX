@@ -46,9 +46,9 @@ class Holding:
             "symbol": self.symbol,
             "name": self.name,
             "quantity": self.quantity,
-            "buying_price": Decimal(self.buying_price) if self.buying_price is not None else None,
-            "current_price": Decimal(self.current_price) if self.current_price is not None else None,
-            "performance": Decimal(self.performance) if self.performance is not None else None,
+            "buying_price": str(self.buying_price) if self.buying_price is not None else None,
+            "current_price": str(self.current_price) if self.current_price is not None else None,
+            "performance": str(self.performance) if self.performance is not None else None,
         }
 
     @classmethod

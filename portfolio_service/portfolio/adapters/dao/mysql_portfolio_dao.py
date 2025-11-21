@@ -12,7 +12,7 @@ class MySQLPortfolioDAO(PortfolioDAO):
     def get_portfolio(self, client_id: UUID) -> PortfolioDTO:
         portfolio, created = Portfolio.objects.get_or_create(client_id=client_id)
 
-        holdings = [HoldingDTO(client_id=holding.client_id, symbol=holding.symbol) for holding in portfolio.holdings.all()]
+        holdings = [HoldingDTO(client_id=holding.client_id, symbol=holding.symbol, name=holding.name, quantity=holding.quantity, buying_price=holding.buying_price, current_price=holding.current_price, performance=holding.performance) for holding in portfolio.holdings.all()]
  
         return PortfolioDTO(code=201 if created else 200, client_id=client_id, value=portfolio.value, holdings=holdings, performance=portfolio.performance)
 
