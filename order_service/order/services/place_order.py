@@ -1,15 +1,16 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 from uuid import UUID
 
 from order.domain.entities.order import Order, OrderInvalidException
 from order.domain.ports.order_repository import OrderRepository
+from order.domain.ports.stock_repository import StockException, StockRepository
+from order.domain.ports.wallet_repository import (WalletException,
+                                                  WalletRepository)
 
 from order_service.exceptions import DataAccessException
-from order.domain.ports.wallet_repository import WalletException, WalletRepository
-from order.domain.ports.stock_repository import StockException, StockRepository
 from order_service.use_case_results import UseCaseResult
 
 logger = logging.getLogger("order")
@@ -80,7 +81,9 @@ class PlaceOrderUseCase:
                 quantizer = Decimal("1").scaleb(-digits)
 
                 # multiply and round
-                order.price = (base_price * Decimal("1.05")).quantize(quantizer, rounding=ROUND_HALF_UP)
+                order.price = (base_price * Decimal("1.05")).quantize(
+                    quantizer, rounding=ROUND_HALF_UP
+                )
 
             self.wallet_repository.reserve_funds(order=order)
 
@@ -110,7 +113,7 @@ class PlaceOrderUseCase:
                 message=wallet_exception.user_message,
                 code=wallet_exception.error_code,
             )
-        
+
         except StockException as stock_exception:
             logger.error(stock_exception.log_message, exc_info=True)
             return PlaceOrderUseCaseResult(
@@ -119,7 +122,9 @@ class PlaceOrderUseCase:
             )
 
         except DataAccessException as data_access_exception:
-            self.wallet_repository.release_funds(order_id=order.order_id, client_id=order.client_id)
+            self.wallet_repository.release_funds(
+                order_id=order.order_id, client_id=order.client_id
+            )
             return PlaceOrderUseCaseResult(
                 message=data_access_exception.user_message,
                 code=data_access_exception.error_code,
@@ -143,22 +148,28 @@ class PlaceOrderUseCase:
     def delete_order(self, client_id: UUID, order_id: UUID):
         try:
             logger.error(f"delete order client {client_id} et {order_id}")
-            order = self.order_repository.delete_order(client_id=client_id, order_id=order_id)
+            order = self.order_repository.delete_order(
+                client_id=client_id, order_id=order_id
+            )
             self.wallet_repository.release_funds(order_id=order_id, client_id=client_id)
 
-            return PlaceOrderUseCaseResult(message="The order was successfully cancelled.", code=200)
-            
+            return PlaceOrderUseCaseResult(
+                message="The order was successfully cancelled.", code=200
+            )
+
         except OrderInvalidException as order_exception:
             logger.error(order_exception.log_message, exc_info=True)
             return PlaceOrderUseCaseResult(
                 message=order_exception.user_message,
                 code=order_exception.error_code,
             )
-     
+
         except WalletException as wallet_exception:
             logger.error(wallet_exception.log_message, exc_info=True)
 
-            self.order_repository.delete_order_rollback(client_id=client_id, order_id=order_id, previous_status=order.status)
+            self.order_repository.delete_order_rollback(
+                client_id=client_id, order_id=order_id, previous_status=order.status
+            )
 
             return PlaceOrderUseCaseResult(
                 message=wallet_exception.user_message,

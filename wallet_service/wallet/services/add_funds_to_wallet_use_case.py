@@ -4,9 +4,7 @@ from uuid import UUID
 
 from django.db import transaction
 from wallet.adapters.mock_payment_service_repository import (
-    PaymentServiceRepository,
-    PaymentServiceRepositoryResponse,
-)
+    PaymentServiceRepository, PaymentServiceRepositoryResponse)
 from wallet.domain.entities.wallet import Wallet
 from wallet.domain.entities.withdrawal import Withdrawal
 from wallet.domain.ports.dao.wallet_dao import WalletDTO

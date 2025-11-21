@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stock', '0001_initial'),
+        ("stock", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stock',
-            name='limit_price_band',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True),
+            model_name="stock",
+            name="limit_price_band",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=5, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='stock',
-            name='tick_size',
+            model_name="stock",
+            name="tick_size",
             field=models.DecimalField(decimal_places=5, default=0.01, max_digits=5),
             preserve_default=False,
         ),

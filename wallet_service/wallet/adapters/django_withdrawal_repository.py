@@ -2,10 +2,8 @@ from decimal import Decimal
 from uuid import UUID
 
 from wallet.adapters.dao.mysql_withdrawal_dao import MySQLWithdrawalDAO
-from wallet.domain.ports.withdrawal_repository import (
-    WithdrawalDTO,
-    WithdrawalRepository,
-)
+from wallet.domain.ports.withdrawal_repository import (WithdrawalDTO,
+                                                       WithdrawalRepository)
 
 
 class DjangoWithdrawalRepository(WithdrawalRepository):

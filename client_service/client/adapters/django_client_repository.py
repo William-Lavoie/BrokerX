@@ -1,8 +1,8 @@
 from client.adapters.dao.mysql_client_dao import MySQLClientDAO
 from client.adapters.redis.redis_client import RedisClient
-
 #
-from client.domain.entities.client import Client, ClientInvalidException, ClientStatus
+from client.domain.entities.client import (Client, ClientInvalidException,
+                                           ClientStatus)
 from client.domain.ports.client_repository import ClientRepository
 from client.domain.ports.dao.client_dao import ClientDTO
 

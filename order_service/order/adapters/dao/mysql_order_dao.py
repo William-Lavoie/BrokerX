@@ -127,7 +127,9 @@ class MySQLOrderDAO(OrderDAO):
 
     def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
         try:
-            orders = Order.objects.filter(client_id=client_id).exclude(status="CANCELLED")
+            orders = Order.objects.filter(client_id=client_id).exclude(
+                status="CANCELLED"
+            )
             return [
                 OrderDTO(
                     success=True,
@@ -156,33 +158,33 @@ class MySQLOrderDAO(OrderDAO):
                 exc_info=True,
             )
             return OrderDTO(success=False, code=404)
-        
+
     def delete_order(self, client_id: UUID, order_id: UUID) -> OrderDTO:
         try:
             order = Order.objects.get(order_id=order_id, client_id=client_id)
 
             if order.status in ["EXECUTED", "REJECTED", "CANCELLED"]:
                 return OrderDTO(success=False, code=400)
-             
+
             order_dto = OrderDTO(
-                    success=True,
-                    code=200,
-                    order_id=order.order_id,
-                    client_id=order.client_id,
-                    symbol=order.stock_symbol,
-                    order_type=order.order_type,
-                    order_style=order.order_style,
-                    order_duration=order.order_duration,
-                    quantity=order.quantity,
-                    quantity_executed=order.quantity_executed,
-                    price=order.price,
-                    end_date=order.order_end_date,
-                    status=order.status,
-                    created_at=order.created_at,
-                    updated_at=order.updated_at,
-                    executed_at=order.executed_at,
-                )
-            
+                success=True,
+                code=200,
+                order_id=order.order_id,
+                client_id=order.client_id,
+                symbol=order.stock_symbol,
+                order_type=order.order_type,
+                order_style=order.order_style,
+                order_duration=order.order_duration,
+                quantity=order.quantity,
+                quantity_executed=order.quantity_executed,
+                price=order.price,
+                end_date=order.order_end_date,
+                status=order.status,
+                created_at=order.created_at,
+                updated_at=order.updated_at,
+                executed_at=order.executed_at,
+            )
+
             order.status = "CANCELLED"
             order.save()
 
@@ -193,17 +195,18 @@ class MySQLOrderDAO(OrderDAO):
                 f"ObjectDoesNotExist exception : {e}",
                 exc_info=True,
             )
-            return OrderDTO(success=False, code=404) 
-        
-    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
+            return OrderDTO(success=False, code=404)
+
+    def delete_order_rollback(
+        self, client_id: UUID, order_id: UUID, previous_status: str
+    ) -> None:
         try:
-            Order.objects.filter(order_id=order_id, client_id=client_id).update(status=previous_status)
+            Order.objects.filter(order_id=order_id, client_id=client_id).update(
+                status=previous_status
+            )
 
         except Exception as e:
             logger.error(
                 f"ObjectDoesNotExist exception : {e}",
                 exc_info=True,
             )
-
-
-

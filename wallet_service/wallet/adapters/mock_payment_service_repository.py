@@ -3,9 +3,7 @@ import logging
 from decimal import Decimal
 
 from ..domain.ports.payment_service_repository import (
-    PaymentServiceRepository,
-    PaymentServiceRepositoryResponse,
-)
+    PaymentServiceRepository, PaymentServiceRepositoryResponse)
 from ..external_source.mock_payment_service import MockPaymentService
 
 logger = logging.getLogger(__name__)

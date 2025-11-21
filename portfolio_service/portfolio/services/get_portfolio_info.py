@@ -2,11 +2,12 @@ import logging
 from typing import Optional
 from uuid import UUID
 
-from portfolio.domain.entities.portfolio import Portfolio, PortfolioInvalidException
+from portfolio.domain.entities.portfolio import (Portfolio,
+                                                 PortfolioInvalidException)
 from portfolio.domain.ports.portfolio_repository import PortfolioRepository
+
 from portfolio_service.exceptions import DataAccessException
 from portfolio_service.use_case_results import UseCaseResult
-
 
 logger = logging.getLogger("portfolio")
 
@@ -20,7 +21,7 @@ class GetPortfolioInfoUseCaseResult(UseCaseResult):
         dict = super().to_dict()
         if self.portfolio is not None:
             dict["portfolio"] = self.portfolio.to_dict()
-            
+
         return dict
 
 
@@ -33,7 +34,9 @@ class GetPortfolioInfoUseCase:
 
     def get_portofolio_info(self, client_id: UUID) -> GetPortfolioInfoUseCaseResult:
         try:
-            portfolio: Portfolio = self.portfolio_repository.get_portfolio(client_id=client_id)
+            portfolio: Portfolio = self.portfolio_repository.get_portfolio(
+                client_id=client_id
+            )
 
             return GetPortfolioInfoUseCaseResult(
                 message=f"Successfully retrieved portfolio..",

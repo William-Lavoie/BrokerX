@@ -2,9 +2,12 @@ from decimal import Decimal
 
 import pytest
 from wallet.adapters.django_wallet_repository import DjangoWalletRepository
-from wallet.adapters.django_withdrawal_repository import DjangoWithdrawalRepository
-from wallet.adapters.mock_payment_service_repository import MockPaymentServiceRepository
-from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
+from wallet.adapters.django_withdrawal_repository import \
+    DjangoWithdrawalRepository
+from wallet.adapters.mock_payment_service_repository import \
+    MockPaymentServiceRepository
+from wallet.services.add_funds_to_wallet_use_case import \
+    AddFundsToWalletUseCase
 
 pytestmark = pytest.mark.django_db
 

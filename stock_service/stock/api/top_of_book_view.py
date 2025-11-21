@@ -1,6 +1,6 @@
-from decimal import Decimal
 import json
 import logging
+from decimal import Decimal
 
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -27,12 +27,13 @@ class TopOfBookView(APIView):
 
         if price is not None:
             price = Decimal(price)
-            
+
         order_type = data.get("order_type", None)
 
         use_case = UpdateTopOfBookUseCase(stock_repository=DjangoStockRepository())
 
-        result = use_case.update_top_of_book(symbol=symbol, quantity=quantity, type=order_type, price=price)
+        result = use_case.update_top_of_book(
+            symbol=symbol, quantity=quantity, type=order_type, price=price
+        )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
-

@@ -6,7 +6,6 @@ from wallet.domain.ports.wallet_repository import WalletRepository
 
 from wallet_service.use_case_results import UseCaseResult
 
-
 logger = logging.getLogger("wallet")
 
 
@@ -59,25 +58,24 @@ class ReserveFundsUseCase:
                 code=500,
             )
 
-
-    def release_funds(
-        self, client_id: UUID, order_id: UUID
-    ) -> UseCaseResult:
+    def release_funds(self, client_id: UUID, order_id: UUID) -> UseCaseResult:
         try:
 
-            if self.wallet_repository.release_funds(client_id=client_id, order_id=order_id):
+            if self.wallet_repository.release_funds(
+                client_id=client_id, order_id=order_id
+            ):
                 return UseCaseResult(
                     success=True,
                     message="Funds released successfully.",
                     code=200,
-                )                         
-            
-            return UseCaseResult(
-                    success=False,
-                    message="Funds could not be released.",
-                    code=500,
                 )
-                
+
+            return UseCaseResult(
+                success=False,
+                message="Funds could not be released.",
+                code=500,
+            )
+
         except Exception as e:
             logger.error(f"Error reserving funds: {e}")
             return UseCaseResult(

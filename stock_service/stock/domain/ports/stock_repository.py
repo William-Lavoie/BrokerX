@@ -1,7 +1,7 @@
+import logging
 from abc import abstractmethod
 from dataclasses import dataclass
 from decimal import Decimal
-import logging
 from typing import Optional
 
 from stock.adapters.result import Result
@@ -34,8 +34,10 @@ class StockRepository:
     def get_stock_by_symbol(self, symbol) -> Stock:
         pass
 
-    @abstractmethod 
-    def update_top_of_book(self, stock: Stock, quantity: int, type: str, price: Optional[Decimal] = None) -> None:
+    @abstractmethod
+    def update_top_of_book(
+        self, stock: Stock, quantity: int, type: str, price: Optional[Decimal] = None
+    ) -> None:
         pass
 
     def get_from_dto(cls, dto: StockDTO) -> "Stock":

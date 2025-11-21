@@ -114,7 +114,6 @@ class Order:
         self.updated_at = updated_at
         self.executed_at = executed_at
 
-
     def validate_data(self) -> None:
         if self.quantity < 1:
             raise OrderInvalidException(
@@ -168,13 +167,13 @@ class Order:
             )
 
         if self.order_duration == "GTD":
-            if self.end_date is None :
+            if self.end_date is None:
                 raise OrderInvalidException(
                     user_message="The GTD order must have an end date.",
                     log_message="GTD order missing end date.",
                     error_code=400,
                 )
-            
+
             if self.end_date <= datetime.now().date():
                 raise OrderInvalidException(
                     user_message="The end date must be in the future.",

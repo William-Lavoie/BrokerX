@@ -1,12 +1,17 @@
 # mypy: ignore-errors
 
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
 
 
 class Portfolio(models.Model):
-    client_id = models.UUIDField(db_index=True)
-    value = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, validators=[MinValueValidator(0.00)])
+    client_id = models.UUIDField(db_index=True, unique=True)
+    value = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(0.00)],
+    )
     created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     performance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
@@ -31,3 +36,10 @@ class Holdings(models.Model):
         validators=[MinValueValidator(0.00)],
     )
     performance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                "client_id", "symbol", name="unique_symbol_per_client"
+            )
+        ]

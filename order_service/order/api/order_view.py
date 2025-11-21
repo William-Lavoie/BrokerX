@@ -1,16 +1,16 @@
-from datetime import datetime
-from decimal import Decimal
 import json
 import logging
+from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from order.adapters.django_order_repository import DjangoOrderRepository
-from order.services.place_order import PlaceOrderUseCase
-from order.adapters.wallet_service import WalletService
 from order.adapters.stock_service import StockService
+from order.adapters.wallet_service import WalletService
+from order.services.place_order import PlaceOrderUseCase
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -35,7 +35,7 @@ class OrderView(APIView):
             price = Decimal(str(price))
 
         logger.error(f"price: {price}")
-            
+
         end_date = data.get("end_date", None)
         quantity = data.get("quantity", 0)
 
@@ -53,7 +53,9 @@ class OrderView(APIView):
 
         idempotency_key = request.headers.get("Idempotency-Key")
 
-        use_case = PlaceOrderUseCase(DjangoOrderRepository(), StockService(), WalletService())
+        use_case = PlaceOrderUseCase(
+            DjangoOrderRepository(), StockService(), WalletService()
+        )
 
         result = use_case.execute(
             client_id=client_id,
@@ -64,7 +66,7 @@ class OrderView(APIView):
             quantity=quantity,
             idempotency_key=UUID(idempotency_key),
             price=price if price else None,
-            end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None,
+            end_date=datetime.strptime(end_date, "%Y-%m-%d") if end_date else None,
         )
 
         return JsonResponse(data=result.to_dict(), status=result.code)
@@ -79,7 +81,7 @@ class OrderView(APIView):
 
         result = use_case.get_orders(client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)
-    
+
     def delete(self, request):
         data = json.loads(request.body)
         order_id = UUID(data.get("order_id", ""))
@@ -92,7 +94,3 @@ class OrderView(APIView):
 
         result = use_case.delete_order(order_id=order_id, client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)
-
-
-
-

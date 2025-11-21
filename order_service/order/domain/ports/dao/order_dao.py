@@ -38,6 +38,7 @@ class OrderDAO:
         pass
 
     @abstractmethod
-    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
+    def delete_order_rollback(
+        self, client_id: UUID, order_id: UUID, previous_status: str
+    ) -> None:
         pass
-    

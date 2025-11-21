@@ -1,7 +1,8 @@
 from decimal import Decimal
 
 import pytest
-from wallet.adapters.mock_payment_service_repository import MockPaymentServiceRepository
+from wallet.adapters.mock_payment_service_repository import \
+    MockPaymentServiceRepository
 from wallet.external_source.mock_payment_service import MockPaymentService
 
 pytestmark = pytest.mark.django_db

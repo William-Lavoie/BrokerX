@@ -25,7 +25,7 @@ class Portfolio:
         client_id: UUID,
         value: Decimal = Decimal("0.00"),
         performance: Decimal = Decimal("0.00"),
-        holdings: list[Holding] = []
+        holdings: list[Holding] = [],
     ):
         self.client_id = client_id
         self.value = value
@@ -33,17 +33,20 @@ class Portfolio:
         self.holdings = holdings
 
         if value < 0:
-            raise PortfolioInvalidException(user_message="Your portfolio cannot have a negative value",
-                                            log_message="The value of the portfolio for client {client_id} was {value}",
-                                            error_code=400
+            raise PortfolioInvalidException(
+                user_message="Your portfolio cannot have a negative value",
+                log_message="The value of the portfolio for client {client_id} was {value}",
+                error_code=400,
             )
-        
+
     def to_dict(self):
         return {
             "client_id": str(self.client_id),
             "value": Decimal(self.value) if self.value is not None else None,
-            "performance": Decimal(self.performance) if self.performance is not None else None,
-            "holdings": [holding.to_dict() for holding in self.holdings]
+            "performance": (
+                Decimal(self.performance) if self.performance is not None else None
+            ),
+            "holdings": [holding.to_dict() for holding in self.holdings],
         }
 
     @classmethod
@@ -51,6 +54,10 @@ class Portfolio:
         return cls(
             client_id=UUID(data["client_id"]),
             value=Decimal(data["value"]) if data.get("value") is not None else None,
-            performance=Decimal(data["performance"]) if data.get("performance") is not None else None,
-            holdings=[Holding().from_dict(holding) for holding in data["holdings"]]
+            performance=(
+                Decimal(data["performance"])
+                if data.get("performance") is not None
+                else None
+            ),
+            holdings=[Holding().from_dict(holding) for holding in data["holdings"]],
         )

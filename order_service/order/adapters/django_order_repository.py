@@ -56,9 +56,9 @@ class DjangoOrderRepository(OrderRepository):
         ]
 
     def get_orders_by_client(self, client_id: UUID) -> list[Order]:
-       # redis_orders = self.redis.get_orders_by_client(client_id=client_id)
-        #if redis_orders:
-         #   return redis_orders
+        # redis_orders = self.redis.get_orders_by_client(client_id=client_id)
+        # if redis_orders:
+        #   return redis_orders
 
         order_dtos = self.dao.get_orders_by_client(client_id=client_id)
 
@@ -66,7 +66,7 @@ class DjangoOrderRepository(OrderRepository):
 
         self.redis.set_orders_by_client(client_id=client_id, orders=orders)
         return orders
-    
+
     def delete_order(self, client_id: UUID, order_id: UUID) -> Order:
         order_dto = self.dao.delete_order(client_id, order_id)
 
@@ -76,11 +76,13 @@ class DjangoOrderRepository(OrderRepository):
                 log_message=f"Order {order_id} could not deleted.",
                 error_code=500,
             )
-        
+
         self.redis.delete_order(order_id=order_id, client_id=client_id)
         return order_dto.get_order_from_dto()
-    
-    def delete_order_rollback(self, client_id: UUID, order_id: UUID, previous_status: str) -> None:
-        self.dao.delete_order_rollback(client_id=client_id, order_id=order_id, previous_status=previous_status)
 
-        
+    def delete_order_rollback(
+        self, client_id: UUID, order_id: UUID, previous_status: str
+    ) -> None:
+        self.dao.delete_order_rollback(
+            client_id=client_id, order_id=order_id, previous_status=previous_status
+        )

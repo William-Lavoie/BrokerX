@@ -3,11 +3,11 @@ from unittest.mock import MagicMock
 
 import pytest
 from wallet.domain.ports.dao.wallet_dao import WalletDTO
-from wallet.domain.ports.payment_service_repository import (
-    PaymentServiceRepositoryResponse,
-)
+from wallet.domain.ports.payment_service_repository import \
+    PaymentServiceRepositoryResponse
 from wallet.domain.ports.withdrawal_repository import WithdrawalDTO
-from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
+from wallet.services.add_funds_to_wallet_use_case import \
+    AddFundsToWalletUseCase
 
 pytestmark = pytest.mark.django_db
 

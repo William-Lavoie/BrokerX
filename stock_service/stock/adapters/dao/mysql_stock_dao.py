@@ -1,11 +1,11 @@
-from decimal import Decimal
 import logging
+from decimal import Decimal
 from typing import Optional
 
 from django.core.exceptions import ObjectDoesNotExist
+from stock.domain.ports.dao.stock_dao import StockDAO
 from stock.domain.ports.stock_repository import StockDTO
 from stock.models import Stock
-from stock.domain.ports.dao.stock_dao import StockDAO
 
 logger = logging.getLogger("mysql")
 
@@ -43,15 +43,18 @@ class MySQLStockDAO(StockDAO):
             )
             return StockDTO(success=False, code=404, active=False)
 
-
     def set_bid(self, symbol: str, quantity: int, price: Optional[Decimal]) -> None:
         try:
-            Stock.objects.filter(symbol=symbol).update(bid_price=price, bid_size=quantity)
+            Stock.objects.filter(symbol=symbol).update(
+                bid_price=price, bid_size=quantity
+            )
         except:
             logger.error("The bid price could not be updated.", exc_info=True)
 
     def set_ask(self, symbol: str, quantity: int, price: Optional[Decimal]) -> None:
         try:
-            Stock.objects.filter(symbol=symbol).update(ask_price=price, ask_size=quantity)
+            Stock.objects.filter(symbol=symbol).update(
+                ask_price=price, ask_size=quantity
+            )
         except:
             logger.error("The ask price could not be updated.", exc_info=True)

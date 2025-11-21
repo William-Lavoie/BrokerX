@@ -104,7 +104,7 @@ class RedisOrder:
                 orders_data = json.loads(orders_client_json)
             else:
                 logger.warning(f"No orders found for client {client_id}.")
-                return 
+                return
 
             order_found = False
             for order in orders_data:
@@ -126,7 +126,14 @@ class RedisOrder:
             )
 
             # Also update the stock-specific orders if needed
-            symbol = next((order.get("symbol") for order in orders_data if order.get("id") == order_id), None)
+            symbol = next(
+                (
+                    order.get("symbol")
+                    for order in orders_data
+                    if order.get("id") == order_id
+                ),
+                None,
+            )
             if symbol:
                 orders_stock_json = redis_client.get(f"orders:{symbol}")
                 if orders_stock_json:
@@ -143,9 +150,13 @@ class RedisOrder:
                         ),
                     )
 
-            logger.info(f"Order {order_id} updated successfully for client {client_id}.")
+            logger.info(
+                f"Order {order_id} updated successfully for client {client_id}."
+            )
             return
 
         except Exception as e:
-            logger.error(f"Failed to update order {order_id} for client {client_id}: {e}")
+            logger.error(
+                f"Failed to update order {order_id} for client {client_id}: {e}"
+            )
             return

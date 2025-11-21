@@ -2,7 +2,8 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
-from wallet.adapters.django_withdrawal_repository import DjangoWithdrawalRepository
+from wallet.adapters.django_withdrawal_repository import \
+    DjangoWithdrawalRepository
 from wallet.domain.ports.withdrawal_repository import WithdrawalDTO
 
 pytestmark = pytest.mark.django_db

@@ -9,8 +9,10 @@ class Stock(models.Model):
     name = models.CharField(max_length=100)
     exchange = models.CharField(max_length=100)
     currency = models.CharField(max_length=10, default="CAD")
-    
-    limit_price_band = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+
+    limit_price_band = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     tick_size = models.DecimalField(max_digits=5, decimal_places=5)
 
     # Daily prices

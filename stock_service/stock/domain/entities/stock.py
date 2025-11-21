@@ -1,6 +1,6 @@
 import copy
-from decimal import Decimal
 import logging
+from decimal import Decimal
 from typing import Optional
 
 logger = logging.getLogger("stock")
@@ -71,7 +71,9 @@ class Stock:
 
         self.active = active
 
-    def validate_order(self, quantity: int, type: str, price: Optional[Decimal]) -> None:
+    def validate_order(
+        self, quantity: int, type: str, price: Optional[Decimal]
+    ) -> None:
 
         # Quantity is larger than the volume
         if quantity > self.volume:
@@ -80,7 +82,7 @@ class Stock:
                 log_message=f"Order quantity {quantity} is invalid. Stock has only {self.volume} shares available.",
                 error_code=400,
             )
-        
+
         # Tick size is not respected
         if price and not price % self.tick_size.normalize() == 0:
             raise StockInvalidException(
@@ -90,18 +92,26 @@ class Stock:
             )
 
         # Band size
-        price_band = Decimal(self.band/100)
+        price_band = Decimal(self.band / 100)
         if type == "BUY":
-            logger.error(f"price band: {price_band}, price: {price} bid: {self.bid_price}")
-            if price and not (Decimal(price) >= Decimal(self.bid_price*(1-price_band)) and Decimal(price) <= Decimal(self.bid_price*(1+price_band))):
-                raise StockInvalidException(
-                user_message=f"The price cannot differ from the market price by more than {self.band}%.",
-                log_message=f"Order price {price} is invalid for band {self.band}.",
-                error_code=400,
+            logger.error(
+                f"price band: {price_band}, price: {price} bid: {self.bid_price}"
             )
+            if price and not (
+                Decimal(price) >= Decimal(self.bid_price * (1 - price_band))
+                and Decimal(price) <= Decimal(self.bid_price * (1 + price_band))
+            ):
+                raise StockInvalidException(
+                    user_message=f"The price cannot differ from the market price by more than {self.band}%.",
+                    log_message=f"Order price {price} is invalid for band {self.band}.",
+                    error_code=400,
+                )
 
         elif type == "SELL":
-            if price and not (price >= self.ask_price*(1-self.band) and price <= self.ask_price(1+self.band)):
+            if price and not (
+                price >= self.ask_price * (1 - self.band)
+                and price <= self.ask_price(1 + self.band)
+            ):
                 raise StockInvalidException(
                     user_message=f"The price cannot differ from the market price by more than {price_band}%.",
                     log_message=f"Order price {price} is invalid for band {self.band}.",

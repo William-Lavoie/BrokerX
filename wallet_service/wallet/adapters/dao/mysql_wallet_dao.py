@@ -2,7 +2,7 @@ import logging
 from decimal import Decimal
 from uuid import UUID
 
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Sum
 from wallet.domain.ports.dao.wallet_dao import WalletDAO, WalletDTO
 from wallet.models import ReservedFunds, Wallet
@@ -50,10 +50,8 @@ class MySQLWalletDAO(WalletDAO):
                 exc_info=True,
             )
             return Wallet(success=False, code=409)
-        
-    def release_funds(
-        self, client_id: UUID, order_id: UUID
-    ) -> WalletDTO:
+
+    def release_funds(self, client_id: UUID, order_id: UUID) -> WalletDTO:
         try:
             with transaction.atomic():
                 ReservedFunds.objects.filter(

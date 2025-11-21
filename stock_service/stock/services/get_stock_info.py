@@ -19,7 +19,7 @@ class GetStockInfoUseCaseResult(UseCaseResult):
         dict = super().to_dict()
         if self.stock is not None:
             dict["stock"] = self.stock.to_dict()
-            
+
         return dict
 
 

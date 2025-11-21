@@ -39,16 +39,21 @@ class Holding:
         self.current_price = current_price
         self.performance = performance
 
-
     def to_dict(self):
         return {
             "client_id": str(self.client_id),
             "symbol": self.symbol,
             "name": self.name,
             "quantity": self.quantity,
-            "buying_price": str(self.buying_price) if self.buying_price is not None else None,
-            "current_price": str(self.current_price) if self.current_price is not None else None,
-            "performance": str(self.performance) if self.performance is not None else None,
+            "buying_price": (
+                str(self.buying_price) if self.buying_price is not None else None
+            ),
+            "current_price": (
+                str(self.current_price) if self.current_price is not None else None
+            ),
+            "performance": (
+                str(self.performance) if self.performance is not None else None
+            ),
         }
 
     @classmethod
@@ -58,7 +63,19 @@ class Holding:
             symbol=data["symbol"],
             name=data["name"],
             quantity=data["quantity"],
-            buying_price=Decimal(data["buying_price"]) if data.get("buying_price") is not None else None,
-            current_price=Decimal(data["current_price"]) if data.get("current_price") is not None else None,
-            performance=Decimal(data["performance"]) if data.get("performance") is not None else None,
+            buying_price=(
+                Decimal(data["buying_price"])
+                if data.get("buying_price") is not None
+                else None
+            ),
+            current_price=(
+                Decimal(data["current_price"])
+                if data.get("current_price") is not None
+                else None
+            ),
+            performance=(
+                Decimal(data["performance"])
+                if data.get("performance") is not None
+                else None
+            ),
         )

@@ -1,5 +1,5 @@
-from decimal import Decimal
 import logging
+from decimal import Decimal
 
 import requests
 from order.domain.entities.order import Order
@@ -29,20 +29,19 @@ class StockService(StockRepository):
                     log_message=f"StockException for client {order.client_id}: {response.text}",
                     error_code=400,
                 )
-            
+
             return Decimal(str(response.json().get("price", 0.00)))
-        
+
         except requests.Timeout:
             raise StockException(
                 user_message="The system was not available or could not be reached.",
                 log_message=f"Stock service timed out.",
                 error_code=504,
             )
-        
+
         except requests.RequestException as e:
             raise StockException(
                 user_message="The system was not available or could not be reached.",
                 log_message=f"RequestException for client {order.client_id}: {str(e)}",
                 error_code=500,
             )
-    
