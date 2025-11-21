@@ -15,7 +15,7 @@ class Portfolio(models.Model):
 class Holdings(models.Model):
     client_id = models.UUIDField(db_index=True)
     portfolio = models.ForeignKey(
-        Portfolio, on_delete=models.CASCADE, related_name="portfolio"
+        Portfolio, on_delete=models.CASCADE, related_name="holdings"
     )
     symbol = models.CharField(max_length=100, editable=False)
     name = models.CharField(max_length=100, editable=False)

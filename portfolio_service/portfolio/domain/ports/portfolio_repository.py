@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
@@ -10,6 +11,7 @@ from portfolio.domain.entities.holding import Holding
 
 @dataclass
 class HoldingDTO(Result):
+    code: int
     client_id: UUID
     symbol: str = ""
     name: str = ""
@@ -19,12 +21,12 @@ class HoldingDTO(Result):
     performance: Optional[Decimal] = None,
 
 
-@dataclass
 class PortfolioDTO(Result):
-    client_id: UUID
-    value: Decimal = Decimal("0.00"),
-    performance: Decimal = Decimal("0.00"),
-    holdings: list[HoldingDTO] = []
+    def __init__(self, code: int, client_id: UUID,  value: Decimal = Decimal("0.00"), holdings: list[Holding] = [], performance: Decimal = Decimal("0.00")):
+        super().__init__(code=code, client_id=client_id)
+        self.value = value
+        self.holdings = holdings
+        self.performance = performance
 
 
 class PortfolioRepository:

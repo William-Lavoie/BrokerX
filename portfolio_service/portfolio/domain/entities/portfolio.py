@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from decimal import Decimal
 from uuid import UUID
 
@@ -19,7 +18,6 @@ class PortfolioInvalidException(Exception):
         self.error_code = error_code
 
 
-@dataclass
 class Portfolio:
 
     def __init__(
@@ -33,8 +31,13 @@ class Portfolio:
         self.value = value
         self.performance = performance
         self.holdings = holdings
-    
 
+        if value < 0:
+            raise PortfolioInvalidException(user_message="Your portfolio cannot have a negative value",
+                                            log_message="The value of the portfolio for client {client_id} was {value}",
+                                            error_code=400
+            )
+        
     def to_dict(self):
         return {
             "client_id": str(self.client_id),

@@ -4,6 +4,8 @@ import logging
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from portfolio.services.get_portfolio_info import GetPortfolioInfoUseCase
+from portfolio.adapters.django_portfolio_repository import DjangoPortfolioRepository
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -18,8 +20,8 @@ class PortfolioView(APIView):
 
         client_id = "7a82a0d7197b422c9f884fab0975359a"
 
-        use_case = GetPortfolioUseCase(portfolio_repository=DjangoPortfolioRepository())
+        use_case = GetPortfolioInfoUseCase(portfolio_repository=DjangoPortfolioRepository())
 
-        result = use_case.get_portfolio(client_id=client_id)
+        result = use_case.get_portofolio_info(client_id=client_id)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
