@@ -2,7 +2,7 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models.manager import RelatedManager
+from django.db.models import QuerySet
 
 
 class Portfolio(models.Model):
@@ -17,7 +17,7 @@ class Portfolio(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     performance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
-    holdings: RelatedManager["Holdings"]
+    holdings: QuerySet["Holdings"]
 
 
 class Holdings(models.Model):

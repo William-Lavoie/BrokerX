@@ -83,7 +83,16 @@ class MySQLPortfolioDAO(PortfolioDAO):
 
                 holding.save()
 
-                portfolio.holdings.add(holding)
+                portfolio.holdings.create(
+                    client_id=client_id,
+                    symbol=symbol,
+                    name=name,
+                    quantity=quantity,
+                    buying_price=holding.buying_price,
+                    current_price=holding.current_price,
+                    performance=holding.performance,
+                    reserved_for_sale=holding.reserved_for_sale,
+                )
 
                 total_value = sum(
                     h.current_price * h.quantity for h in portfolio.holdings.all()
@@ -121,6 +130,60 @@ class MySQLPortfolioDAO(PortfolioDAO):
 
         except Portfolio.DoesNotExist:
             logger.error(f"Portfolio for client_id {client_id} does not exist.")
+            return PortfolioDTO(
+                code=404,
+                client_id=client_id,
+            )
+
+    def reserve_holdings(
+        self, client_id: UUID, symbol: str, quantity: int
+    ) -> PortfolioDTO:
+        try:
+            with transaction.atomic():
+                holding = Holdings.objects.get(client_id=client_id, symbol=symbol)
+
+                if holding.quantity - holding.reserved_for_sale < quantity:
+                    return PortfolioDTO(
+                        code=400,
+                        client_id=client_id,
+                    )
+
+                holding.reserved_for_sale += quantity
+                holding.save()
+
+                return PortfolioDTO(
+                    code=200,
+                    client_id=client_id,
+                )
+
+        except Holdings.DoesNotExist:
+            return PortfolioDTO(
+                code=404,
+                client_id=client_id,
+            )
+
+    def release_holdings(
+        self, client_id: UUID, symbol: str, quantity: int
+    ) -> PortfolioDTO:
+        try:
+            with transaction.atomic():
+                holding = Holdings.objects.get(client_id=client_id, symbol=symbol)
+
+                if holding.reserved_for_sale < quantity:
+                    return PortfolioDTO(
+                        code=400,
+                        client_id=client_id,
+                    )
+
+                holding.reserved_for_sale -= quantity
+                holding.save()
+
+                return PortfolioDTO(
+                    code=200,
+                    client_id=client_id,
+                )
+
+        except Holdings.DoesNotExist:
             return PortfolioDTO(
                 code=404,
                 client_id=client_id,

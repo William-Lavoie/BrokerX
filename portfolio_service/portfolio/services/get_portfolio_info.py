@@ -46,7 +46,7 @@ class GetPortfolioInfoUseCase:
 
         except PortfolioInvalidException as stock_exception:
             logger.warning(
-                f"PortfolioInvalidException in GetPortfolioInfoUseCaseResult for client {client_id}"
+                f"PortfolioInvalidException in GetPortfolioInfoUseCase for client {client_id}"
             )
             return GetPortfolioInfoUseCaseResult(
                 message=stock_exception.user_message,

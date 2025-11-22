@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from portfolio.adapters.dao.mysql_portfolio_dao import MySQLPortfolioDAO
-from portfolio.domain.entities.portfolio import Portfolio
+from portfolio.domain.entities.portfolio import Portfolio, PortfolioInvalidException
 from portfolio.domain.ports.portfolio_repository import PortfolioRepository
 
 from portfolio_service.exceptions import DataAccessException
@@ -53,3 +53,63 @@ class DjangoPortfolioRepository(PortfolioRepository):
             )
 
         return self.get_portfolio_from_dto(portfolio_dto)
+
+    def reserve_holdings(self, client_id: UUID, symbol: str, quantity: int) -> None:
+        portfolio_dto = self.dao.reserve_holdings(
+            client_id=client_id,
+            symbol=symbol,
+            quantity=quantity,
+        )
+
+        if portfolio_dto.code == 400:
+            raise PortfolioInvalidException(
+                user_message="Not enough holdings available to reserve the requested quantity.",
+                log_message=(
+                    f"Not enough holdings to reserve for client_id {client_id}."
+                ),
+                error_code=400,
+            )
+
+        elif portfolio_dto.code == 404:
+            raise PortfolioInvalidException(
+                user_message="The specified holding does not exist in the portfolio.",
+                log_message=(
+                    f"Holding {symbol} does not exist for client_id {client_id}."
+                ),
+                error_code=404,
+            )
+
+        elif not portfolio_dto.success:
+            raise DataAccessException(
+                user_message="An unexpected error occured while trying to reserve your holdings."
+            )
+
+    def release_holdings(self, client_id: UUID, symbol: str, quantity: int) -> None:
+        portfolio_dto = self.dao.release_holdings(
+            client_id=client_id,
+            symbol=symbol,
+            quantity=quantity,
+        )
+
+        if portfolio_dto.code == 400:
+            raise PortfolioInvalidException(
+                user_message="Not enough reserved holdings to release the requested quantity.",
+                log_message=(
+                    f"Not enough reserved holdings to release for client_id {client_id}."
+                ),
+                error_code=400,
+            )
+
+        elif portfolio_dto.code == 404:
+            raise PortfolioInvalidException(
+                user_message="The specified holding does not exist in the portfolio.",
+                log_message=(
+                    f"Holding {symbol} does not exist for client_id {client_id}."
+                ),
+                error_code=404,
+            )
+
+        elif not portfolio_dto.success:
+            raise DataAccessException(
+                user_message="An unexpected error occured while trying to release your holdings."
+            )

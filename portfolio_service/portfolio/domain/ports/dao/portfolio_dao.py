@@ -23,3 +23,15 @@ class PortfolioDAO:
         current_price: Optional[Decimal] = None,
     ) -> PortfolioDTO:
         pass
+
+    @abstractmethod
+    def reserve_holdings(
+        self, client_id: UUID, symbol: str, quantity: int
+    ) -> PortfolioDTO:
+        pass
+
+    @abstractmethod
+    def release_holdings(
+        self, client_id: UUID, symbol: str, quantity: int
+    ) -> PortfolioDTO:
+        pass

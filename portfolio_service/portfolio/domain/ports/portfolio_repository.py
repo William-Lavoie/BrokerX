@@ -53,6 +53,14 @@ class PortfolioRepository:
     ) -> Portfolio:
         pass
 
+    @abstractmethod
+    def reserve_holdings(self, client_id: UUID, symbol: str, quantity: int) -> None:
+        pass
+
+    @abstractmethod
+    def release_holdings(self, client_id: UUID, symbol: str, quantity: int) -> None:
+        pass
+
     def get_holding_from_dto(self, holding_dto) -> Holding:
         return Holding(
             client_id=holding_dto.client_id,
