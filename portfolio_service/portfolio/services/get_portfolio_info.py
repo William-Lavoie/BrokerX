@@ -1,9 +1,9 @@
 import logging
+from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from portfolio.domain.entities.portfolio import (Portfolio,
-                                                 PortfolioInvalidException)
+from portfolio.domain.entities.portfolio import Portfolio, PortfolioInvalidException
 from portfolio.domain.ports.portfolio_repository import PortfolioRepository
 
 from portfolio_service.exceptions import DataAccessException
@@ -39,7 +39,7 @@ class GetPortfolioInfoUseCase:
             )
 
             return GetPortfolioInfoUseCaseResult(
-                message=f"Successfully retrieved portfolio..",
+                message=f"Successfully retrieved portfolio.",
                 code=200,
                 portfolio=portfolio,
             )
@@ -47,6 +47,46 @@ class GetPortfolioInfoUseCase:
         except PortfolioInvalidException as stock_exception:
             logger.warning(
                 f"PortfolioInvalidException in GetPortfolioInfoUseCaseResult for client {client_id}"
+            )
+            return GetPortfolioInfoUseCaseResult(
+                message=stock_exception.user_message,
+                code=stock_exception.error_code,
+            )
+
+        except DataAccessException as data_access_exception:
+            return GetPortfolioInfoUseCaseResult(
+                message=data_access_exception.user_message,
+                code=data_access_exception.error_code,
+            )
+
+    def buy_holdings(
+        self,
+        client_id: UUID,
+        symbol: str,
+        name: str,
+        quantity: int,
+        buying_price: Decimal,
+        current_price: Optional[Decimal] = None,
+    ) -> GetPortfolioInfoUseCaseResult:
+        try:
+            portfolio = self.portfolio_repository.buy_holdings(
+                client_id=client_id,
+                symbol=symbol,
+                name=name,
+                quantity=quantity,
+                buying_price=buying_price,
+                current_price=current_price,
+            )
+
+            return GetPortfolioInfoUseCaseResult(
+                message=f"Successfully updated holding {symbol} in portfolio.",
+                code=200,
+                portfolio=portfolio,
+            )
+
+        except PortfolioInvalidException as stock_exception:
+            logger.warning(
+                f"PortfolioInvalidException in SetHoldingUseCase for client {client_id}"
             )
             return GetPortfolioInfoUseCaseResult(
                 message=stock_exception.user_message,

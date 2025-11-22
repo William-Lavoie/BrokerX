@@ -2,6 +2,7 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models.manager import RelatedManager
 
 
 class Portfolio(models.Model):
@@ -15,6 +16,8 @@ class Portfolio(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     performance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+
+    holdings: RelatedManager["Holdings"]
 
 
 class Holdings(models.Model):
@@ -36,6 +39,9 @@ class Holdings(models.Model):
         validators=[MinValueValidator(0.00)],
     )
     performance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    reserved_for_sale = models.IntegerField(
+        default=0, validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         constraints = [

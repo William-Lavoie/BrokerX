@@ -1,8 +1,10 @@
+from decimal import Decimal
+from typing import Optional
 from uuid import UUID
 
 from portfolio.adapters.dao.mysql_portfolio_dao import MySQLPortfolioDAO
+from portfolio.domain.entities.portfolio import Portfolio
 from portfolio.domain.ports.portfolio_repository import PortfolioRepository
-from portfolio.models import Portfolio
 
 from portfolio_service.exceptions import DataAccessException
 
@@ -24,5 +26,30 @@ class DjangoPortfolioRepository(PortfolioRepository):
         # self.redis.set_wallet_balance(
         #    client_id=client_id, balance=wallet_dto.balance
         # )
+
+        return self.get_portfolio_from_dto(portfolio_dto)
+
+    def buy_holdings(
+        self,
+        client_id: UUID,
+        symbol: str,
+        name: str,
+        quantity: int,
+        buying_price: Decimal,
+        current_price: Optional[Decimal] = None,
+    ) -> Portfolio:
+        portfolio_dto = self.dao.buy_holdings(
+            client_id=client_id,
+            symbol=symbol,
+            name=name,
+            quantity=quantity,
+            buying_price=buying_price,
+            current_price=current_price,
+        )
+
+        if not portfolio_dto.success:
+            raise DataAccessException(
+                user_message="An unexpected error occured while trying to set your holding."
+            )
 
         return self.get_portfolio_from_dto(portfolio_dto)

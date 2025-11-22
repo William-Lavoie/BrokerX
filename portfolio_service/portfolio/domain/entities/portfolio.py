@@ -53,11 +53,7 @@ class Portfolio:
     def from_dict(cls, data: dict):
         return cls(
             client_id=UUID(data["client_id"]),
-            value=Decimal(data["value"]) if data.get("value") is not None else None,
-            performance=(
-                Decimal(data["performance"])
-                if data.get("performance") is not None
-                else None
-            ),
-            holdings=[Holding().from_dict(holding) for holding in data["holdings"]],
+            value=Decimal(data["value"]),
+            performance=(Decimal(data["performance"])),
+            holdings=[Holding.from_dict(holding) for holding in data["holdings"]],
         )

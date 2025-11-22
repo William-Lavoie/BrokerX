@@ -11,14 +11,14 @@ from portfolio.domain.entities.portfolio import Portfolio
 
 @dataclass
 class HoldingDTO(Result):
-    code: int
     client_id: UUID
     symbol: str = ""
     name: str = ""
     quantity: int = 0
-    buying_price: Optional[Decimal] = (None,)
-    current_price: Optional[Decimal] = (None,)
-    performance: Optional[Decimal] = (None,)
+    buying_price: Optional[Decimal] = None
+    current_price: Optional[Decimal] = None
+    performance: Optional[Decimal] = None
+    reserved_for_sale: int = 0
 
 
 class PortfolioDTO(Result):
@@ -27,7 +27,7 @@ class PortfolioDTO(Result):
         code: int,
         client_id: UUID,
         value: Decimal = Decimal("0.00"),
-        holdings: list[Holding] = [],
+        holdings: list[HoldingDTO] = [],
         performance: Decimal = Decimal("0.00"),
     ):
         super().__init__(code=code, client_id=client_id)
@@ -38,7 +38,19 @@ class PortfolioDTO(Result):
 
 class PortfolioRepository:
     @abstractmethod
-    def get_portfolio(self, client_id: UUID) -> PortfolioDTO:
+    def get_portfolio(self, client_id: UUID) -> Portfolio:
+        pass
+
+    @abstractmethod
+    def buy_holdings(
+        self,
+        client_id: UUID,
+        symbol: str,
+        name: str,
+        quantity: int,
+        buying_price: Decimal,
+        current_price: Optional[Decimal] = None,
+    ) -> Portfolio:
         pass
 
     def get_holding_from_dto(self, holding_dto) -> Holding:
@@ -70,3 +82,9 @@ def calculate_avg_price(
     total_quantity = Decimal(initial_quantity + new_quantity)
 
     return total_price / total_quantity
+
+
+def calculate_holding_performance(
+    buying_price: Decimal, current_price: Decimal
+) -> Decimal:
+    return (current_price - buying_price) / buying_price
