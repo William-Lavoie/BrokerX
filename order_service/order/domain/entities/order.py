@@ -14,7 +14,7 @@ class OrderDTO(Result):
     client_id: Optional[UUID] = None
     symbol: str = ""
     order_type: str = ""
-    order_style: str = ("",)
+    order_style: str = ""
     order_duration: str = ""
     quantity: int = 0
     quantity_executed: int = 0

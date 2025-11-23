@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from order.adapters.django_order_repository import DjangoOrderRepository
+from order.adapters.portfolio_service import PortfolioService
 from order.adapters.stock_service import StockService
 from order.adapters.wallet_service import WalletService
 from order.services.place_order import PlaceOrderUseCase
@@ -54,7 +55,10 @@ class OrderView(APIView):
         idempotency_key = request.headers.get("Idempotency-Key")
 
         use_case = PlaceOrderUseCase(
-            DjangoOrderRepository(), StockService(), WalletService()
+            order_repository=DjangoOrderRepository(),
+            stock_repository=StockService(),
+            wallet_repository=WalletService(),
+            portfolio_repository=PortfolioService(),
         )
 
         result = use_case.execute(

@@ -6,9 +6,12 @@ from uuid import UUID
 
 from order.domain.entities.order import Order, OrderInvalidException
 from order.domain.ports.order_repository import OrderRepository
+from order.domain.ports.portfolio_repository import (
+    PortfolioException,
+    PortfolioRepository,
+)
 from order.domain.ports.stock_repository import StockException, StockRepository
-from order.domain.ports.wallet_repository import (WalletException,
-                                                  WalletRepository)
+from order.domain.ports.wallet_repository import WalletException, WalletRepository
 
 from order_service.exceptions import DataAccessException
 from order_service.use_case_results import UseCaseResult
@@ -38,10 +41,12 @@ class PlaceOrderUseCase:
     def __init__(
         self,
         order_repository: OrderRepository,
+        portfolio_repository: Optional[PortfolioRepository] = None,
         stock_repository: Optional[StockRepository] = None,
         wallet_repository: Optional[WalletRepository] = None,
     ):
         self.order_repository = order_repository
+        self.portfolio_repository = portfolio_repository
         self.stock_repository = stock_repository
         self.wallet_repository = wallet_repository
 
@@ -85,7 +90,10 @@ class PlaceOrderUseCase:
                     quantizer, rounding=ROUND_HALF_UP
                 )
 
-            self.wallet_repository.reserve_funds(order=order)
+            if order_type == "BUY":
+                self.wallet_repository.reserve_funds(order=order)
+            elif order_type == "SELL":
+                self.portfolio_repository.reserve_holdings(order=order)
 
             self.order_repository.add_order(
                 order=order, idempotency_key=idempotency_key
@@ -119,6 +127,13 @@ class PlaceOrderUseCase:
             return PlaceOrderUseCaseResult(
                 message=stock_exception.user_message,
                 code=stock_exception.error_code,
+            )
+
+        except PortfolioException as portfolio_exception:
+            logger.error(portfolio_exception.log_message, exc_info=True)
+            return PlaceOrderUseCaseResult(
+                message=portfolio_exception.user_message,
+                code=portfolio_exception.error_code,
             )
 
         except DataAccessException as data_access_exception:
