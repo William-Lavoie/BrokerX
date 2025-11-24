@@ -13,7 +13,7 @@ class BaseOTPRepository(OTPRepository):
         secret = self.generate_passcode()
         passcode = pyotp.TOTP(s=secret, interval=600, digits=6)
 
-        if not self.send_passcode(client_id, email, passcode.now()):
+        if not self.send_passcode(email, passcode.now()):
             return OTPDTO(success=False, code=500)
 
         if not self.register_secret(client_id, secret):

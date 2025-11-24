@@ -19,9 +19,7 @@ class OTPRepository(ABC):
         pass
 
     @abstractmethod
-    def send_passcode(
-        self, client_id: Optional[UUID], email: str, passcode: str
-    ) -> bool:
+    def send_passcode(self, email: str, passcode: str) -> bool:
         pass
 
     @abstractmethod

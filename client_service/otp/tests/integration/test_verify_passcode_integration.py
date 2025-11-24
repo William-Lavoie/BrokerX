@@ -47,5 +47,4 @@ def test_execute():
     )
 
     assert result.code == 200
-    assert result.success
-    assert result.message == "You have entered the correct passcode"
+    assert result.message == "You have entered the correct passcode."

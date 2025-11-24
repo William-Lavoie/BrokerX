@@ -47,7 +47,7 @@ class MySQLOTPDAO(OTPDAO):
 
                 ClientCreationAudit.objects.create(
                     user=User.objects.get(uuid=client_id),
-                    action=("FAILED_ACTIVATION"),
+                    action=("FAILED_VALIDATION"),
                     metadata={"number_attemps": attempts},
                 )
 

@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from client.domain.entities.client import ClientStatus
@@ -23,13 +24,11 @@ class VerifyPassCode:
         if not otp_dto.success:
             if otp_dto.attempts >= 3:
                 return UseCaseResult(
-                    success=False,
                     message="You have made 3 attempts, the passcode has been disabled. You must ask for a new passcode.",
                     code=422,
                 )
             return UseCaseResult(
-                success=False,
-                message=f"Wrong passcode. Attempts left : {3-otp_dto.attempts}",
+                message=f"Wrong passcode. Attempts left : {3-otp_dto.attempts}.",
                 code=422,
             )
 
@@ -39,14 +38,12 @@ class VerifyPassCode:
 
         if not result.success:
             return UseCaseResult(
-                success=False,
                 message="There was an error, please try again.",
                 code=500,
             )
 
         return UseCaseResult(
-            success=True,
-            message="You have entered the correct passcode",
+            message="You have entered the correct passcode.",
             code=200,
         )
 
@@ -55,14 +52,12 @@ class VerifyPassCode:
 
         if otp_dto.success:
             return UseCaseResult(
-                success=True,
-                message="The passcode was sent to your email",
+                message="The passcode was sent to your email.",
                 code=201,
             )
 
         else:
             return UseCaseResult(
-                success=False,
                 message="There was an error, please try again.",
                 code=500,
             )

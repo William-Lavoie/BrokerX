@@ -24,7 +24,7 @@ def test_send_passcode(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.return_value = 1
 
-    assert repo.send_passcode("test", "john_smith@example.com", "123abc")
+    assert repo.send_passcode("john_smith@example.com", "123abc")
     mock_send_mail.assert_called_once_with(
         "Here is your passcode: ",
         "123abc",
@@ -39,7 +39,7 @@ def test_send_passcode_failure(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.return_value = 0
 
-    assert not repo.send_passcode("test", "john_smith@example.com", "123abc")
+    assert not repo.send_passcode("john_smith@example.com", "123abc")
 
 
 @patch("otp.adapters.email_otp_repository.send_mail")
@@ -47,7 +47,7 @@ def test_send_passcode_exception(mock_send_mail):
     repo = EmailOTPRepository()
     mock_send_mail.side_effect = Exception("Server error")
 
-    assert not repo.send_passcode("test", "john_smith@example.com", "123abc")
+    assert not repo.send_passcode("john_smith@example.com", "123abc")
 
 
 @patch("otp.adapters.email_otp_repository.pyotp.TOTP")

@@ -19,13 +19,19 @@ class OTPView(APIView):
 
         passcode = data["passcode"]
 
-        use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
+        use_case = VerifyPassCode(
+            otp_repository=EmailOTPRepository(),
+            client_repository=DjangoClientRepository(),
+        )
         result = use_case.execute(request.user.uuid, request.user.email, passcode)
 
         return JsonResponse(data=result.to_dict(), status=result.code)
 
     def put(self, request):
-        use_case = VerifyPassCode(EmailOTPRepository(), DjangoClientRepository())
+        use_case = VerifyPassCode(
+            otp_repository=EmailOTPRepository(),
+            client_repository=DjangoClientRepository(),
+        )
         result = use_case.generate_passcode(request.user.uuid, request.user.email)
 
         return JsonResponse(data=result.to_dict(), status=result.code)

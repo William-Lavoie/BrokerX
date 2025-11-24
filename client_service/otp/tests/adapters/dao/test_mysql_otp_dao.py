@@ -1,5 +1,5 @@
 import pytest
-from client.models import User
+from client.models import ClientCreationAudit, User
 from otp.models import OTP
 
 pytestmark = pytest.mark.django_db
@@ -91,6 +91,8 @@ def test_increment_attempts():
     client_otp = OTP.objects.get(client_id="fc6a8193-d8a7-4b43-aa5c-63a376a89e60")
     assert client_otp.number_attempts == 1
 
+    assert ClientCreationAudit.objects.filter(action="FAILED_VALIDATION").count() == 1
+
 
 def test_increment_attempts_maximum():
     dao = MySQLOTPDAO()
@@ -104,7 +106,11 @@ def test_increment_attempts_maximum():
     assert result.attempts == 3
     assert not result.validated
 
-    assert not OTP.objects.filter(client_id="fc6a8193-d8a7-4b43-aa5c-63a376a89e60")
+    assert (
+        OTP.objects.filter(client_id="fc6a8193-d8a7-4b43-aa5c-63a376a89e60").count()
+        == 0
+    )
+    assert ClientCreationAudit.objects.filter(action="FAILED_VALIDATION").count() == 1
 
 
 def test_increment_attempts_no_user():
@@ -115,3 +121,5 @@ def test_increment_attempts_no_user():
     assert not result.success
     assert result.code == 404
     assert not result.validated
+
+    assert ClientCreationAudit.objects.filter(action="FAILED_VALIDATION").count() == 0

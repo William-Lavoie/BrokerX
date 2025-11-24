@@ -19,7 +19,6 @@ def test_execute():
         password="securepassword",
     )
 
-    assert result.success
     assert result.message == "The user was successfully created"
 
     user = User.objects.get(email="john@example.com")
