@@ -34,7 +34,6 @@ class RedisClient:
 
             if client_json:
                 client_dict = json.loads(client_json.decode())
-                logger.error("REDIS WORKS")
                 return Client.from_dict(client_dict)
             else:
                 return None

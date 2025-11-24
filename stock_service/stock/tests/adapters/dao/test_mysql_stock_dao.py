@@ -2,7 +2,6 @@ from decimal import Decimal
 
 import pytest
 from stock.adapters.dao.mysql_stock_dao import MySQLStockDAO
-from stock.domain.ports.stock_repository import StockDTO
 from stock.models import Stock
 
 pytestmark = pytest.mark.django_db

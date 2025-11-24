@@ -3,7 +3,7 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 from client.adapters.dao.mysql_client_dao import MySQLClientDAO
-from client.models import Client, User
+from client.models import Client, ClientCreationAudit, User
 
 
 @pytest.fixture(autouse=True)
@@ -81,6 +81,15 @@ def test_add_client():
     assert saved_client.phone_number == "514-872-1231"
     assert saved_client.status == "PENDING"
 
+    client_audit = ClientCreationAudit.objects.filter(
+        action="CLIENT_CREATED", user=saved_client.user
+    )
+    assert client_audit.count() == 1
+    assert client_audit.first().action == "CLIENT_CREATED"
+    assert client_audit.first().user == saved_client.user
+    assert client_audit.first().timestamp is not None
+    assert client_audit.first().metadata is not None
+
 
 def test_add_client_email_already_used():
     dao = MySQLClientDAO()
@@ -123,6 +132,33 @@ def test_update_client_status():
 
     client = Client.objects.get(email="john_smith@example.com")
     assert client.status == "ACTIVE"
+
+    client_audit = ClientCreationAudit.objects.filter(
+        action="CLIENT_ACTIVATED", user=client.user
+    )
+    assert client_audit.count() == 1
+    assert client_audit.first().action == "CLIENT_ACTIVATED"
+    assert client_audit.first().user == client.user
+    assert client_audit.first().timestamp is not None
+    assert client_audit.first().metadata is not None
+
+
+def test_update_client_status_rejected():
+    dao = MySQLClientDAO()
+    result = dao.update_status("john_smith@example.com", "REJECTED")
+    assert result.success
+    assert result.code == 200
+    client = Client.objects.get(email="john_smith@example.com")
+    assert client.status == "REJECTED"
+
+    client_audit = ClientCreationAudit.objects.filter(
+        action="CLIENT_REJECTED", user=client.user
+    )
+    assert client_audit.count() == 1
+    assert client_audit.first().action == "CLIENT_REJECTED"
+    assert client_audit.first().user == client.user
+    assert client_audit.first().timestamp is not None
+    assert client_audit.first().metadata is not None
 
 
 def test_update_status_no_user():

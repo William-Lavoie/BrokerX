@@ -15,8 +15,6 @@ class OTPView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        logger.error(request.body)
-        logger.error(request.headers)
         data = json.loads(request.body)
 
         passcode = data["passcode"]

@@ -44,63 +44,58 @@ class MySQLClientDAO(ClientDAO):
         address: str,
         password: str,
     ) -> ClientDTO:
-        try:
-            existing_user = Client.objects.filter(
-                Q(email=email) | Q(phone_number=phone_number)
-            ).exists()
+        existing_user = Client.objects.filter(
+            Q(email=email) | Q(phone_number=phone_number)
+        ).exists()
 
-            if existing_user:
-                logger.warning(
-                    f"There is already a user with the same email address ({email}) or phone number ({phone_number})"
-                )
-                return ClientDTO(success=False, code=409)
+        if existing_user:
+            logger.warning(
+                f"There is already a user with the same email address ({email}) or phone number ({phone_number})"
+            )
+            return ClientDTO(success=False, code=409)
 
-            with transaction.atomic():
-                user = User.objects.create(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    username=email,
-                )
-                user.set_password(password)
-                user.save()
+        with transaction.atomic():
+            user = User.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                username=email,
+            )
+            user.set_password(password)
+            user.save()
 
-                client = Client.objects.create(
-                    user=user,
-                    client_id=user.uuid,
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    phone_number=phone_number,
-                    birth_date=birth_date,
-                    address=address,
-                    status="PENDING",
-                )
+            client = Client.objects.create(
+                user=user,
+                client_id=user.uuid,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone_number=phone_number,
+                birth_date=birth_date,
+                address=address,
+                status="PENDING",
+            )
 
-                client_dto = ClientDTO(
-                    success=True,
-                    code=201,
-                    first_name=client.first_name,
-                    last_name=client.last_name,
-                    address=client.address,
-                    birth_date=client.birth_date,
-                    email=client.email,
-                    phone_number=client.phone_number,
-                    status=client.status,
-                    client_id=client.client_id,
-                )
+            client_dto = ClientDTO(
+                success=True,
+                code=201,
+                first_name=client.first_name,
+                last_name=client.last_name,
+                address=client.address,
+                birth_date=client.birth_date,
+                email=client.email,
+                phone_number=client.phone_number,
+                status=client.status,
+                client_id=client.client_id,
+            )
 
-                ClientCreationAudit.objects.create(
-                    user=user,
-                    action="CLIENT_CREATED",
-                    metadata=json.dumps(client_dto.to_dict()),
-                )
+            ClientCreationAudit.objects.create(
+                user=user,
+                action="CLIENT_CREATED",
+                metadata=json.dumps(client_dto.to_dict()),
+            )
 
-            return client_dto
-
-        except AttributeError as e:
-            logger.error(f"The request is invalid: {e}")
-            return ClientDTO(success=False, code=400)
+        return client_dto
 
     def update_status(self, email: str, new_status: str) -> ClientDTO:
         try:
@@ -111,7 +106,9 @@ class MySQLClientDAO(ClientDAO):
 
             ClientCreationAudit.objects.create(
                 user=client.user,
-                action=("CLIENT_ACTIVATED" if "ACTIVE" else "CLIENT_REJECTED"),
+                action=(
+                    "CLIENT_ACTIVATED" if new_status == "ACTIVE" else "CLIENT_REJECTED"
+                ),
             )
 
             return ClientDTO(success=True, code=200)

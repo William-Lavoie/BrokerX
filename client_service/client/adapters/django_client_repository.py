@@ -1,8 +1,8 @@
 from client.adapters.dao.mysql_client_dao import MySQLClientDAO
 from client.adapters.redis.redis_client import RedisClient
+
 #
-from client.domain.entities.client import (Client, ClientInvalidException,
-                                           ClientStatus)
+from client.domain.entities.client import Client, ClientInvalidException, ClientStatus
 from client.domain.ports.client_repository import ClientRepository
 from client.domain.ports.dao.client_dao import ClientDTO
 
@@ -21,7 +21,7 @@ class DjangoClientRepository(ClientRepository):
             return redis_client
 
         else:
-            client_dto: ClientDTO = self.dao.get_client_by_email(email)
+            client_dto: ClientDTO = self.dao.get_client_by_email(email=email)
             if not client_dto.success:
                 if client_dto.code == 404:
                     raise ClientInvalidException(error_code=404)
