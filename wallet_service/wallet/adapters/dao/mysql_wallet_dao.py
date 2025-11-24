@@ -15,7 +15,9 @@ class MySQLWalletDAO(WalletDAO):
         with transaction.atomic():
             wallet, created = Wallet.objects.get_or_create(client_id=client_id)
 
-            return WalletDTO(success=True, code=200, balance=wallet.balance)
+            return WalletDTO(
+                success=True, code=201 if created else 200, balance=wallet.balance
+            )
 
     def add_funds(self, client_id: UUID, amount: Decimal) -> WalletDTO:
         with transaction.atomic():
@@ -49,7 +51,7 @@ class MySQLWalletDAO(WalletDAO):
                 f"IntegrityError: client {client_id} already has a reservation for order {order_id},",
                 exc_info=True,
             )
-            return Wallet(success=False, code=409)
+            return WalletDTO(success=False, code=409)
 
     def release_funds(self, client_id: UUID, order_id: UUID) -> WalletDTO:
         try:
@@ -62,4 +64,4 @@ class MySQLWalletDAO(WalletDAO):
 
         except:
             logger.error("An unexpected error occured", exc_info=True)
-            return Wallet(success=False, code=500)
+            return WalletDTO(success=False, code=500)

@@ -2,7 +2,6 @@ from decimal import Decimal
 
 import pytest
 from wallet.adapters.dao.mysql_wallet_dao import MySQLWalletDAO
-from wallet.domain.ports.dao.wallet_dao import WalletDTO
 
 pytestmark = pytest.mark.django_db
 
@@ -34,7 +33,7 @@ def test_get_balance_no_user():
     wallet_dto = dao.get_balance("820b220d-5967-4597-a584-a5e853c0521c")
 
     assert wallet_dto.success
-    assert wallet_dto.code == 200
+    assert wallet_dto.code == 201
     assert wallet_dto.balance == Decimal("0.00")
 
 
