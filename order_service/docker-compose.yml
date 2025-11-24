@@ -9,6 +9,11 @@ services:
       DB_USER: user
       DB_PASSWORD: pass
       DB_NAME: order_db
+      KAFKA_HOST: kafka:9092
+      KAFKA_TOPIC: order-saga-events
+      KAFKA_GROUP_ID: order-saga-group
+      KAFKA_AUTO_OFFSET_RESET: earliest
+      LOG_LEVEL: INFO
     ports:
       - "8002:8002"
     expose:

@@ -1,9 +1,11 @@
+import json
 import logging
 from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 from uuid import UUID
 
+from order.adapters.kafka.order_event_producer import OrderEventProducer
 from order.domain.entities.order import Order, OrderInvalidException
 from order.domain.ports.order_repository import OrderRepository
 from order.domain.ports.portfolio_repository import (
@@ -14,6 +16,7 @@ from order.domain.ports.stock_repository import StockException, StockRepository
 from order.domain.ports.wallet_repository import WalletException, WalletRepository
 
 from order_service.exceptions import DataAccessException
+from order_service.settings import KAFKA_TOPIC
 from order_service.use_case_results import UseCaseResult
 
 logger = logging.getLogger("order")
@@ -98,6 +101,28 @@ class PlaceOrderUseCase:
             self.order_repository.add_order(
                 order=order, idempotency_key=idempotency_key
             )
+
+            event_data = {
+                "event": "OrderCreated",
+                "order_id": str(order.order_id),
+                "client_id": str(order.client_id),
+                "price": str(order.price),
+                "quantity": order.quantity,
+                "symbol": order.symbol,
+                "order_type": order.order_type,
+                "order_style": order.order_style,
+                "order_duration": order.order_duration,
+                "end_date": order.end_date,
+            }
+
+            serialized_data = json.dumps(event_data).encode("utf-8")
+            logger.error(f"Serialized event data size: {len(serialized_data)} bytes")
+
+            try:
+                OrderEventProducer().get_instance().send(KAFKA_TOPIC, value=event_data)
+                logger.error(f"Message sent successfully to {KAFKA_TOPIC}")
+            except Exception as e:
+                logger.error(f"Failed to send message: {str(e)}")
 
             return PlaceOrderUseCaseResult(
                 message="The order was placed successfully.",

@@ -190,6 +190,13 @@ LOGGING = {
             "maxBytes": 5_000_000,
             "backupCount": 5,
         },
+        "kafka_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "kafka.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
     },
     "loggers": {
         "django.server": {
@@ -212,6 +219,11 @@ LOGGING = {
             "level": "WARNING",
             "propagate": False,
         },
+        "kafka": {
+            "handlers": ["console", "kafka_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
     },
     "root": {
         "handlers": ["console", "order_error_file"],
@@ -225,3 +237,9 @@ REDIS_CONFIG = {
     "db": 0,
     "max_connections": 10,
 }
+
+KAFKA_HOST = os.getenv("KAFKA_HOST")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+KAFKA_GROUP_ID = os.getenv("KAFKA_GROUP_ID")
+KAFKA_AUTO_OFFSET_RESET = os.getenv("KAFKA_AUTO_OFFSET_RESET")
+LOG_LEVEL = os.getenv("LOG_LEVEL")
