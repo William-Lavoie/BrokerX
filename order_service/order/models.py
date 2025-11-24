@@ -69,7 +69,7 @@ class Order(models.Model):
 
 
 class OrderExecution(models.Model):
-    order = models.ForeignKey(
+    orders = models.ManyToOneRel(
         Order, on_delete=models.CASCADE, related_name="executions"
     )
     quantity = models.IntegerField(validators=[MinValueValidator(1)])
@@ -82,8 +82,6 @@ class OrderExecution(models.Model):
 class OrderAudit(models.Model):
     ACTIONS = [
         ("ORDER_PLACED", "Order Placed"),
-        ("ORDER_EXECUTED", "Order Executed"),
-        ("ORDER_PARTIALLY_EXECUTED", "Order Partially Executed"),
         ("ORDER_REJECTED", "Order Rejected"),
         ("ORDER_FAILED", "Order Failed"),
     ]

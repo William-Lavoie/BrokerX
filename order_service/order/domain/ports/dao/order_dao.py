@@ -42,3 +42,11 @@ class OrderDAO:
         self, client_id: UUID, order_id: UUID, previous_status: str
     ) -> None:
         pass
+
+    @abstractmethod
+    def get_potential_matches(self, order) -> list[OrderDTO]:
+        pass
+
+    @abstractmethod
+    def execute_order(self, order, matching_orders: list[OrderDTO]) -> dict:
+        pass

@@ -25,6 +25,7 @@ class OrderCreatedHandler(EventHandler):
         order_event_producer = OrderEventProducer()
         try:
             logger.error(f"Handling OrderCreated event: {event_data}")
+
             event_data["event"] = "StockDecreased"
         except Exception as e:
 

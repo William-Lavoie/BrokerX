@@ -8,7 +8,6 @@ import json
 import logging
 
 from kafka import KafkaProducer
-from order_service.settings import KAFKA_HOST
 from order_service.singleton import Singleton
 
 logger = logging.getLogger("order")

@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from order.domain.entities.order import OrderDTO
 from order.domain.ports.dao.order_dao import OrderDAO
-from order.models import Order, OrderAudit
+from order.models import Order, OrderAudit, OrderExecution
 
 logger = logging.getLogger("mysql")
 
@@ -89,41 +89,6 @@ class MySQLOrderDAO(OrderDAO):
                 exc_info=True,
             )
             return OrderDTO(success=False, code=500)
-
-    def find_matching_orders(
-        self,
-        client_id: UUID,
-        symbol: str,
-        direction: str,
-        quantity: int,
-        limit: Decimal,
-    ):
-        try:
-            new_direction = "B" if direction == "sell" else "S"
-
-            with transaction.atomic():
-                orders = Order.objects.filter(
-                    symbol=symbol, direction=new_direction
-                ).exclude(client_id=client_id)
-                return [
-                    OrderDTO(
-                        success=True,
-                        code=200,
-                        direction=order.direction,
-                        limit=order.limit,
-                        initial_quantity=order.initial_quantity,
-                        remaining_quantity=order.remaining_quantity,
-                        order_id=order.order_id,
-                    )
-                    for order in orders
-                ]
-
-        except ObjectDoesNotExist as e:
-            logger.error(
-                f"ObjectDoesNotExist exception : {e}",
-                exc_info=True,
-            )
-            return OrderDTO(success=False, code=404)
 
     def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
         try:
@@ -210,3 +175,112 @@ class MySQLOrderDAO(OrderDAO):
                 f"ObjectDoesNotExist exception : {e}",
                 exc_info=True,
             )
+
+    def get_potential_matches(self, order: Order) -> list[OrderDTO]:
+        try:
+            with transaction.atomic():
+                orders = Order.objects.filter(
+                    stock_symbol=order.stock_symbol,
+                    order_type=("SELL" if order.order_type == "BUY" else "BUY"),
+                    status="PENDING" or "PARTIALLY_EXECUTED",
+                ).exclude(client_id=order.client_id)
+                return [
+                    OrderDTO(
+                        success=True,
+                        code=200,
+                        order_id=order.order_id,
+                        client_id=order.client_id,
+                        symbol=order.stock_symbol,
+                        order_type=order.order_type,
+                        order_style=order.order_style,
+                        order_duration=order.order_duration,
+                        quantity=order.quantity,
+                        quantity_executed=order.quantity_executed,
+                        price=order.price,
+                        end_date=order.order_end_date,
+                        status=order.status,
+                        created_at=order.created_at,
+                        updated_at=order.updated_at,
+                        executed_at=order.executed_at,
+                    )
+                    for order in orders
+                ]
+
+        except Exception as e:
+            logger.error(
+                f"Exception occurred while retrieving potential matches for order {order.order_id}: {e}",
+                exc_info=True,
+            )
+            return OrderDTO(success=False, code=500)
+
+    def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
+        try:
+            orders_matched = {}
+            with transaction.atomic():
+
+                for match in matching_orders:
+                    trade_quantity = min(
+                        order.quantity - order.quantity_executed,
+                        match.quantity - match.quantity_executed,
+                    )
+
+                    order.quantity_executed += trade_quantity
+                    match.quantity_executed += trade_quantity
+
+                    if match.quantity_executed == match.quantity:
+                        match.status = "EXECUTED"
+                        match.executed_at = datetime.now()
+                    else:
+                        match.status = "PARTIALLY_EXECUTED"
+
+                    if order.quantity_executed == order.quantity:
+                        order.status = "EXECUTED"
+                        order.executed_at = datetime.now()
+                    else:
+                        order.status = "PARTIALLY_EXECUTED"
+
+                    match.updated_at = datetime.now()
+                    order.updated_at = datetime.now()
+
+                    orders_matched[match.order_id] = {
+                        "trade_quantity": trade_quantity,
+                        "price": match.price,
+                    }
+
+                    OrderExecution.objects.create(
+                        orders=(match, order),
+                        quantity=trade_quantity,
+                        price=match.price,
+                        buyer_client_id=(
+                            order.client_id
+                            if order.order_type == "BUY"
+                            else match.client_id
+                        ),
+                        seller_client_id=(
+                            order.client_id
+                            if order.order_type == "SELL"
+                            else match.client_id
+                        ),
+                    )
+
+                    Order.objects.filter(order_id=match.order_id).update(
+                        quantity_executed=match.quantity_executed,
+                        status=match.status,
+                        executed_at=match.executed_at,
+                        updated_at=match.updated_at,
+                    )
+                    Order.objects.filter(order_id=order.order_id).update(
+                        quantity_executed=order.quantity_executed,
+                        status=order.status,
+                        executed_at=order.executed_at,
+                        updated_at=order.updated_at,
+                    )
+
+            return orders_matched
+
+        except Exception as e:
+            logger.error(
+                f"Exception occurred while executing order {order.order_id}: {e}",
+                exc_info=True,
+            )
+            return []

@@ -39,22 +39,6 @@ class DjangoOrderRepository(OrderRepository):
             order.update_from_dto(order_dto=order_dto)
             self.redis.set_order(order.client_id, order)
 
-    def find_matching_orders(self, order: Order) -> list[OrderDTO]:
-        redis_orders = redis_get_orders_by_stock(order.stock.symbol)
-        if redis_orders:
-            return redis_orders
-
-        matching_order_dtos = self.dao.find_matching_orders(
-            email=order.client.email,
-            symbol=order.stock.symbol,
-            direction=order.direction,
-            limit=order.limit,
-        )
-
-        return [
-            super().get_order_from_dto(order_dto) for order_dto in matching_order_dtos
-        ]
-
     def get_orders_by_client(self, client_id: UUID) -> list[Order]:
         # redis_orders = self.redis.get_orders_by_client(client_id=client_id)
         # if redis_orders:
@@ -86,3 +70,11 @@ class DjangoOrderRepository(OrderRepository):
         self.dao.delete_order_rollback(
             client_id=client_id, order_id=order_id, previous_status=previous_status
         )
+
+    def get_potential_matches(self, order: Order) -> list[Order]:
+        matching_order_dtos = self.dao.get_potential_matches(order)
+
+        return [dto.get_order_from_dto() for dto in matching_order_dtos]
+
+    def execute_order(self, order: Order) -> dict:
+        return self.dao.execute_order(order)

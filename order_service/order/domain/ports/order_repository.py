@@ -26,3 +26,11 @@ class OrderRepository:
         self, client_id: UUID, order_id: UUID, previous_status: str
     ) -> None:
         pass
+
+    @abstractmethod
+    def get_potential_matches(self, order: Order) -> list[Order]:
+        pass
+
+    @abstractmethod
+    def execute_order(self, order: Order) -> dict:
+        pass
