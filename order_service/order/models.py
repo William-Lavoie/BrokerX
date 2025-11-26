@@ -69,9 +69,7 @@ class Order(models.Model):
 
 
 class OrderExecution(models.Model):
-    orders = models.ManyToOneRel(
-        Order, on_delete=models.CASCADE, related_name="executions"
-    )
+    orders = models.ManyToManyField(Order, related_name="executions")
     quantity = models.IntegerField(validators=[MinValueValidator(1)])
     price = models.DecimalField(max_digits=12, decimal_places=2)
     executed_at = models.DateTimeField(auto_now_add=True, editable=False)

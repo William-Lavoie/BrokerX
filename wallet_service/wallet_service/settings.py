@@ -222,3 +222,9 @@ REDIS_CONFIG = {
     "db": 0,
     "max_connections": 10,
 }
+
+KAFKA_HOST = os.getenv("KAFKA_HOST")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+KAFKA_GROUP_ID = os.getenv("KAFKA_GROUP_ID")
+KAFKA_AUTO_OFFSET_RESET = os.getenv("KAFKA_AUTO_OFFSET_RESET")
+LOG_LEVEL = os.getenv("LOG_LEVEL")

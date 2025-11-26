@@ -9,10 +9,10 @@ import logging
 import threading
 from typing import Optional
 
-from order.event_management.handler_registry import HandlerRegistry
+from wallet.event_management.handler_registry import HandlerRegistry
 
 from kafka import KafkaConsumer
-from order_service.singleton import Singleton
+from wallet_service.singleton import Singleton
 
 logger = logging.getLogger("kafka")
 

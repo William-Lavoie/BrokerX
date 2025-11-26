@@ -115,9 +115,6 @@ class PlaceOrderUseCase:
                 "end_date": order.end_date,
             }
 
-            serialized_data = json.dumps(event_data).encode("utf-8")
-            logger.error(f"Serialized event data size: {len(serialized_data)} bytes")
-
             try:
                 OrderEventProducer().get_instance().send(KAFKA_TOPIC, value=event_data)
                 logger.error(f"Message sent successfully to {KAFKA_TOPIC}")

@@ -4,13 +4,10 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from order.adapters.kafka.order_event_producer import OrderEventProducer
+from order.adapters.django_order_repository import DjangoOrderRepository
 from order.domain.entities.order import Order, OrderInvalidException
 
 from order_service.exceptions import DataAccessException
-from order_service.order.adapters.django_order_repository import DjangoOrderRepository
-from order_service.order.services.place_order import PlaceOrderUseCaseResult
-from order_service.settings import KAFKA_TOPIC
 from order_service.use_case_results import UseCaseResult
 
 logger = logging.getLogger("order")
@@ -22,14 +19,19 @@ class OrderMatchingUseCaseResult(UseCaseResult):
         message: str,
         code: int,
         orders: Optional[list[Order]] = None,
+        event_data: Optional[dict] = None,
     ):
         super().__init__(message=message, code=code)
         self.orders: Optional[list[Order]] = orders
+        self.event_data: Optional[dict] = event_data
 
     def to_dict(self):
         data = super().to_dict()
         if self.orders is not None:
             data["orders"] = [order.to_dict() for order in self.orders]
+
+        if self.event_data is not None:
+            data["event_data"] = self.event_data
 
         return data
 
@@ -94,29 +96,22 @@ class OrderMatchingUseCase:
             )
 
             event_data = {
-                "event_type": "ORDER_EXECUTED",
-                "data": {
-                    "order": order.to_dict(),
-                    "order_matched": orders_matched,
-                    "matching_orders": [order.to_dict() for order in matching_orders],
-                },
+                "event": "OrderMatched",
+                "order": order.to_dict(),
+                "order_matched": orders_matched,
+                "matching_orders": [order.to_dict() for order in matching_orders],
             }
-
-            try:
-                OrderEventProducer().get_instance().send(KAFKA_TOPIC, value=event_data)
-                logger.error(f"Message sent successfully to {KAFKA_TOPIC}")
-            except Exception as e:
-                logger.error(f"Failed to send message: {str(e)}")
 
             return OrderMatchingUseCaseResult(
                 message="The order was placed successfully.",
                 code=201,
                 orders=[order],
+                event_data=event_data,
             )
 
         except OrderInvalidException as order_invalid_exception:
             logger.error(
-                f"OrderInvalidException in PlaceOrderUseCase for client_id {client_id}: {order_invalid_exception.log_message}",
+                f"OrderInvalidException in OrderMatchingUseCase for client_id {client_id}: {order_invalid_exception.log_message}",
                 exc_info=True,
             )
             return OrderMatchingUseCaseResult(
@@ -125,8 +120,9 @@ class OrderMatchingUseCase:
             )
 
         except DataAccessException as data_access_exception:
-            self.wallet_repository.release_funds(
-                order_id=order.order_id, client_id=order.client_id
+            logger.error(
+                f"DataAccessException in OrderMatchingUseCase for client_id {client_id}: {data_access_exception.log_message}",
+                exc_info=True,
             )
             return OrderMatchingUseCaseResult(
                 message=data_access_exception.user_message,

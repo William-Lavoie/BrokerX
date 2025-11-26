@@ -151,14 +151,6 @@ class Order:
                     error_code=400,
                 )
 
-        if self.order_style == "MARKET":
-            if self.price is not None:
-                raise OrderInvalidException(
-                    user_message="The market order should not have a price.",
-                    log_message=f"Market order has unexpected price {self.price}.",
-                    error_code=400,
-                )
-
         if self.quantity_executed > self.quantity:
             raise OrderInvalidException(
                 user_message="The executed quantity cannot exceed the order quantity.",

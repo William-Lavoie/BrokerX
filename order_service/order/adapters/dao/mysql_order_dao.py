@@ -247,8 +247,21 @@ class MySQLOrderDAO(OrderDAO):
                         "price": match.price,
                     }
 
-                    OrderExecution.objects.create(
-                        orders=(match, order),
+                    matched_order = Order.objects.get(order_id=match.order_id)
+                    matched_order.quantity_executed = match.quantity_executed
+                    matched_order.status = match.status
+                    matched_order.executed_at = match.executed_at
+                    matched_order.updated_at = match.updated_at
+                    matched_order.save()
+
+                    order_instance = Order.objects.get(order_id=order.order_id)
+                    order_instance.quantity_executed = order.quantity_executed
+                    order_instance.status = order.status
+                    order_instance.executed_at = order.executed_at
+                    order_instance.updated_at = order.updated_at
+                    order_instance.save()
+
+                    execution = OrderExecution.objects.create(
                         quantity=trade_quantity,
                         price=match.price,
                         buyer_client_id=(
@@ -262,25 +275,20 @@ class MySQLOrderDAO(OrderDAO):
                             else match.client_id
                         ),
                     )
-
-                    Order.objects.filter(order_id=match.order_id).update(
-                        quantity_executed=match.quantity_executed,
-                        status=match.status,
-                        executed_at=match.executed_at,
-                        updated_at=match.updated_at,
-                    )
-                    Order.objects.filter(order_id=order.order_id).update(
-                        quantity_executed=order.quantity_executed,
-                        status=order.status,
-                        executed_at=order.executed_at,
-                        updated_at=order.updated_at,
-                    )
+                    execution.orders.set([order_instance, matched_order])
 
             return orders_matched
+
+        except ObjectDoesNotExist as e:
+            logger.error(
+                f"ObjectDoesNotExist exception : {e}",
+                exc_info=True,
+            )
+            return {}
 
         except Exception as e:
             logger.error(
                 f"Exception occurred while executing order {order.order_id}: {e}",
                 exc_info=True,
             )
-            return []
+            return {}
