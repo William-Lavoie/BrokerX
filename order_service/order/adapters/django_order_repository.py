@@ -76,5 +76,5 @@ class DjangoOrderRepository(OrderRepository):
 
         return [dto.get_order_from_dto() for dto in matching_order_dtos]
 
-    def execute_order(self, order: Order) -> dict:
-        return self.dao.execute_order(order)
+    def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
+        return self.dao.execute_order(order, matching_orders)

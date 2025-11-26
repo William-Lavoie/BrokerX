@@ -41,7 +41,7 @@ class OrderCreatedHandler(EventHandler):
             )
 
             event_data = result.event_data
-            logger.error(f"OrderMatchingUseCase result event_data: {event_data}")
+
             if event_data["orders_matched"] == []:
                 event_data["event"] = "OrderExecutionCompleted"
             else:

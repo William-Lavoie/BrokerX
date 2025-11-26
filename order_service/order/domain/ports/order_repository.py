@@ -32,5 +32,5 @@ class OrderRepository:
         pass
 
     @abstractmethod
-    def execute_order(self, order: Order) -> dict:
+    def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
         pass

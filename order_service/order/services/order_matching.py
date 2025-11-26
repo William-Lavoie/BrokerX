@@ -100,7 +100,7 @@ class OrderMatchingUseCase:
             event_data = {
                 "event": "OrderMatched",
                 "order": order.to_dict(),
-                "order_matched": orders_matched,
+                "orders_matched": orders_matched,
                 "matching_orders": [order.to_dict() for order in matching_orders],
             }
 
