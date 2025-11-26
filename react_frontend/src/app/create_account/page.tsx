@@ -1,6 +1,5 @@
 "use client"
 
-import { TextInput } from "@/components/forms"
 import { useState } from "react"
 import { toast } from "react-toastify";
 
@@ -9,6 +8,7 @@ export default function Login() {
     const [email_error, setEmailError] = useState("");
     const [password_error, setPasswordError] = useState("");
     const [password_confirm_error, setConfirmedPasswordError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     function emailMatch(): void {
         const email = (document.querySelector("#email-input") as HTMLInputElement)?.value;
@@ -25,7 +25,7 @@ export default function Login() {
         const password = (document.querySelector("#password-input") as HTMLInputElement)?.value;
         const confirm_password = (document.querySelector("#confirm-password-input") as HTMLInputElement)?.value;
 
-        if (password && !password.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$")) {
+        if (password && !password.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
             setPasswordError("The password must have at least 8 characters, one lowercase and one uppercase");
         } else {
             setPasswordError("");
@@ -83,54 +83,95 @@ export default function Login() {
     }
 
     return (
-        <div className="flex justify-center items-center h-full">
-            <div className="md:border md:rounded-xl w-[70%] p-4">
-                <form className="flex flex-col gap-y-8 items-center" onSubmit={create_account}>
-                    <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput name="first-name" label="First Name"></TextInput>
-                        <TextInput name="last-name" label="Last Name"></TextInput>
-                    </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="bg-white shadow-lg rounded-xl w-full max-w-3xl p-8">
+                <div className="flex flex-col items-center gap-4 mb-4">
+                    <img src="/images/default.png" alt="BrokerX Logo" className="h-30"/>
+                </div>
+                <h2 className="text-2xl font-semibold mb-6 text-center">Create an account</h2>
 
-                    <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput name="email" label="Email address" id="email-input" type="email" handler={emailMatch}></TextInput>
+                <form className="grid gap-6" onSubmit={create_account}>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <TextInput name="confirm-email" label="Confirm Email" id="confirm-email-input" type="email" handler={emailMatch}></TextInput>
-                            <span className="text-red-500">{email_error}</span>
+                            <label htmlFor="first-name" className="block text-sm font-medium mb-1">First Name</label>
+                            <input id="first-name" name="first-name" type="text" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                        </div>
+                        <div>
+                            <label htmlFor="last-name" className="block text-sm font-medium mb-1">Last Name</label>
+                            <input id="last-name" name="last-name" type="text" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
                         </div>
                     </div>
 
-                    <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput name="phone-number" label="Phone Number" type="tel"></TextInput>
-                        <TextInput name="date-of-birth" label="Date of Birth" type="date"></TextInput>  {/* TODO: fix width */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="email-input" className="block text-sm font-medium mb-1">Email address</label>
+                            <input id="email-input" name="email" type="email" required onChange={emailMatch} className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                        </div>
+                        <div>
+                            <label htmlFor="confirm-email-input" className="block text-sm font-medium mb-1">Confirm Email</label>
+                            <input id="confirm-email-input" name="confirm-email" type="email" required onChange={emailMatch} className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                            <span className="text-red-500 text-sm mt-1 block">{email_error}</span>
+                        </div>
                     </div>
 
-                    <div className="sm:flex sm:flex-row sm:gap-x-6">
-                        <TextInput name="address" label="Address" type="text"></TextInput>
-                        <div className="w-50">
-                            <label id="communication-method">Preferred communication method</label>
-                            <select name="communication-method" id="communication-method" className="bg-gray-200 w-full min-w-[150px] p-2 appearance-none">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="phone-number" className="block text-sm font-medium mb-1">Phone Number</label>
+                            <input id="phone-number" name="phone-number" type="tel" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                        </div>
+                        <div>
+                            <label htmlFor="date-of-birth" className="block text-sm font-medium mb-1">Date of Birth</label>
+                            <input id="date-of-birth" name="date-of-birth" type="date" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="address" className="block text-sm font-medium mb-1">Address</label>
+                            <input id="address" name="address" type="text" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                        </div>
+                        <div>
+                            <label htmlFor="communication-method" className="block text-sm font-medium mb-1">Preferred communication method</label>
+                            <select name="communication-method" id="communication-method" required className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]">
                                 <option>Email</option>
                                 <option>SMS</option>
                             </select>
                         </div>
-
                     </div>
 
-                    <div className="sm:flex sm:flex-row sm:gap-x-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <TextInput name="password" label="Password" id="password-input" type="password" handler={validatePasswords}></TextInput>
-                            <span className="text-red-500">{password_error}</span>
+                            <label htmlFor="password-input" className="block text-sm font-medium mb-1">Password</label>
+                            <input id="password-input" name="password" type={showPassword ? "text" : "password"} required onChange={validatePasswords} className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                            <span className="text-red-500 text-sm mt-1 block">{password_error}</span>
                         </div>
 
                         <div>
-                            <TextInput name="confirm-password" label="Confirm Password" id="confirm-password-input" type="password" handler={validatePasswords}></TextInput>
-                            <span className="text-red-500">{password_confirm_error}</span>
+                            <label htmlFor="confirm-password-input" className="block text-sm font-medium mb-1">Confirm Password</label>
+                            <input id="confirm-password-input" name="confirm-password" type={showPassword ? "text" : "password"} required onChange={validatePasswords} className="bg-gray-100 w-full p-2 rounded-md border-[var(--color-emerald-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-emerald-700)] focus:border-[var(--color-emerald-700)]" />
+                            <span className="text-red-500 text-sm mt-1 block">{password_confirm_error}</span>
                         </div>
                     </div>
 
-                    <button className="bg-blue-500 w-1/3 h-10 rounded-xl">Submit</button>
+                    <div className="flex items-center gap-2 text-sm">
+                        <input
+                            id="show-password"
+                            type="checkbox"
+                            checked={showPassword}
+                            onChange={(e) => setShowPassword(e.target.checked)}
+                            className="h-4 w-4 rounded border-[var(--color-emerald-700)] text-[var(--color-emerald-700)] focus:ring-[var(--color-emerald-700)]"
+                        />
+                        <label htmlFor="show-password" className="text-slate-700">Show password</label>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-center md:items-center md:justify-between gap-4">
+                        <button type="submit" className="bg-emerald-700 text-white py-2 px-6 rounded-lg w-full md:w-auto hover:bg-emerald-800">Create account</button>
+                        <div className="flex items-center gap-4">
+                            <a href="/login" className="text-sm text-gray-600 hover:underline">Already have an account? Log in</a>
+                        </div>
+                    </div>
                 </form>
-                <a href="/create_account">I don&apos;t have an account</a>
             </div>
         </div>
 

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from "react-toastify";
+import ConditionalNav from "../components/ConditionalNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-[90vh]`}
       >
         <ToastContainer />
-        <Navbar></Navbar>
+        <ConditionalNav>
+          <Navbar></Navbar>
+        </ConditionalNav>
         {children}
       </body>
     </html>
