@@ -35,8 +35,6 @@ class OrderView(APIView):
         if price is not None:
             price = Decimal(str(price))
 
-        logger.error(f"price: {price}")
-
         end_date = data.get("end_date", None)
         quantity = data.get("quantity", 0)
 

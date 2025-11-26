@@ -42,7 +42,7 @@ class DjangoStockRepository(StockRepository):
     def update_top_of_book(
         self, stock: Stock, quantity: int, type: str, price: Optional[Decimal] = None
     ) -> None:
-        logger.error(f"price {price} stock bid = {stock.bid_price}  type: {type}")
+
         if not price:
             return
 

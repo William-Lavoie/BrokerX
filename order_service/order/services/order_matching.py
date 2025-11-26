@@ -77,7 +77,9 @@ class OrderMatchingUseCase:
                     orders=[],
                 )
 
-            sorted_orders = sorted(orders, key=lambda order: (-order.price, order.time))
+            sorted_orders = sorted(
+                orders, key=lambda order: (-order.price, order.created_at)
+            )
 
             matching_orders = []
             total_quantity = 0

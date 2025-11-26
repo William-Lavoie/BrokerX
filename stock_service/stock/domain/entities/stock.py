@@ -94,9 +94,7 @@ class Stock:
         # Band size
         price_band = Decimal(self.band / 100)
         if type == "BUY":
-            logger.error(
-                f"price band: {price_band}, price: {price} bid: {self.bid_price}"
-            )
+
             if price and not (
                 Decimal(price) >= Decimal(self.bid_price * (1 - price_band))
                 and Decimal(price) <= Decimal(self.bid_price * (1 + price_band))

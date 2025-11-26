@@ -31,7 +31,7 @@ class MySQLOrderDAO(OrderDAO):
             with transaction.atomic():
                 created = False
                 order = Order.objects.filter(order_id=idempotency_key).first()
-                logger.error(f"price in add stock is {price}")
+
                 if not order:
                     order = Order(
                         order_id=idempotency_key,
@@ -211,7 +211,7 @@ class MySQLOrderDAO(OrderDAO):
                 f"Exception occurred while retrieving potential matches for order {order.order_id}: {e}",
                 exc_info=True,
             )
-            return OrderDTO(success=False, code=500)
+            return [OrderDTO(success=False, code=500)]
 
     def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
         try:

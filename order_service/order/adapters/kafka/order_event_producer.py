@@ -23,9 +23,7 @@ class OrderEventProducer(metaclass=Singleton):
                 bootstrap_servers=self.kafka_host,
                 value_serializer=lambda dict: json.dumps(dict).encode("utf-8"),
             )
-            logger.error(
-                f"Kafka producer initialized with bootstrap servers: {self.kafka_host}"
-            )
+
         except Exception as e:
             logger.error(f"Failed to initialize Kafka producer: {e}")
             raise

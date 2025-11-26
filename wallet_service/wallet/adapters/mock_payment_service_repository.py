@@ -3,7 +3,9 @@ import logging
 from decimal import Decimal
 
 from ..domain.ports.payment_service_repository import (
-    PaymentServiceRepository, PaymentServiceRepositoryResponse)
+    PaymentServiceRepository,
+    PaymentServiceRepositoryResponse,
+)
 from ..external_source.mock_payment_service import MockPaymentService
 
 logger = logging.getLogger(__name__)
@@ -22,9 +24,6 @@ class MockPaymentServiceRepository(PaymentServiceRepository):
         try:
             response = self.payment_service.withdraw_funds(email, amount)
             response = json.loads(response)
-
-            if not response.get("success"):
-                logger.error(response)
 
             return PaymentServiceRepositoryResponse(
                 success=response.get("success", False),

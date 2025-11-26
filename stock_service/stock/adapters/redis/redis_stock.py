@@ -39,7 +39,6 @@ class RedisStock:
                         for k, v in d.items()
                     },
                 )
-                logger.error(stock_dict)
 
                 return Stock.from_dict(stock_dict)
             else:
