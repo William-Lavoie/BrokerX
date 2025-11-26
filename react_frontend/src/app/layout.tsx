@@ -29,13 +29,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-[90vh]`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-red-100 antialiased h-[90vh]`}
       >
+      <div className={`${geistSans.variable} ${geistMono.variable} bg-gradient-to-r from-emerald-400 to-teal-200 h--full min-h-screen`}>
         <ToastContainer />
         <ConditionalNav>
-          <Navbar></Navbar>
+          <Navbar />
         </ConditionalNav>
         {children}
+      </div>
+
       </body>
     </html>
   );
