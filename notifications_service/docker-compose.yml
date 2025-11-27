@@ -1,0 +1,21 @@
+services:
+  notifications-app:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      KAFKA_HOST: kafka:9092
+      KAFKA_TOPIC: notifications
+      KAFKA_GROUP_ID: notifications-group
+      KAFKA_AUTO_OFFSET_RESET: earliest
+      LOG_LEVEL: INFO
+    ports:
+      - "8006:8006"
+    entrypoint: ["python", "entrypoint.py"]
+    networks:
+      - brokerx-network
+
+
+networks:
+  brokerx-network:
+    external: true
