@@ -7,6 +7,7 @@ from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
+from django.utils import timezone
 from order.domain.entities.order import OrderDTO
 from order.domain.ports.dao.order_dao import OrderDAO
 from order.models import Order, OrderAudit, OrderExecution
@@ -67,12 +68,12 @@ class MySQLOrderDAO(OrderDAO):
                     updated_at=order.updated_at,
                     executed_at=order.executed_at,
                 )
-
-                OrderAudit.objects.create(
-                    order=order,
-                    action="ORDER_PLACED",
-                    metadata=json.dumps(order_dto.to_dict()),
-                )
+                if created:
+                    OrderAudit.objects.create(
+                        order=order,
+                        action="ORDER_PLACED",
+                        metadata=json.dumps(order_dto.to_dict()),
+                    )
 
                 return order_dto
 
@@ -83,18 +84,88 @@ class MySQLOrderDAO(OrderDAO):
             )
             return OrderDTO(success=False, code=400)
 
-        except Exception as e:
+    def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
+        orders = Order.objects.filter(client_id=client_id).exclude(status="CANCELLED")
+        return [
+            OrderDTO(
+                success=True,
+                code=200,
+                order_id=order.order_id,
+                client_id=order.client_id,
+                symbol=order.stock_symbol,
+                order_type=order.order_type,
+                order_style=order.order_style,
+                order_duration=order.order_duration,
+                quantity=order.quantity,
+                quantity_executed=order.quantity_executed,
+                price=order.price,
+                end_date=order.order_end_date,
+                status=order.status,
+                created_at=order.created_at,
+                updated_at=order.updated_at,
+                executed_at=order.executed_at,
+            )
+            for order in orders
+        ]
+
+    def delete_order(self, client_id: UUID, order_id: UUID) -> OrderDTO:
+        try:
+            order = Order.objects.get(order_id=order_id, client_id=client_id)
+
+            if order.status in ["EXECUTED", "REJECTED", "CANCELLED"]:
+                return OrderDTO(success=False, code=400)
+
+            order.status = "CANCELLED"
+            order.save()
+
+            order_dto = OrderDTO(
+                success=True,
+                code=200,
+                order_id=order.order_id,
+                client_id=order.client_id,
+                symbol=order.stock_symbol,
+                order_type=order.order_type,
+                order_style=order.order_style,
+                order_duration=order.order_duration,
+                quantity=order.quantity,
+                quantity_executed=order.quantity_executed,
+                price=order.price,
+                end_date=order.order_end_date,
+                status=order.status,
+                created_at=order.created_at,
+                updated_at=order.updated_at,
+                executed_at=order.executed_at,
+            )
+
+            OrderAudit.objects.create(
+                order=order,
+                action="ORDER_CANCELLED",
+                metadata=json.dumps(order_dto.to_dict()),
+            )
+
+            return order_dto
+
+        except ObjectDoesNotExist as e:
             logger.error(
-                f"Exception occurred while adding order for client {client_id}: {e}",
+                f"ObjectDoesNotExist exception : {e}",
                 exc_info=True,
             )
-            return OrderDTO(success=False, code=500)
+            return OrderDTO(success=False, code=404)
 
-    def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
-        try:
-            orders = Order.objects.filter(client_id=client_id).exclude(
-                status="CANCELLED"
-            )
+    def delete_order_rollback(
+        self, client_id: UUID, order_id: UUID, previous_status: str
+    ) -> None:
+        Order.objects.filter(
+            order_id=order_id, client_id=client_id, status="CANCELLED"
+        ).update(status=previous_status)
+
+    def get_potential_matches(self, order: Order) -> list[OrderDTO]:
+        with transaction.atomic():
+            orders = Order.objects.filter(
+                stock_symbol=order.stock_symbol,
+                order_type=("SELL" if order.order_type == "BUY" else "BUY"),
+                status="PENDING" or "PARTIALLY_EXECUTED",
+            ).exclude(client_id=order.client_id)
             return [
                 OrderDTO(
                     success=True,
@@ -117,102 +188,6 @@ class MySQLOrderDAO(OrderDAO):
                 for order in orders
             ]
 
-        except ObjectDoesNotExist as e:
-            logger.error(
-                f"ObjectDoesNotExist exception : {e}",
-                exc_info=True,
-            )
-            return OrderDTO(success=False, code=404)
-
-    def delete_order(self, client_id: UUID, order_id: UUID) -> OrderDTO:
-        try:
-            order = Order.objects.get(order_id=order_id, client_id=client_id)
-
-            if order.status in ["EXECUTED", "REJECTED", "CANCELLED"]:
-                return OrderDTO(success=False, code=400)
-
-            order_dto = OrderDTO(
-                success=True,
-                code=200,
-                order_id=order.order_id,
-                client_id=order.client_id,
-                symbol=order.stock_symbol,
-                order_type=order.order_type,
-                order_style=order.order_style,
-                order_duration=order.order_duration,
-                quantity=order.quantity,
-                quantity_executed=order.quantity_executed,
-                price=order.price,
-                end_date=order.order_end_date,
-                status=order.status,
-                created_at=order.created_at,
-                updated_at=order.updated_at,
-                executed_at=order.executed_at,
-            )
-
-            order.status = "CANCELLED"
-            order.save()
-
-            return order_dto
-
-        except ObjectDoesNotExist as e:
-            logger.error(
-                f"ObjectDoesNotExist exception : {e}",
-                exc_info=True,
-            )
-            return OrderDTO(success=False, code=404)
-
-    def delete_order_rollback(
-        self, client_id: UUID, order_id: UUID, previous_status: str
-    ) -> None:
-        try:
-            Order.objects.filter(order_id=order_id, client_id=client_id).update(
-                status=previous_status
-            )
-
-        except Exception as e:
-            logger.error(
-                f"ObjectDoesNotExist exception : {e}",
-                exc_info=True,
-            )
-
-    def get_potential_matches(self, order: Order) -> list[OrderDTO]:
-        try:
-            with transaction.atomic():
-                orders = Order.objects.filter(
-                    stock_symbol=order.stock_symbol,
-                    order_type=("SELL" if order.order_type == "BUY" else "BUY"),
-                    status="PENDING" or "PARTIALLY_EXECUTED",
-                ).exclude(client_id=order.client_id)
-                return [
-                    OrderDTO(
-                        success=True,
-                        code=200,
-                        order_id=order.order_id,
-                        client_id=order.client_id,
-                        symbol=order.stock_symbol,
-                        order_type=order.order_type,
-                        order_style=order.order_style,
-                        order_duration=order.order_duration,
-                        quantity=order.quantity,
-                        quantity_executed=order.quantity_executed,
-                        price=order.price,
-                        end_date=order.order_end_date,
-                        status=order.status,
-                        created_at=order.created_at,
-                        updated_at=order.updated_at,
-                        executed_at=order.executed_at,
-                    )
-                    for order in orders
-                ]
-
-        except Exception as e:
-            logger.error(
-                f"Exception occurred while retrieving potential matches for order {order.order_id}: {e}",
-                exc_info=True,
-            )
-            return [OrderDTO(success=False, code=500)]
-
     def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
         try:
             orders_matched = {}
@@ -229,20 +204,20 @@ class MySQLOrderDAO(OrderDAO):
 
                     if match.quantity_executed == match.quantity:
                         match.status = "EXECUTED"
-                        match.executed_at = datetime.now()
+                        match.executed_at = timezone.now()
                     else:
                         match.status = "PARTIALLY_EXECUTED"
 
                     if order.quantity_executed == order.quantity:
                         order.status = "EXECUTED"
-                        order.executed_at = datetime.now()
+                        order.executed_at = timezone.now()
                     else:
                         order.status = "PARTIALLY_EXECUTED"
 
-                    match.updated_at = datetime.now()
-                    order.updated_at = datetime.now()
+                    match.updated_at = timezone.now()
+                    order.updated_at = timezone.now()
 
-                    orders_matched[match.order_id] = {
+                    orders_matched[str(match.order_id)] = {
                         "trade_quantity": trade_quantity,
                         "price": match.price,
                     }
@@ -282,13 +257,6 @@ class MySQLOrderDAO(OrderDAO):
         except ObjectDoesNotExist as e:
             logger.error(
                 f"ObjectDoesNotExist exception : {e}",
-                exc_info=True,
-            )
-            return {}
-
-        except Exception as e:
-            logger.error(
-                f"Exception occurred while executing order {order.order_id}: {e}",
                 exc_info=True,
             )
             return {}

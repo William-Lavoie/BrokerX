@@ -81,6 +81,7 @@ class OrderAudit(models.Model):
     ACTIONS = [
         ("ORDER_PLACED", "Order Placed"),
         ("ORDER_REJECTED", "Order Rejected"),
+        ("ORDER_CANCELLED", "Order Cancelled"),
         ("ORDER_FAILED", "Order Failed"),
     ]
 
