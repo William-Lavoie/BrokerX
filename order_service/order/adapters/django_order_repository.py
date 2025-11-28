@@ -37,7 +37,7 @@ class DjangoOrderRepository(OrderRepository):
                 )
 
             order.update_from_dto(order_dto=order_dto)
-            self.redis.set_order(order.client_id, order)
+            self.redis.set_order(client_id=order.client_id, order=order)
 
     def get_orders_by_client(self, client_id: UUID) -> list[Order]:
         # redis_orders = self.redis.get_orders_by_client(client_id=client_id)
@@ -72,9 +72,9 @@ class DjangoOrderRepository(OrderRepository):
         )
 
     def get_potential_matches(self, order: Order) -> list[Order]:
-        matching_order_dtos = self.dao.get_potential_matches(order)
+        matching_order_dtos = self.dao.get_potential_matches(order=order)
 
         return [dto.get_order_from_dto() for dto in matching_order_dtos]
 
     def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
-        return self.dao.execute_order(order, matching_orders)
+        return self.dao.execute_order(order=order, matching_orders=matching_orders)
