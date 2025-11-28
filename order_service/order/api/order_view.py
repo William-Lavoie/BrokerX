@@ -25,7 +25,7 @@ class OrderView(APIView):
     def post(self, request):
         data = json.loads(request.body)
 
-        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
+        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
         symbol = data.get("symbol", "")
         order_type = data.get("order_type", "")
         order_style = data.get("order_style", "")
@@ -79,7 +79,7 @@ class OrderView(APIView):
             DjangoOrderRepository(),
         )
 
-        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
+        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
 
         result = use_case.get_orders(client_id=client_id)
         return JsonResponse(data=result.to_dict(), status=result.code)
@@ -88,7 +88,7 @@ class OrderView(APIView):
         data = json.loads(request.body)
         order_id = UUID(data.get("order_id", ""))
 
-        client_id = UUID("7a82a0d7197b422c9f884fab0975359a")
+        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
 
         use_case = PlaceOrderUseCase(
             order_repository=DjangoOrderRepository(), wallet_repository=WalletService()

@@ -229,7 +229,7 @@ class Command(BaseCommand):
             name="Bitcoin CAD",
             exchange="Crypto",
             currency="CAD",
-            limit_price_band=5000.00,
+            limit_price_band=500.00,
             tick_size=0.01,
             last_price=45000.00,
             open_price=44000.00,

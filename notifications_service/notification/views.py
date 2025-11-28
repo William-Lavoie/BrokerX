@@ -41,7 +41,7 @@ def event_stream(user_id):
 
 
 def sse_notifications(request):
-    user_id = UUID("7a82a0d7197b422c9f884fab0975359a")
+    user_id = UUID("5a2753379b0a4db7baf166ab8946b511")2
 
     response = StreamingHttpResponse(
         event_stream(user_id),

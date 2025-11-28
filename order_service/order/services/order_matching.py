@@ -81,6 +81,11 @@ class OrderMatchingUseCase:
                 orders, key=lambda order: (-order.price, order.created_at)
             )
 
+            for existing_order in sorted_orders:
+                logger.debug(
+                    f"Found matching order: {existing_order.to_dict()}"
+                )
+
             matching_orders = []
             total_quantity = 0
 

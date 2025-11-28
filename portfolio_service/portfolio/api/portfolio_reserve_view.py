@@ -22,7 +22,7 @@ class PortfolioReserveView(APIView):
         symbol = data.get("symbol")
         quantity = data.get("quantity")
 
-        client_id = "7a82a0d7197b422c9f884fab0975359a"
+        client_id = "5a2753379b0a4db7baf166ab8946b511"
 
         use_case = ReserveHoldingsUseCase(
             portfolio_repository=DjangoPortfolioRepository()
@@ -40,7 +40,7 @@ class PortfolioReserveView(APIView):
         symbol = data.get("symbol")
         quantity = data.get("quantity")
 
-        client_id = "7a82a0d7197b422c9f884fab0975359a"
+        client_id = "5a2753379b0a4db7baf166ab8946b511"
 
         use_case = ReserveHoldingsUseCase(
             portfolio_repository=DjangoPortfolioRepository()

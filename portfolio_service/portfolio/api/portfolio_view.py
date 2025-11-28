@@ -18,7 +18,7 @@ class PortfolioView(APIView):
 
     def get(self, request):
 
-        client_id = "7a82a0d7197b422c9f884fab0975359a"
+        client_id = "5a2753379b0a4db7baf166ab8946b511"
 
         use_case = GetPortfolioInfoUseCase(
             portfolio_repository=DjangoPortfolioRepository()
@@ -31,7 +31,7 @@ class PortfolioView(APIView):
     def put(self, request):
         data = json.loads(request.body)
 
-        client_id = "7a82a0d7197b422c9f884fab0975359a"
+        client_id = "5a2753379b0a4db7baf166ab8946b511"
         symbol = data.get("symbol")
         name = data.get("name")
         quantity = data.get("quantity")
