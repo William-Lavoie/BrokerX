@@ -32,6 +32,8 @@ class OrderMatchingUseCaseResult(UseCaseResult):
 
         if self.event_data is not None:
             data["event_data"] = self.event_data
+        else:
+            data["event_data"] = {}
 
         return data
 
@@ -82,9 +84,7 @@ class OrderMatchingUseCase:
             )
 
             for existing_order in sorted_orders:
-                logger.debug(
-                    f"Found matching order: {existing_order.to_dict()}"
-                )
+                logger.debug(f"Found matching order: {existing_order.to_dict()}")
 
             matching_orders = []
             total_quantity = 0

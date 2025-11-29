@@ -46,3 +46,15 @@ class DjangoWalletRepository(WalletRepository):
 
     def release_funds(self, client_id: UUID, order_id: UUID) -> WalletDTO:
         return self.dao.release_funds(client_id=client_id, order_id=order_id).success
+
+    def process_payments(self, orders_info: list[dict]) -> None:
+        wallet_dto = self.dao.process_payments(orders_info=orders_info)
+
+        if not wallet_dto or not wallet_dto.success:
+            raise Exception("Error processing payment.")
+
+    def process_transfers(self, orders_info: list[dict]) -> None:
+        wallet_dto = self.dao.process_transfers(orders_info=orders_info)
+
+        if not wallet_dto.success:
+            raise Exception("Error processing transfer.")

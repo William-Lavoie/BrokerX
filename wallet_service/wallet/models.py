@@ -9,10 +9,10 @@ from django.db import models
 class Wallet(models.Model):
     client_id = models.UUIDField(editable=False, unique=True, db_index=True)
     balance = models.DecimalField(
-        max_digits=7,
+        max_digits=9,
         decimal_places=2,
         default=0.00,
-        validators=[MinValueValidator(0.00), MaxValueValidator(10000.00)],
+        validators=[MinValueValidator(0.00), MaxValueValidator(100000000.00)],
     )
 
 

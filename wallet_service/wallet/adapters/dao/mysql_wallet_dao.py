@@ -33,7 +33,9 @@ class MySQLWalletDAO(WalletDAO):
             total=Sum("amount")
         )["total"]
 
-        return reserved_funds if reserved_funds is not None else Decimal("0.00")
+        return (
+            Decimal(reserved_funds) if reserved_funds is not None else Decimal("0.00")
+        )
 
     def reserve_funds(
         self, client_id: UUID, amount: Decimal, order_id: UUID
@@ -44,7 +46,7 @@ class MySQLWalletDAO(WalletDAO):
                     client_id=client_id, order_id=order_id, amount=amount
                 )
 
-                return WalletDTO(success=True, code=201)
+            return WalletDTO(success=True, code=201)
 
         except IntegrityError:
             logger.error(
@@ -60,8 +62,72 @@ class MySQLWalletDAO(WalletDAO):
                     client_id=client_id, order_id=order_id
                 ).delete()
 
-                return WalletDTO(success=True, code=200)
+            return WalletDTO(success=True, code=200)
 
         except:
+            logger.error("An unexpected error occured", exc_info=True)
+            return WalletDTO(success=False, code=500)
+
+    def process_payments(
+        self,
+        orders_info: list[dict],
+    ) -> WalletDTO:
+        try:
+            with transaction.atomic():
+                for order in orders_info:
+                    wallet = Wallet.objects.select_for_update().get(
+                        client_id=order["client_id"]
+                    )
+
+                    reserved_funds = ReservedFunds.objects.get(
+                        client_id=order["client_id"], order_id=order["order_id"]
+                    )
+
+                    wallet.balance -= order["amount"]
+                    wallet.save()
+
+                    reserved_funds.amount -= order["amount"]
+                    if reserved_funds.amount <= 0:
+                        reserved_funds.delete()
+                    else:
+                        reserved_funds.save()
+
+                return WalletDTO(success=True, code=200)
+
+        except Wallet.DoesNotExist:
+            logger.error(
+                f"Wallet.DoesNotExist: client {order['client_id']} does not have a wallet.",
+                exc_info=True,
+            )
+            return WalletDTO(success=False, code=404)
+
+        except Exception as e:
+            logger.error("An unexpected error occured", exc_info=True)
+            return WalletDTO(success=False, code=500)
+
+    def process_transfers(
+        self,
+        orders_info: list[dict],
+    ) -> WalletDTO:
+        try:
+            with transaction.atomic():
+                for order in orders_info:
+                    wallet = Wallet.objects.select_for_update().get(
+                        client_id=order["client_id"]
+                    )
+
+                    wallet.balance += order["amount"]
+                    wallet.save()
+
+                return WalletDTO(success=True, code=200, balance=wallet.balance)
+
+        except Wallet.DoesNotExist:
+            logger.error(
+                f"Wallet.DoesNotExist: client {order['client_id']} does not have a wallet.",
+                exc_info=True,
+            )
+            return WalletDTO(success=False, code=404)
+
+        except Exception as e:
             logger.error("An unexpected error occured", exc_info=True)
             return WalletDTO(success=False, code=500)

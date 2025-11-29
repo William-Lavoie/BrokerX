@@ -8,9 +8,11 @@ from uuid import UUID
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.utils import timezone
+from order.domain.entities.order import Order as OrderEntity
 from order.domain.entities.order import OrderDTO
 from order.domain.ports.dao.order_dao import OrderDAO
-from order.models import Order, OrderAudit, OrderExecution
+from order.models import Order as OrderModel
+from order.models import OrderAudit, OrderExecution
 
 logger = logging.getLogger("mysql")
 
@@ -31,10 +33,10 @@ class MySQLOrderDAO(OrderDAO):
         try:
             with transaction.atomic():
                 created = False
-                order = Order.objects.filter(order_id=idempotency_key).first()
+                order = OrderModel.objects.filter(order_id=idempotency_key).first()
 
                 if not order:
-                    order = Order(
+                    order = OrderModel(
                         order_id=idempotency_key,
                         client_id=client_id,
                         stock_symbol=symbol,
@@ -85,7 +87,9 @@ class MySQLOrderDAO(OrderDAO):
             return OrderDTO(success=False, code=400)
 
     def get_orders_by_client(self, client_id: UUID) -> list[OrderDTO]:
-        orders = Order.objects.filter(client_id=client_id).exclude(status="CANCELLED")
+        orders = OrderModel.objects.filter(client_id=client_id).exclude(
+            status="CANCELLED"
+        )
         return [
             OrderDTO(
                 success=True,
@@ -110,7 +114,7 @@ class MySQLOrderDAO(OrderDAO):
 
     def delete_order(self, client_id: UUID, order_id: UUID) -> OrderDTO:
         try:
-            order = Order.objects.get(order_id=order_id, client_id=client_id)
+            order = OrderModel.objects.get(order_id=order_id, client_id=client_id)
 
             if order.status in ["EXECUTED", "REJECTED", "CANCELLED"]:
                 return OrderDTO(success=False, code=400)
@@ -155,14 +159,14 @@ class MySQLOrderDAO(OrderDAO):
     def delete_order_rollback(
         self, client_id: UUID, order_id: UUID, previous_status: str
     ) -> None:
-        Order.objects.filter(
+        OrderModel.objects.filter(
             order_id=order_id, client_id=client_id, status="CANCELLED"
         ).update(status=previous_status)
 
-    def get_potential_matches(self, order: Order) -> list[OrderDTO]:
+    def get_potential_matches(self, order: OrderEntity) -> list[OrderDTO]:
         with transaction.atomic():
-            orders = Order.objects.filter(
-                stock_symbol=order.stock_symbol,
+            orders = OrderModel.objects.filter(
+                stock_symbol=order.symbol,
                 order_type=("SELL" if order.order_type == "BUY" else "BUY"),
                 status="PENDING" or "PARTIALLY_EXECUTED",
             ).exclude(client_id=order.client_id)
@@ -188,7 +192,9 @@ class MySQLOrderDAO(OrderDAO):
                 for order in orders
             ]
 
-    def execute_order(self, order: Order, matching_orders: list[Order]) -> dict:
+    def execute_order(
+        self, order: OrderEntity, matching_orders: list[OrderEntity]
+    ) -> dict:
         try:
             orders_matched = {}
             with transaction.atomic():
@@ -219,17 +225,17 @@ class MySQLOrderDAO(OrderDAO):
 
                     orders_matched[str(match.order_id)] = {
                         "trade_quantity": trade_quantity,
-                        "price": match.price,
+                        "price": str(match.price) if match.price is not None else None,
                     }
 
-                    matched_order = Order.objects.get(order_id=match.order_id)
+                    matched_order = OrderModel.objects.get(order_id=match.order_id)
                     matched_order.quantity_executed = match.quantity_executed
                     matched_order.status = match.status
                     matched_order.executed_at = match.executed_at
                     matched_order.updated_at = match.updated_at
                     matched_order.save()
 
-                    order_instance = Order.objects.get(order_id=order.order_id)
+                    order_instance = OrderModel.objects.get(order_id=order.order_id)
                     order_instance.quantity_executed = order.quantity_executed
                     order_instance.status = order.status
                     order_instance.executed_at = order.executed_at

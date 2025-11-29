@@ -25,3 +25,11 @@ class WalletRepository:
     @abstractmethod
     def release_funds(self, client_id: UUID, order_id: UUID) -> bool:
         pass
+
+    @abstractmethod
+    def process_payments(self, orders_info: list[dict]) -> None:
+        pass
+
+    @abstractmethod
+    def process_transfers(self, orders_info: list[dict]) -> None:
+        pass

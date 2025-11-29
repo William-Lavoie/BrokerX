@@ -191,7 +191,7 @@ class Order:
             "order_duration": self.order_duration,
             "quantity": self.quantity,
             "quantity_executed": self.quantity_executed,
-            "price": float(self.price) if self.price is not None else None,
+            "price": str(self.price) if self.price is not None else None,
             "end_date": self.end_date.isoformat() if self.end_date else None,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,

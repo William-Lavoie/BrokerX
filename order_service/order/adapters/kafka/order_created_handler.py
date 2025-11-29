@@ -42,15 +42,16 @@ class OrderCreatedHandler(EventHandler):
 
             event_data = result.event_data
 
-            if event_data["orders_matched"] == []:
+            if not event_data:
+                event_data = {}
+
+            if not "orders_matched" in event_data or event_data["orders_matched"] == []:
                 event_data["event"] = "OrderExecutionCompleted"
             else:
                 event_data["event"] = "OrderExecuted"
 
         except Exception as e:
-            logger.error(f"Error handling OrderCreated event: {str(e)}", exc_info=True)
             event_data["event"] = "OrderExecutionCompleted"
         finally:
             logger.error(f"Sending event: {event_data}")
-            event_data["event"] = "OrderExecuted"
             self.order_producer.get_instance().send(KAFKA_TOPIC, value=event_data)

@@ -29,3 +29,15 @@ class WalletDAO:
         self, client_id: UUID, amount: Decimal, order_id: UUID
     ) -> WalletDTO:
         pass
+
+    @abstractmethod
+    def release_funds(self, client_id: UUID, order_id: UUID) -> WalletDTO:
+        pass
+
+    @abstractmethod
+    def process_payments(self, orders_info: list[dict]) -> WalletDTO:
+        pass
+
+    @abstractmethod
+    def process_transfers(self, orders_info: list[dict]) -> WalletDTO:
+        pass

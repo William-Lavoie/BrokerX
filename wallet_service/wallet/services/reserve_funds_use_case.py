@@ -51,7 +51,7 @@ class ReserveFundsUseCase:
                 )
 
         except Exception as e:
-            logger.error(f"Error reserving funds: {e}")
+            logger.error(f"Error reserving funds: {e}", exc_info=True)
             return UseCaseResult(
                 success=False,
                 message="Error reserving funds.",
@@ -77,7 +77,7 @@ class ReserveFundsUseCase:
             )
 
         except Exception as e:
-            logger.error(f"Error reserving funds: {e}")
+            logger.error(f"Error reserving funds: {e}", exc_info=True)
             return UseCaseResult(
                 success=False,
                 message="Error reserving funds.",
