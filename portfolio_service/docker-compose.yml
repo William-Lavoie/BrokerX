@@ -9,6 +9,11 @@ services:
       DB_USER: user
       DB_PASSWORD: pass
       DB_NAME: portfolio_db
+      KAFKA_HOST: kafka:9092
+      KAFKA_TOPIC: order-saga-events
+      KAFKA_GROUP_ID: execute-order-saga
+      KAFKA_AUTO_OFFSET_RESET: earliest
+      LOG_LEVEL: INFO
     ports:
       - "8005:8005"
     expose:

@@ -9,6 +9,7 @@ djangorestframework_simplejwt==5.5.1
 filelock==3.20.0
 identify==2.6.15
 iniconfig==2.3.0
+kafka-python==2.2.15
 mysql==0.0.3
 mysqlclient==2.2.7
 nodeenv==1.9.1
