@@ -117,4 +117,5 @@ class OrderExecutedHandler(EventHandler):
             event_data["event"] = "OrdersPaymentFailed"
             event_data["error"] = str(e)
         finally:
+            logger.error(f"Producing event: {event_data}")
             order_event_producer.get_instance().send(KAFKA_TOPIC, value=event_data)

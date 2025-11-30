@@ -61,6 +61,14 @@ class PortfolioRepository:
     def release_holdings(self, client_id: UUID, symbol: str, quantity: int) -> None:
         pass
 
+    @abstractmethod
+    def process_acquisitions(self, orders_info: list[dict]) -> None:
+        pass
+
+    @abstractmethod
+    def process_transfers(self, orders_info: list[dict]) -> None:
+        pass
+
     def get_holding_from_dto(self, holding_dto) -> Holding:
         return Holding(
             client_id=holding_dto.client_id,

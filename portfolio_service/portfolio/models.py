@@ -26,7 +26,9 @@ class Holdings(models.Model):
         Portfolio, on_delete=models.CASCADE, related_name="holdings"
     )
     symbol = models.CharField(max_length=100, editable=False)
-    name = models.CharField(max_length=100, editable=False)
+    name = models.CharField(
+        default="", max_length=100, editable=False, null=True, blank=True
+    )
     quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     buying_price = models.DecimalField(
         max_digits=12,

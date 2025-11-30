@@ -162,6 +162,13 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "kafka_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_DIR / "kafka.logs",
+            "formatter": "verbose",
+            "maxBytes": 5_000_000,
+            "backupCount": 5,
+        },
         "mysql_error_file": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOG_DIR / "mysql-error.logs",
@@ -209,6 +216,11 @@ LOGGING = {
         },
         "redis": {
             "handlers": ["console", "redis_error_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "kafka": {
+            "handlers": ["console", "kafka_file"],
             "level": "WARNING",
             "propagate": False,
         },

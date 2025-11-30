@@ -11,7 +11,7 @@ services:
       DB_NAME: portfolio_db
       KAFKA_HOST: kafka:9092
       KAFKA_TOPIC: order-saga-events
-      KAFKA_GROUP_ID: execute-order-saga
+      KAFKA_GROUP_ID: place-order-saga-portfolio
       KAFKA_AUTO_OFFSET_RESET: earliest
       LOG_LEVEL: INFO
     ports:

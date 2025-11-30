@@ -10,7 +10,7 @@ import logging
 from kafka import KafkaProducer
 from portfolio_service.singleton import Singleton
 
-logger = logging.getLogger("wallet")
+logger = logging.getLogger("portfolio")
 
 
 class OrderEventProducer(metaclass=Singleton):

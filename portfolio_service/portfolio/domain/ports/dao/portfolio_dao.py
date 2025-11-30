@@ -25,6 +25,15 @@ class PortfolioDAO:
         pass
 
     @abstractmethod
+    def sell_holdings(
+        self,
+        client_id: UUID,
+        symbol: str,
+        quantity: int,
+    ) -> PortfolioDTO:
+        pass
+
+    @abstractmethod
     def reserve_holdings(
         self, client_id: UUID, symbol: str, quantity: int
     ) -> PortfolioDTO:

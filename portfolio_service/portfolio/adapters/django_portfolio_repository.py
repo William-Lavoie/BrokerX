@@ -14,18 +14,12 @@ class DjangoPortfolioRepository(PortfolioRepository):
         super().__init__()
         self.dao = dao if dao is not None else MySQLPortfolioDAO()
 
-    # self.redis = redis if redis is not None else RedisPortfolio()
-
     def get_portfolio(self, client_id: UUID) -> Portfolio:
         portfolio_dto = self.dao.get_portfolio(client_id=client_id)
         if not portfolio_dto.code:
             raise DataAccessException(
                 user_message="An unexpected error occured while trying to fetch your portfolio."
             )
-
-        # self.redis.set_wallet_balance(
-        #    client_id=client_id, balance=wallet_dto.balance
-        # )
 
         return self.get_portfolio_from_dto(portfolio_dto)
 
@@ -113,3 +107,44 @@ class DjangoPortfolioRepository(PortfolioRepository):
             raise DataAccessException(
                 user_message="An unexpected error occured while trying to release your holdings."
             )
+
+    def process_acquisitions(self, orders_info: dict) -> None:
+
+        for order in orders_info:
+            client_id = order.get("client_id")
+            symbol = order.get("symbol")
+            quantity = order.get("quantity")
+            buying_price = order.get("buying_price")
+            name = order.get("name")
+            current_price = order.get("current_price")
+
+            portfolio_dto = self.dao.buy_holdings(
+                client_id=client_id,
+                symbol=symbol,
+                name=name,
+                quantity=quantity,
+                buying_price=buying_price,
+                current_price=order.get("current_price"),
+            )
+
+            if not portfolio_dto.success:
+                raise DataAccessException(
+                    user_message="An unexpected error occured while trying to process your acquisitions."
+                )
+
+    def process_transfers(self, orders_info: list[dict]) -> None:
+        for order in orders_info:
+            client_id = order.get("client_id")
+            symbol = order.get("symbol")
+            quantity = order.get("quantity")
+
+            portfolio_dto = self.dao.sell_holdings(
+                client_id=client_id,
+                symbol=symbol,
+                quantity=quantity,
+            )
+
+            if not portfolio_dto.success:
+                raise DataAccessException(
+                    user_message="An unexpected error occured while trying to process your transfers."
+                )
