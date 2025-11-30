@@ -45,12 +45,24 @@ class OrderPaymentProcessedHandler(EventHandler):
             transfers = []
 
             if order.get("order_type") == "BUY":
+
+                buying_price = 0
+                total_quantity = 0
+                for order_matched in event_data.get("orders_matched", {}).values():
+                    buying_price += Decimal(order_matched.get("price", 0)) * int(
+                        order_matched.get("trade_quantity", 0)
+                    )
+                    total_quantity += int(order_matched.get("trade_quantity", 0))
+
+                if total_quantity > 0:
+                    buying_price = buying_price / total_quantity
+
                 acquisitions.append(
                     {
                         "client_id": UUID(order.get("client_id")),
                         "symbol": order.get("symbol"),
-                        "quantity": int(order.get("quantity")),
-                        "buying_price": Decimal(order.get("price")),
+                        "quantity": total_quantity,
+                        "buying_price": buying_price,
                         "name": order.get("name"),
                         "current_price": (
                             Decimal(order.get("current_price"))
@@ -91,7 +103,11 @@ class OrderPaymentProcessedHandler(EventHandler):
                             .get(matched_order.get("order_id"))
                             .get("trade_quantity", 0)
                         ),
-                        "buying_price": Decimal(matched_order.get("price")),
+                        "buying_price": Decimal(
+                            event_data.get("orders_matched")
+                            .get(matched_order.get("order_id"))
+                            .get("price", 0)
+                        ),
                         "name": matched_order.get("name"),
                         "current_price": (
                             Decimal(matched_order.get("current_price"))

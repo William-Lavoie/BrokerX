@@ -124,7 +124,7 @@ class DjangoPortfolioRepository(PortfolioRepository):
                 name=name,
                 quantity=quantity,
                 buying_price=buying_price,
-                current_price=order.get("current_price"),
+                current_price=current_price,
             )
 
             if not portfolio_dto.success:

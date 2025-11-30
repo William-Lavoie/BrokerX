@@ -51,6 +51,17 @@ class MySQLOrderDAO(OrderDAO):
                     order.full_clean()
                     order.save()
 
+                else:
+                    order.stock_symbol = symbol
+                    order.order_type = order_type
+                    order.order_style = order_style
+                    order.order_duration = order_duration
+                    order.quantity = quantity
+                    order.price = price
+                    order.order_end_date = end_date
+                    order.full_clean()
+                    order.save()
+
                 code = 201 if created else 200
                 order_dto = OrderDTO(
                     success=True,

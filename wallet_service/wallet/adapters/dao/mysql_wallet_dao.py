@@ -42,8 +42,8 @@ class MySQLWalletDAO(WalletDAO):
     ) -> WalletDTO:
         try:
             with transaction.atomic():
-                ReservedFunds.objects.create(
-                    client_id=client_id, order_id=order_id, amount=amount
+                ReservedFunds.objects.update_or_create(
+                    client_id=client_id, order_id=order_id, defaults={"amount": amount}
                 )
 
             return WalletDTO(success=True, code=201)
