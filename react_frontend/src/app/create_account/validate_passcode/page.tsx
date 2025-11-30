@@ -64,7 +64,7 @@ export default function App() {
 		if (resendTimer > 0) return;
 		setLoadingGenerate(true);
 		try {
-			const response = await fetch("http://localhost:8001/passcode", {
+			const response = await fetch("http://localhost:8080/passcode", {
 				method: "PUT",
 				headers: {
 					"Authorization": `Bearer ${token}`,

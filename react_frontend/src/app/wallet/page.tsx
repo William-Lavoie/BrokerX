@@ -11,7 +11,7 @@ export default function Wallet() {
  	useEffect(() => {
  		async function loadBalance() {
  			try {
- 				const res = await fetch("http://localhost:8003/wallet", {
+ 				const res = await fetch("http://localhost:8080/wallet", {
  					method: "GET",
  					headers: {
  						"Authorization": `Bearer ${token}`,

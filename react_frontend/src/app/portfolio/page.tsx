@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
       const token = localStorage.getItem("access_token");
 
-    fetch("http://localhost:8005/portfolio", {
+    fetch("http://localhost:8080/portfolio", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

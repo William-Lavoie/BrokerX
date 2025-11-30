@@ -1,6 +1,7 @@
 import json
 import logging
 
+import jwt
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,7 @@ from portfolio.services.reserve_holdings import ReserveHoldingsUseCase
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
+SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 logger = logging.getLogger("portfolio")
 
 
@@ -21,8 +23,7 @@ class PortfolioReserveView(APIView):
 
         symbol = data.get("symbol")
         quantity = data.get("quantity")
-
-        client_id = "5a2753379b0a4db7baf166ab8946b511"
+        client_id = data.get("client_id")
 
         use_case = ReserveHoldingsUseCase(
             portfolio_repository=DjangoPortfolioRepository()
@@ -37,10 +38,12 @@ class PortfolioReserveView(APIView):
     def put(self, request):
         data = json.loads(request.body)
 
+        token = request.headers.get("Authorization").split(" ")[1]
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+
         symbol = data.get("symbol")
         quantity = data.get("quantity")
-
-        client_id = "5a2753379b0a4db7baf166ab8946b511"
+        client_id = data.get("client_id")
 
         use_case = ReserveHoldingsUseCase(
             portfolio_repository=DjangoPortfolioRepository()

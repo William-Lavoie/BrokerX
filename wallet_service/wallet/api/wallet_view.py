@@ -2,6 +2,7 @@ import json
 import logging
 from decimal import ROUND_HALF_UP, Decimal
 
+import jwt
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -13,42 +14,57 @@ from wallet.adapters.mock_payment_service_repository import MockPaymentServiceRe
 from wallet.services.add_funds_to_wallet_use_case import AddFundsToWalletUseCase
 
 logger = logging.getLogger("wallet")
+SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 
 
-@method_decorator(csrf_exempt, name="dispatch")
 class WalletView(APIView):
     permission_classes = [AllowAny]
 
     def put(self, request):
-        data = json.loads(request.body)
+        token = request.headers.get("Authorization").split(" ")[1]
 
-        amount = Decimal(data.get("amount")).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-        idempotency_key = request.headers.get("Idempotency-Key")
+        try:
+            uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+            email = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("email")
+            logger.error(f"request : {request.__dict__}")
+            data = json.loads(request.body)
 
-        use_case = AddFundsToWalletUseCase(
-            MockPaymentServiceRepository(),
-            DjangoWalletRepository(),
-            DjangoWithdrawalRepository(),
-        )
+            amount = Decimal(data.get("amount")).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+            idempotency_key = request.headers.get("Idempotency-Key")
 
-        uuid = "5a2753379b0a4db7baf166ab8946b511"
-        email = "william569@hotmail.ca"
+            use_case = AddFundsToWalletUseCase(
+                MockPaymentServiceRepository(),
+                DjangoWalletRepository(),
+                DjangoWithdrawalRepository(),
+            )
 
-        result = use_case.execute(uuid, email, amount, idempotency_key)
+            result = use_case.execute(uuid, email, amount, idempotency_key)
 
-        return JsonResponse(data=result.to_dict(), status=result.code)
+            return JsonResponse(data=result.to_dict(), status=result.code)
+
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            return JsonResponse({"error": "An unexpected error occurred."}, status=500)
 
     def get(self, request):
+        token = request.headers.get("Authorization").split(" ")[1]
 
-        use_case = AddFundsToWalletUseCase(
-            MockPaymentServiceRepository(),
-            DjangoWalletRepository(),
-            DjangoWithdrawalRepository(),
-        )
+        try:
+            uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+            logger.info(f"Extracted UUID from token: {uuid}")
 
-        uuid = "5a2753379b0a4db7baf166ab8946b511"
-        result = use_case.get_balance(uuid)
+            use_case = AddFundsToWalletUseCase(
+                MockPaymentServiceRepository(),
+                DjangoWalletRepository(),
+                DjangoWithdrawalRepository(),
+            )
 
-        return JsonResponse(data=result.to_dict(), status=result.code)
+            result = use_case.get_balance(uuid)
+
+            return JsonResponse(data=result.to_dict(), status=result.code)
+
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            return JsonResponse({"error": "An unexpected error occurred."}, status=500)

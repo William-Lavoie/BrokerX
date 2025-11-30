@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+import jwt
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +16,7 @@ from order.services.place_order import PlaceOrderUseCase
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
+SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 logger = logging.getLogger("order")
 
 
@@ -25,7 +27,9 @@ class OrderView(APIView):
     def post(self, request):
         data = json.loads(request.body)
 
-        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
+        token = request.headers.get("Authorization").split(" ")[1]
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+
         symbol = data.get("symbol", "")
         order_type = data.get("order_type", "")
         order_style = data.get("order_style", "")
@@ -60,7 +64,7 @@ class OrderView(APIView):
         )
 
         result = use_case.execute(
-            client_id=client_id,
+            client_id=uuid,
             symbol=symbol,
             order_type=order_type,
             order_style=order_style,
@@ -79,15 +83,18 @@ class OrderView(APIView):
             DjangoOrderRepository(),
         )
 
-        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
+        token = request.headers.get("Authorization").split(" ")[1]
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
 
-        result = use_case.get_orders(client_id=client_id)
+        result = use_case.get_orders(client_id=uuid)
         return JsonResponse(data=result.to_dict(), status=result.code)
 
     def put(self, request):
         data = json.loads(request.body)
 
-        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
+        token = request.headers.get("Authorization").split(" ")[1]
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+
         symbol = data.get("symbol", "")
         order_type = data.get("order_type", "")
         order_style = data.get("order_style", "")
@@ -122,7 +129,7 @@ class OrderView(APIView):
         )
 
         result = use_case.execute(
-            client_id=client_id,
+            client_id=uuid,
             symbol=symbol,
             order_type=order_type,
             order_style=order_style,
@@ -139,11 +146,11 @@ class OrderView(APIView):
         data = json.loads(request.body)
         order_id = UUID(data.get("order_id", ""))
 
-        client_id = UUID("5a2753379b0a4db7baf166ab8946b511")
-
+        token = request.headers.get("Authorization").split(" ")[1]
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
         use_case = PlaceOrderUseCase(
             order_repository=DjangoOrderRepository(), wallet_repository=WalletService()
         )
 
-        result = use_case.delete_order(order_id=order_id, client_id=client_id)
+        result = use_case.delete_order(order_id=order_id, client_id=uuid)
         return JsonResponse(data=result.to_dict(), status=result.code)

@@ -64,7 +64,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=14),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
