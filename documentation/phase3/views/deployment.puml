@@ -1,0 +1,31 @@
+@startuml
+node "Host" {
+  node "Gateway" #lightblue {
+    component "KrakenD"
+  }
+
+  node "Client service" #lightblue {
+    component "client_service"
+    component "client-redis"
+    database "client-mysql"
+  }
+
+  node "Wallet service" #lightblue {
+    component "wallet_service"
+    component "wallet-redis"
+    database "wallet-mysql"
+  }
+
+  node "Order service" #lightblue {
+    component "order_service"
+    component "order-redis"
+    database "order-mysql"
+  }
+}
+
+legend right
+  == Legend ==
+  #lightblue : Docker container
+endlegend
+
+@enduml
