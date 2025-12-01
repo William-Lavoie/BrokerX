@@ -1,119 +1,202 @@
 @startuml
-    class CreateClientUseCase{
-        + client_repository : ClientRepository
-        + otp_repository : OTPRepository
-        + execute(first_name: str, last_name: str, birth_date: str, email: str, phone_number: str, address: str, password: str,) : UseCaseResult
+    class OrderView{
+        + post(request)
+        + get(request)
+        + put(request)
+        + delete(request)
     }
 
-    class UseCaseResult{
-       + success: bool
-       + message: string
+    class PlaceOrderUseCase{
+        + order_repository : OrderRepository
+        + portfolio_repository: PortfolioRepository
+        + stock_repository: StockRepository
+        + wallet_repository: WalletRepository
+        + execute(client_id: UUID, symbol: str, order_type: str, order_style: str, order_duration: str, quantity: int, idempotency_key: UUID, price: Decimal, end_date: datetime) : UseCaseResult
     }
 
-    class ClientRepository <<abstract>> {
-        + add_user(client: Client) : Result
-        + update_user_status(email: str, new_status: str) : Result
-        + client_is_active(email: str) : bool
-    }
-
-    class Result{
-        + success : bool
-        + code : int
-    }
-
-    class ClientDTO{
-        + success : bool
-        + code : int
-        + status : string
-    }
-
-    class OTPDTO {
-        +secret : str
-        +attempts : int
-        +validated : bool
-    }
-
-    class Client {
-        +first_name : str
-        +last_name : str
-        +address : str
-        +birth_date : str
-        +email : str
-        +phone_number : str
-        +status : str
-        +password : str
-    }
-
-    class OTPRepository <<abstract>> {
-        + create_passcode(client: Client) : OTPDTO
-        + send_passcode(email: str, passcode: str) : bool
-        + verify_passcode(email: str, passcode: str) : OTPDTO
-        + register_secret(email: str, secret: str) : bool
-    }
-
-    class DjangoClientRepository {
-        -dao : ClientDAO
-        +add_user(client: Client) : ClientDTO
-        +update_user_status(email: str, new_status: str) : ClientDTO
-        +client_is_active(email: str) : bool
-    }
-
-    class MySQLClientOTPDAO {
-        +set_secret_key(email: str, secret: str) : OTPDTO
-        +get_secret_key(email: str) : OTPDTO
-        +delete_passcode(email: str) : OTPDTO
-        +increment_attempts(email: str) : OTPDTO
-    }
-
-    class ClientOTPDAO {
-        +set_secret_key(email: str, secret: str) : OTPDTO
-        +get_secret_key(email: str) : OTPDTO
-        +delete_passcode(email: str) : OTPDTO
-        +increment_attempts(email: str) : OTPDTO
-    }
-
-    class EmailOTPRepository {
-        -dao : ClientOTPDAO
-        +send_passcode(email: str, passcode: str) : bool
-        +verify_passcode(user_email: str, passcode: str) : OTPDTO
-        +register_secret(email: str, secret: str) : bool
-    }
-
-    class BaseOTPRepository {
-        +create_passcode(client: Client) : OTPDTO
-        +generate_passcode() : str
-    }
-
-    class MySQLClientDAO {
-        +add_user(client: Client) : ClientDTO
-        +update_status(email: str, new_status: str) : ClientDTO
-        +get_status(email: str) : ClientDTO
+    class OrderMatchingUseCase{
+        + order_repository : OrderRepository
+        + portfolio_repository: PortfolioRepository
+        + stock_repository: StockRepository
+        + wallet_repository: WalletRepository
+        + execute(client_id: UUID, symbol: str, order_type: str, order_style: str, order_duration: str, quantity: int, idempotency_key: UUID, price: Decimal, end_date: datetime) : UseCaseResult
     }
 
 
-    class ClientDAO{
-        +add_user(client: Client) : ClientDTO
-        +update_status(email: str, new_status: str) : ClientDTO
-        +get_status(email: str) : ClientDTO
+    class Order{
+        + client_id: UUID
+        + symbol: str
+        + order_type: str
+        + order_style: str
+        + order_duration: str
+        + quantity: int
+        + order_id: UUID
+        + quantity_executed: int
+        + price: Decimal
+        + end_date: datetime
+        + status: str
+        + created_at: datetime
+        + updated_at: datetime
+        + executed_at: datime
+
+        + validate_data()
+        + to_dict(): dict
+        + update_from_dto(order_dto: OrderDTO)
     }
 
-MySQLClientOTPDAO --|> ClientOTPDAO
-EmailOTPRepository --|> BaseOTPRepository
-EmailOTPRepository --|> OTPDTO
-EmailOTPRepository --> MySQLClientOTPDAO
-BaseOTPRepository --|> OTPRepository
-DjangoClientRepository --|> ClientRepository
-DjangoClientRepository --> ClientDTO
-DjangoClientRepository --> Client
-ClientDAO--> ClientDTO
-ClientDTO --|> Result
-DjangoClientRepository --> MySQLClientDAO
-MySQLClientDAO --|> ClientDAO
-CreateClientUseCase --> DjangoClientRepository
-CreateClientUseCase --> EmailOTPRepository
-CreateClientUseCase --> OTPDTO
-CreateClientUseCase --> Client
-CreateClientUseCase --> UseCaseResult
-ClientOTPDAO --> OTPDTO
+    class OrderDTO{
+        + client_id: UUID
+        + symbol: str
+        + order_type: str
+        + order_style: str
+        + order_duration: str
+        + quantity: int
+        + order_id: UUID
+        + quantity_executed: int
+        + price: Decimal
+        + end_date: datetime
+        + status: str
+        + created_at: datetime
+        + updated_at: datetime
+        + executed_at: datime
+
+        + to_dict(): dict
+        + get_order_from_dto(): Order
+    }
+
+    class OrderInvalidException{
+        + user_message: str
+        + log_message: str
+        + error_code: int
+    }
+
+ note right of OrderInvalidException
+    Extends the basic Exception class
+ end note
+
+    class WalletRepository <<abstract>> {
+        + reserve_funds(order: Order)
+        + release_funds(order_id: UUID, client_id: UUID)
+    }
+
+    class WalletService  {
+        + reserve_funds(order: Order)
+        + release_funds(order_id: UUID, client_id: UUID)
+    }
+
+    class StockRepository <<abstract>> {
+        + update_top_of_book(order: Order)
+    }
+
+    class StockService {
+        + update_top_of_book(order: Order)
+    }
+
+    class PortfolioRepository <<abstract>> {
+        + reserve_holdings(order: Order)
+        + release_holdings(order: Order)
+    }
+
+    class PortfolioService {
+        + reserve_holdings(order: Order)
+        + release_holdings(order: Order)
+    }
+
+    class OrderRepository<<abstract>> {
+        + add_order(order: Order, idempotency_key: UUID)
+        + get_potential_matches(order: Order): [Order]
+        + get_orders_by_client(client_id: UUID): [Order]
+        + delete_order(client_id: UUID, order_id: UUID): Order
+        + delete_order_rollback(client_id: UUID, order_id: UUID, previous_status: str)
+        + execute_order(order: Order, matching_orders: [Order]): dict
+    }
+
+    class DjangoOrderRepository {
+        + add_order(order: Order, idempotency_key: UUID)
+        + get_potential_matches(order: Order): [Order]
+        + get_orders_by_client(client_id: UUID): [Order]
+        + delete_order(client_id: UUID, order_id: UUID): Order
+        + delete_order_rollback(client_id: UUID, order_id: UUID, previous_status: str)
+        + execute_order(order: Order, matching_orders: [Order]): dict
+    }
+
+    class OrderDAO <<abstract>> {
+        + client_id: UUID,
+        +symbol: str,
+        + order_type: str,
+        + order_style: str,
+        + order_duration: str,
+        + quantity: int,
+        + idempotency_key: UUID,
+        + end_date: datetime,
+        + price: Decimal
+
+        + add_order(order: Order, idempotency_key: UUID)
+        + get_potential_matches(order: Order): [Order]
+        + get_orders_by_client(client_id: UUID): [Order]
+        + delete_order(client_id: UUID, order_id: UUID): Order
+        + delete_order_rollback(client_id: UUID, order_id: UUID, previous_status: str)
+        + execute_order(order: Order, matching_orders: [Order]): dict
+    }
+
+class MySQLOrderDAO  {
+        + client_id: UUID,
+        +symbol: str,
+        + order_type: str,
+        + order_style: str,
+        + order_duration: str,
+        + quantity: int,
+        + idempotency_key: UUID,
+        + end_date: datetime,
+        + price: Decimal
+
+        + add_order(order: Order, idempotency_key: UUID)
+        + get_potential_matches(order: Order): [Order]
+        + get_orders_by_client(client_id: UUID): [Order]
+        + delete_order(client_id: UUID, order_id: UUID): Order
+        + delete_order_rollback(client_id: UUID, order_id: UUID, previous_status: str)
+        + execute_order(order: Order, matching_orders: [Order]): dict
+    }
+
+class RedisOrder {
+    + set_orders_by_client(client_id: UUID, orders: [Order])
+    + get_orders_by_client(client_id: UUID): [Order]
+    + redis_get_orders_by_stock(symbol: str): [Order]
+    + set_order(client_id: UUID, order: Order)
+    + delete_order(order_id: UUID, client_id: UUID)
+}
+
+class OrderCreatedHandler {
+    + get_event_type(): str
+    + handle(event_data: dict)
+}
+
+class OrderEventProducer {
+    + get_instance(): KafkaProducer
+}
+
+OrderView --> PlaceOrderUseCase
+PlaceOrderUseCase --> OrderRepository
+OrderMatchingUseCase --> OrderRepository
+PlaceOrderUseCase --> WalletRepository
+PlaceOrderUseCase --> StockRepository
+PlaceOrderUseCase --> PortfolioRepository
+OrderRepository--> OrderDAO
+PlaceOrderUseCase --> Order
+OrderMatchingUseCase --> Order
+OrderRepository--> Order
+PlaceOrderUseCase --> OrderInvalidException
+Order --> OrderInvalidException
+Order --> OrderDTO
+OrderRepository--> OrderDTO
+DjangoOrderRepository --> RedisOrder
+OrderCreatedHandler --> OrderMatchingUseCase
+OrderCreatedHandler --> OrderEventProducer
+
+StockService --|> StockRepository
+WalletRepository --|> WalletService
+PortfolioRepository--|> PortfolioService
+OrderRepository--|> DjangoOrderRepository
+OrderDAO --|> MySQLOrderDAO
 
 @enduml

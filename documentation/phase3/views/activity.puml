@@ -20,8 +20,17 @@ repeat
   elseif(Place order) then (yes)
      :Enter order information;
      :Confirm order placement;
+  elseif(Modify Order) then (yes)
+     :Enter new order information;
+     :Confirm order modification;
+  elseif(Cancel Order) then (yes)
+     :Click Delete order;
+  elseif(Subscribe to stock) then (yes)
+     :Enter symbol;
+     :Click on Search;
   endif
 repeat while (User stays logged in?)
+
 :Logout;
 stop
 @enduml

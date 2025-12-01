@@ -14,21 +14,33 @@ actor Client as "Client"
 rectangle "Client service" as CS
 rectangle "Wallet service" as WS
 rectangle "Order service" as OS
+rectangle "Stock service" as SS
+rectangle "Portfolio service" as PS
+rectangle "Notifications service" as NS
 rectangle "Gateway" as G
 rectangle "Simulated Payment Service" as SPS
 database "MySQL" as DBC
 database "MySQL" as DBW
 database "MySQL" as DBO
+database "MYSQL" as DBS
+database "MYSQL" as DBP
+database "MYSQL" as DBN
 
 
 Client --> G : Sends HTTP requests
 G --> CS
 G --> WS
 G --> OS
+G --> SS
+G --> PS
+G --> NS
 WS --> SPS
 WS --> DBW
 CS --> DBC
 OS --> DBO
+SS --> DBS
+PS --> DBP
+NS --> DBN
 
 legend right
   |= Symbol |= Meaning           |

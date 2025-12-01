@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
       const token = localStorage.getItem("access_token");
 
-    fetch("http://localhost:8080/portfolio", {
+    fetch("http://localhost:8005/portfolio", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h2>📊 Portfolio Overview</h2>
+      <h2>Portfolio Overview</h2>
 
       <div style={{ marginBottom: "15px" }}>
         <strong>Client ID:</strong> {portfolio.client_id}
@@ -38,7 +38,7 @@ export default function Home() {
         <strong>Performance:</strong> {portfolio.performance}%
       </div>
 
-        <h3 style={{ marginTop: "30px" }}>📁 Holdings</h3>
+        <h3 style={{ marginTop: "30px" }}>Holdings</h3>
 
       {portfolio.holdings.length === 0 ? (
         <p>No holdings available.</p>

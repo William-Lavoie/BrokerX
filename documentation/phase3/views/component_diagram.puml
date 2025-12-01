@@ -7,65 +7,76 @@ skinparam rectangle {
   BorderColor #000000
   RoundCorner 15
 }
-package "Domain (Core)" {
+package "Domain" {
     package "Entities" {
-        [Client]
+        [Order]
     }
 
-    package "Ports (Interfaces)" {
-        interface ClientRepository
-        interface OTPRepository
+    package "Ports" {
+        interface OrderRepository
+        interface PortfolioRepository
+        interface StockRepository
+        interface WalletRepository
+
+        package "Dao" {
+            interface OrderDAO
+        }
     }
 
-    package "Dao" {
-        interface ClientDAO
-        interface OTPDAO
-    }
+
 }
 
 package "Views" {
-    [ClientView]
-    [OTPView]
+    [OrderView]
 }
 
 package "Adapters" {
-    [DjangoClientRepository]
-    [BaseOTPRepository]
-    [EmailOTPRepository]
+    [DjangoOrderRepository]
+    [PortfolioService]
+    [StockService]
+    [WalletService]
 
     package "DAO" {
-        [MySQLClientDAO]
-        [MySQLOTPDAO]
+        [MySQLOrderDAO]
     }
 
     package "Redis" {
-        [RedisClient]
+        [RedisOrder]
+    }
+
+    package "Kafka" {
+        [OrderCreatedHandler]
+        [OrderEventProducer]
     }
 }
 
 package "Services" {
-    [CreateClient]
-    [VerifyPasscode]
+    [OrderMatchingUseCase]
+    [PlaceOrderUseCase]
 }
 
-[ClientView] --> [CreateClient] : Send create client request
-[CreateClient] -> [DjangoClientRepository] : create client
-[DjangoClientRepository] -> [RedisClient] : cache client information
-[DjangoClientRepository] -> [MySQLClientDAO] : store client information
+[OrderView] --> [PlaceOrderUseCase]
+[PlaceOrderUseCase] --> [DjangoOrderRepository]
+[PlaceOrderUseCase] --> [WalletService]: Reserve funds
+[PlaceOrderUseCase] --> [StockService]: Update top of book
+[StockService] --> [PlaceOrderUseCase]: Get top of book
+[PlaceOrderUseCase] --> [PortfolioService]: Reserve holdings
+[PlaceOrderUseCase] --> [OrderEventProducer]: Produce "EventCreated" event
 
-[CreateClient] -> [EmailOTPRepository] : generate passcode
-[CreateClient] -> [Client]
-[DjangoClientRepository] -> [Client]
+[PlaceOrderUseCase] --> [Order]
+[DjangoOrderRepository] --> [Order]
+[DjangoOrderRepository] --> [RedisOrder]: cache order information
+[DjangoOrderRepository] --> [MySQLOrderDAO]: store order information
 
-[OTPView] --> [VerifyPasscode] : Send verify passcode request
-[VerifyPasscode] --> [DjangoClientRepository] : update client status
-[VerifyPasscode] --> [EmailOTPRepository] : verify passcode
+[StockService] --|> [StockRepository]
+[WalletService] --|> [WalletRepository]
+[PortfolioService] --|> [PortfolioRepository]
+[DjangoOrderRepository] --|> [OrderRepository]
+[MySQLOrderDAO] --|> [OrderDAO]
 
-[DjangoClientRepository] --|> [ClientRepository]
-[BaseOTPRepository] --|>  [OTPRepository]
-[MySQLClientDAO] --|> [ClientDAO]
-[MySQLOTPDAO] --|> [OTPDAO]
-[EmailOTPRepository] --|> [BaseOTPRepository]
-[EmailOTPRepository] --> [MySQLOTPDAO] : store OTP information
+[OrderMatchingUseCase] --> [DjangoOrderRepository]
+[OrderMatchingUseCase] --> [OrderEventProducer]: Produce "OrderExecuted" event
+[OrderMatchingUseCase] --> [OrderCreatedHandler]: Handle "OrderCreated" event
+
 
 @enduml

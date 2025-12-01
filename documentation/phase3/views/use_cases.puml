@@ -2,5 +2,9 @@
     "Non client"--> (Client Registration and Identity Validation)
     Client --> (Authentication)
     Client --> (Add funds to the wallet)
+    Client --> (Subscribe to market data)
     Client --> (Place Order)
+    Client --> (Update/Cancel order)
+    Client --> (Order matching and execution)
+    Client --> (Notifications of executions)
 @enduml

@@ -26,11 +26,12 @@ This document is based on the arc42 model available at https://arc42.org/overvie
 ### Requirements overview
 BrokerX is a web-based application for simulated stock broking. It is an educational project that aims to replicate in a simulated environment online broking applications such as WealthSimple. No real money or personal information will be collected, exchanged, and/or used in the making, deployment and/or use of this application.
 
-### Phase 2 overview
-The central goal of phase 2 was to improve performance and set up monitoring to build a robust environment. Several changes were introduced, including, but not limited to:
-- The user interface was decoupled from the backend which now serves JSON responses through a REST API.
-- A Next.js frontend with React was made to communicate with BrokerX. Since it is considered external to BrokerX, it will not be discussed as part of the application.
-- The application was migrated from a monolithic architecture to microservices.
+### Phase 3 overview
+The central goal of phase 3 was to finish implementing all the use cases and add event-driven communication. Several changes were introduced, including, but not limited to:
+- New services were created, in particular for portfolios and notifications.
+- Event-driven communication Kafka was implemented in the order, wallet and portfolio services for order matching (see UC07).
+
+
 
 ### Quality goals
 
@@ -38,15 +39,14 @@ The central goal of phase 2 was to improve performance and set up monitoring to 
 |----------|------------------|----------|
 | 1 | **Maintainability** | Separation of concerns through the use of the hexagonal architecture within each service |
 | 2 | **Persistence** | Support of a backend database per service with MySQL|
-| 3 | **Availability** | Greater or equal to 95.5% uptime |
+| 3 | **Availability** | Greater or equal to 99.9% uptime |
 | 4 | **Testability** | Coverage greater or equal than 80% |
 | 5 | **Traceability** | Logging of errors in dedicated files |
-| 6* | **Deployability** | Services must be deployable independently |
-| 7* | **Scalability** | Must allow for a high number of concurent users
-| 8* | **Reliability** | Must remain operable if one or several services fail |
-| 9* | **Performance** | See section [Performance Reports](#performance-reports)
+| 6 | **Deployability** | Services must be deployable independently |
+| 7 | **Scalability** | Must allow for a high number of concurent users
+| 8 | **Reliability** | Must remain operable if one or several services fail |
+| 9 | **Performance** | See section [Performance Reports](#performance-reports)
 
-\* These quality goals were added in phase 2.
 
 ### Stakeholders
 - Developer : Learning how to design and implement a system from beginning to end.
@@ -61,24 +61,29 @@ The central goal of phase 2 was to improve performance and set up monitoring to 
 | **REST API** | KrakenD, JWT, Postman, Swagger | Follows RESTful practices, API gateway to handle inter-service communication with authentication |
 | **Testing** | Pytest (unit  and integration testing), K6 (stress tests) | Reliable testing frameworks that allow full coverage and simulation of real usage |
 | **Monitoring** | Prometheus, Grafana | Open-source tools with Django integration for easy monitoring and dashboards |
-| **Logging** | Loki for easy and reliable logging |
-| **Caching** | Redis | Fast server side caching on certain endpoint
+| **Logging** | Django built-in logging system | Integrated logging system for traceability
+| **Caching** | Redis | Fast server side caching on certain endpoints
 | **CI/CD** | Continuous integration and deployment through GitHub Actions | Ease of use, tests and deployment automation |
 | **Deployment** | Deployment in Docker containers | Chosen for simplicity and portability |
+| **Event-driven communication** | Asynchronous communication across services with Kafka |
 
 
 ## 3. System Scope and Context
 
 ### 3.1 Business Context
+#### Activity diagram
+
 ![Activity Diagram](images/activity.png)
 
-The system currently allows clients to add funds to their wallets. Additional functionalities (including placing order and viewing their portfolio) will be added during the following phases of the project.
 ### 3.2 Technical Context
 - **Interface** - Next.js web app with React
 - **Client service** - Client registration and authentication
 - **Wallet service** - Wallet funding
 - **Order service** - Order placement
-- **Stock service** - Portfolio management
+- **Stock service** - Stock information
+- **Portfolio service** - Managing clients' assets
+- **Notifications service** - Sending notifications for order executions
+- **API Gateway** - Managing traffic among services
 - **Persistence Layer**: MySQL databases with DAO pattern.
 - **Simulated Payment Service**: Python module that mocks a banking account for clients to simulate withdrawing money from an external bank.
 
@@ -93,24 +98,24 @@ The system currently allows clients to add funds to their wallets. Additional fu
 | **Testability** | Use of interfaces to simplify mocking of external sources and generation of coverage reports integrated into the CI pipeline |
 | **Maintainability** | Layered architecture within each service with DTOs to pass data between layers |
 |**Integrity**| Idempotency key on sensitive operations |
-|**Communication between service**| API Gateway to route traffic to the appropriate service
+|**Communication between service**| API Gateway to route traffic to the appropriate service and Kafka for saga choregraphy
 
 ## 5. Building Block View
-### Component Diagram (UC01)
+### Component Diagram
 ![Component diagram](images/component.png)
 
-Note that this represents only one service (client) for simplicity, but unless otherwise mentioned every service follows this structure inherited from the monolithic architecture. In fact, every service is a monolith with a hexagonal architecture. In this architecture, the view represents an inbound adapter that directly receives requests from the user interface.
+Note that this represents only one service (order) for simplicity, but unless otherwise mentioned every service follows this structure inherited from the monolithic architecture. In this architecture, the view represents an inbound adapter that directly receives requests from the user interface.
 
 Services implement uses cases and serve to coordinate the different systems, as well as to update the view once an operation is completed.
 
 Ports represent a contract with an external entity, whether it be part of the app, such as the DAO classes, or an external API, for example. It defines what methods and returns are expected from external entities.
 
-Adapters implement ports and communicate with external entities through DTOs. Adapters of DAO ports are responsible for communicating with the database, while generic adapters such as `DjangoClientRepository` coordinates between multiple entities, though in this case each adapter is linked to only one other. In general, `DjangoClientRepository` can be thought of as an intermediary between the service layer and sources of clients, in this case the MySQL database.
+Adapters implement ports and communicate with external entities through DTOs. Adapters of DAO ports are responsible for communicating with the database, while generic adapters such as `DjangoOrderRepository` coordinates between multiple entities. In general, `DjangoOrderRepository` can be thought of as an intermediary between the service layer and sources of orders, in this case the MySQL database.
 
-### Class Diagram (Client)
+### Class Diagram
 ![Class diagram](images/class.png)
 
-Other services follow the same pattern.
+Other services follow the same pattern. Note that some utilitary classes have been avoided in orded to keep the diagram a reasonable size.
 
 ## 6. Runtime View
 The following diagram shows the uses cases and the actors who can trigger them.
@@ -385,43 +390,6 @@ Please note that since the payment system is simulated, you can always withdraw 
 | UC-07       | Internal Matching and Execution              | 🔵 Done              | Transactions between buyers and sellers cannot be completed without this.    |
 | UC-08       | Confirmation of Executions and Notifications | 🟠 Should    | Nice to have for transparency and client trust.                              |
 
-
-## Phase 2 retrospective
-
-The application is unfortunately only partially functional at this stage. Because of time constraints, I migrated too late to a microservices architecture and was not able to make it work in time. As such, only the client service can be used fully, and monitoring does not work. However, before the migration, the application was working in its entirety, and had monitoring with Prometheus and Grafana.
-
-Authentication with JWT token, monitoring, stress tests, load balancing and use cases UC05 were implemented and functional in the previous monolithic application, but have not been ported to the new microservices architecture. The code for the monolith can still be found in the directory `brokerX`. Everything missing will be added during phase 3.
-
-This phase is a failure, however the migration to microservices makes the code more modular and extensible, and several missing features have been implemented but were simply not ported to the microservices architecture for time constraints. For these reasons, I am hopeful that the project will be completed in time for phase 3.
-
-<span style="color:green;">&#9679;</span> Implemented
-- Test coverage is satisfactory
-- Hexagonal architecture is followed for each service
-- Error handling in the backend and logging
-- REST API with Swagger documentation
-- Reproductible migrations
-- Functional and easy script to quickly deploy
-- Domain well defined
-- Pre-commit hook with linters (black, mypy and isort)
-
-<span style="color:orange;">&#9679;</span> Needs Improvement
-- Improve UI styling and reactivity, especially on mobile
-- Show error messages in the UI
-- JWT authentication
-- CI script generates coverage report, has healthchecks, and a badge on the README
-- CD script deploys automatically on VM
-- Incomplete microservices architecture
-
-
-<span style="color:red;">&#9679;</span> Missing
-- E2E testing
-- Sending emails (no SMTP server)
-- Allow SMS messages
-- Rollback script
-- Monitoring for microservices
-- CI/CD is non functional
-- Load balancing
-- Postman collection
 
 ## References
 - This project has been made in collaboration with chatGPT for the purposes listed below. Note that uses of artificial intelligence in this project is limited to strictly those listed below. In particular, it has **not** been used to generate artifacts.

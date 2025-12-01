@@ -1,4 +1,5 @@
 @startuml
+
 node "Host" {
   node "Gateway" #lightblue {
     component "KrakenD"
@@ -21,7 +22,59 @@ node "Host" {
     component "order-redis"
     database "order-mysql"
   }
+
+
+
+  node "Portfolio service" #lightblue {
+    component "portfolio_service"
+    component "portfolio-redis"
+    database "portfolio-mysql"
+  }
+
+  node "Notifications service" #lightblue {
+    component "notifications_service"
+    component "notifications-redis"
+    database "notifications-mysql"
+  }
+
+ node "Stock service" #lightblue {
+    component "stock_service"
+    component "stock-redis"
+    database "stock-mysql"
+  }
+
+  node "Kafka" #lightblue {
+      component "Kafka cluster"
+  }
+
 }
+
+' Add arrows between services to show interactions
+KrakenD --> "Client service"
+KrakenD --> "Wallet service"
+KrakenD --> "Order service"
+KrakenD --> "Stock service"
+KrakenD --> "Portfolio service"
+KrakenD --> "Notifications service"
+
+"client_service" --> "client-redis"
+"wallet_service" --> "wallet-redis"
+"order_service" --> "order-redis"
+"stock_service" --> "stock-redis"
+"portfolio_service" --> "portfolio-redis"
+"notifications_service" --> "notifications-redis"
+
+"client_service" --> "client-mysql"
+"wallet_service" --> "wallet-mysql"
+"order_service" --> "order-mysql"
+"stock_service" --> "stock-mysql"
+"portfolio_service" --> "portfolio-mysql"
+"notifications_service" --> "notifications-mysql"
+
+"Wallet service" --> "Kafka cluster"
+"Order service" --> "Kafka cluster"
+"Portfolio service" --> "Kafka cluster"
+"Notifications service" --> "Kafka cluster"
 
 legend right
   == Legend ==
