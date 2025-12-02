@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
   title: BrokerX API
-  version: 1.0.0
+  version: 3.0.0
 tags:
   - name: Client
     description: Operations related to client management
@@ -11,6 +11,12 @@ tags:
 
   - name: Order
     description: Operations related to order management
+
+  - name: Portfolio
+    description: Operations related to client portfolio management
+
+  - name: Stock
+    description: Operations related to stock information
 
 paths:
   /client:
@@ -657,7 +663,59 @@ paths:
                     type: string
                     example: "There was an unexpected error."
 
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - Order
+      summary: Modify an order
 
+
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Order
+      summary: Cancel an order
+
+  /portfolio:
+    get:
+      security:
+      - BearerAuth: []
+      tags:
+        - Portfolio
+      summary: Get client portfolio
+
+    put :
+      security:
+      - BearerAuth: []
+      tags:
+        - Portfolio
+      summary: Update client portfolio
+
+  /portfolio/reserve:
+    post:
+      security:
+      - BearerAuth: []
+      tags:
+        - Portfolio
+      summary: Reserve assets in portfolio
+
+    put :
+      security:
+      - BearerAuth: []
+      tags:
+        - Portfolio
+      summary: Release reserved assets in portfolio
+
+
+  /stock/{symbol}:
+    get:
+      security:
+      - BearerAuth: []
+      tags:
+        - Stock
+      summary: Get stock information
 
 components:
   securitySchemes:

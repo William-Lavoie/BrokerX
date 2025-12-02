@@ -15,6 +15,9 @@ export default function Home() {
 
 
     useEffect(() => {
+      if (!token) {
+        window.location.href = "http://localhost:3000/login";
+      }
       fetch('http://localhost:8080/client', {
         method: "GET",
         headers: {
@@ -23,7 +26,7 @@ export default function Home() {
         },
       })
         .then(response => response.json())
-        .then(json => setClientInfo(json))
+        .then(json => { if (json?.status !== "Active") { window.location.href = "http://localhost:3000/create_account/validate_passcode"; } setClientInfo(json) })
         .catch(error => console.error(error));
     }, []);
 

@@ -51,6 +51,7 @@ export default function App() {
 			}
 
 			toast.success("Passcode validated. Account authenticated.");
+			window.location.href = "http://localhost:3000/";
 		} catch (error) {
 			console.error(error);
 			toast.error("Network error. Please try again.");

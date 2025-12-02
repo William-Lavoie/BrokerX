@@ -5,34 +5,50 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import ProfileDropdown from "./profile_picture";
 
+// Add: safe token getter and a global SSE wrapper to avoid multiple connections
+const getClientToken = () => {
+	// Only access localStorage in browser
+	if (typeof window === 'undefined') return '';
+	return localStorage.getItem('access_token') || '';
+};
+
+type SSEWrapper = {
+	source: EventSource;
+	listeners: Set<(e: MessageEvent) => void>;
+};
+
+declare global {
+	interface Window {
+		__brokerx_sse?: SSEWrapper;
+	}
+}
+
 async function get_stock_info(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-        event.preventDefault();
-        try {
+		event.preventDefault();
+		try {
+			const form = event.currentTarget;
+			const formData = new FormData(form);
+			const symbolRaw = formData.get("symbol");
+			const symbol = symbolRaw ? String(symbolRaw).trim() : "";
 
-            const form = event.currentTarget;
-            const formData = new FormData(form);
-            const symbol = formData.get("symbol");
+			if (!symbol) {
+				// nothing to do
+				return;
+			}
 
-
-            const response = await fetch(`http://localhost:8004/stock?symbol=${symbol}`, {
-                method: "GET",
-            });
-
-            if (!response.ok) {
-                throw new Error("");
-            }
-
-            const data = await response.json();
-
-        } catch (error) {
-            console.error(error);
-        }
-    }
+			// Redirect to a page that will display stock info.
+			// The target page can read the symbol from the query and fetch/display details.
+			const encoded = encodeURIComponent(symbol);
+			window.location.href = `/stock?symbol=${encoded}`;
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 function NavbarButton({text, route}: {text: string, route: string}) {
     return (
          <div className="w-1/10  flex justify-center items-end">
-            <a href={route} className="h-1/3 w-full  bg-white cursor-pointer text-black hover:!bg-blue-500 border-1 flex justify-center items-center rounded-t-md">
+            <a href={route} className="h-1/3 w-full  bg-white cursor-pointer text-black hover:!bg-emerald-500 border-1 flex justify-center items-center rounded-t-md">
                 {text}
             </a>
         </div>
@@ -45,9 +61,40 @@ export function Navbar() {
 	const [unreadCount, setUnreadCount] = useState<number>(0);
 
 	useEffect(() => {
-		const source = new EventSource("http://localhost:8006/notification/");
+		// Use the client token. If missing, don't attempt SSE.
+		const token = getClientToken();
+		if (!token) {
+			console.warn("No access token found for notifications SSE.");
+			return;
+		}
 
-		source.onmessage = (e) => {
+		// SSE endpoint with token as query param (EventSource cannot send custom headers).
+		const sseUrl = `http://localhost:8006/notification?token=${encodeURIComponent(token)}/`;
+
+		// Create global wrapper if it doesn't exist.
+		if (!window.__brokerx_sse) {
+			const es = new EventSource(sseUrl);
+			const wrapper: SSEWrapper = { source: es, listeners: new Set() };
+
+			es.onmessage = (e: MessageEvent) => {
+				// dispatch to all registered listeners
+				wrapper.listeners.forEach((l) => {
+					try { l(e); } catch (err) { console.error("Listener error", err); }
+				});
+			};
+
+			es.onerror = (err) => {
+				console.error("EventSource error:", err);
+			};
+
+			window.__brokerx_sse = wrapper;
+		} else {
+			// Optional: if token changed and backend requires it, you may recreate the source here.
+			// For now we reuse the existing connection.
+		}
+
+		// local listener for this component instance
+		const localHandler = (e: MessageEvent) => {
 			try {
 				const data = JSON.parse(e.data);
 				const entry = {
@@ -63,12 +110,17 @@ export function Navbar() {
 			}
 		};
 
-		source.onerror = (err) => {
-			console.error("EventSource error:", err);
-		};
+		window.__brokerx_sse.listeners.add(localHandler);
 
+		// cleanup: remove our listener; if no listeners remain close the source
 		return () => {
-			source.close();
+			if (window.__brokerx_sse) {
+				window.__brokerx_sse.listeners.delete(localHandler);
+				if (window.__brokerx_sse.listeners.size === 0) {
+					window.__brokerx_sse.source.close();
+					delete window.__brokerx_sse;
+				}
+			}
 		};
 	}, []);
 
@@ -79,7 +131,7 @@ export function Navbar() {
 
     return (
         <>
-            <nav className="hidden md:flex bg-blue-300 h-[10vh] gap-x-[3%] sticky top-0">
+            <nav className="hidden md:flex bg-white h-[10vh] gap-x-[3%] sticky top-0">
                 <img src="/images/default.png" alt="logo" />
 
                 <NavbarButton text="Home" route="/" />

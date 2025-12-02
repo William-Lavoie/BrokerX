@@ -1,11 +1,17 @@
 import json
+import logging
 import time
 from uuid import UUID
 
 from django.http import HttpResponse, StreamingHttpResponse
+from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
+from rest_framework.decorators import api_view, permission_classes
 
 connections = {}  # Example: { 3: [queue1, queue2], 7: [queue3] }
+import jwt
+SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 
+logger = logging.getLogger("notification")
 
 def send_user_notification(user_id, message):
     event = {
@@ -39,15 +45,34 @@ def event_stream(user_id):
         if not connections[user_id]:
             del connections[user_id]
 
-
 def sse_notifications(request):
-    user_id = UUID("5a2753379b0a4db7baf166ab8946b511")2
+    # Extract the token from the query parameter
+    token = request.GET.get("token")
+    # If no token is provided, return an unauthorized response
+    if not token:
+        return HttpResponse("Unauthorized", status=401)
 
+    try:
+
+        logger.error(f"Token received: {token}")
+        # Decode the token to get the UUID (assuming it's a JWT token)
+        uuid = jwt.decode(token, SECRET_KEY, algorithms=["HS256"]).get("uuid")
+
+        # If the UUID is not in the token, return unauthorized
+        if not uuid:
+            return HttpResponse("Unauthorized", status=401)
+
+    except Exception as e:
+        logger.error(f"Token decoding error: {str(e)}")
+        return HttpResponse("Unauthorized", status=401)
+
+    # Now create the streaming response
     response = StreamingHttpResponse(
-        event_stream(user_id),
+        event_stream(uuid),  # your event stream function
         content_type="text/event-stream",
     )
 
+    # Return the streaming response
     return response
 
 

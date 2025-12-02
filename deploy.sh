@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ALL_SERVICES=("client" "wallet")
+ALL_SERVICES=("client" "wallet" "stock" "order" "notifications" "portfolio")
 
 if [ "$#" -gt 0 ]; then
     SERVICES=()
@@ -21,15 +21,30 @@ if ! docker network ls | grep -q brokerx-network; then
     docker network create brokerx-network
 fi
 
+echo "Deploying API Gateway..."
+cd gateway
+docker compose down -v --remove-orphans > /dev/null 2>&1
+docker compose build --no-cache > /dev/null 2>&1
+docker compose up -d > /dev/null 2>&1
+echo -e "\033[0;32mAPI Gateway deployed successfully.\033[0m"
+
+cd ".."
+cd "kafka"
+echo "Deploying Kafka..."
+docker compose down -v --remove-orphans > /dev/null 2>&1
+docker compose build --no-cache > /dev/null 2>&1
+docker compose up -d > /dev/null 2>&1
+echo -e "\033[0;32mKafka deployed successfully.\033[0m"
+cd ".."
+
 for SERVICE in "${SERVICES[@]}"; do
     echo "Deploying $SERVICE..."
 
     cd "${SERVICE}_service"
-    docker compose down -v --remove-orphans
-    docker compose build --no-cache
-    docker compose up -d
+    docker compose down -v --remove-orphans > /dev/null 2>&1
+    docker compose build --no-cache > /dev/null 2>&1
+    docker compose up -d > /dev/null 2>&1
     until docker compose exec -T mysql mysqladmin ping -h "${SERVICE}-mysql" --silent; do
-        echo "Waiting for MySQL..."
         sleep 2
     done
 
@@ -37,16 +52,7 @@ for SERVICE in "${SERVICES[@]}"; do
     cd ".."
 done
 
-echo "Deploying Gateway..."
-
-cd "gateway"
-docker compose down -v --remove-orphans
-docker compose build --no-cache
-docker compose up -d
-
-echo -e "\033[0;32mGateway deployed successfully.\033[0m"
-cd ".."
-
+echo "Cleaning up unused Docker resources..."
 docker image prune -f
 docker container prune -f
 docker volume prune -f

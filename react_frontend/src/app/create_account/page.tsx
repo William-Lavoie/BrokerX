@@ -72,9 +72,8 @@ export default function Login() {
         }
 
         const data = await response.json();
-        if (data["succcess"]) {
-            window.location.href = "http://localhost:3000/validate_passcode"
-        }
+        toast.success(data.message || "Account created successfully. Please validate your account with the passcode sent to you.");
+        window.location.href = "http://localhost:3000/login";
 
         } catch (error) {
             console.error(error);
