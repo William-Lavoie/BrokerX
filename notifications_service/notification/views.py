@@ -4,14 +4,16 @@ import time
 from uuid import UUID
 
 from django.http import HttpResponse, StreamingHttpResponse
-from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 from rest_framework.decorators import api_view, permission_classes
 
 connections = {}  # Example: { 3: [queue1, queue2], 7: [queue3] }
 import jwt
+
 SECRET_KEY = "gq35rgaerFW53T45GQ345FAdasfawf24k7iy"
 
 logger = logging.getLogger("notification")
+
 
 def send_user_notification(user_id, message):
     event = {
@@ -44,6 +46,7 @@ def event_stream(user_id):
         connections[user_id].remove(queue)
         if not connections[user_id]:
             del connections[user_id]
+
 
 def sse_notifications(request):
     # Extract the token from the query parameter

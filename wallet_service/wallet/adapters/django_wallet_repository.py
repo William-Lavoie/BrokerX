@@ -23,9 +23,9 @@ class DjangoWalletRepository(WalletRepository):
         return wallet_dto
 
     def get_balance(self, client_id: UUID) -> WalletDTO:
-       # redis_balance = self.redis.get_wallet_balance(client_id=client_id)
-        #if redis_balance:
-         #   return WalletDTO(success=True, code=200, balance=Decimal(redis_balance))
+        # redis_balance = self.redis.get_wallet_balance(client_id=client_id)
+        # if redis_balance:
+        #   return WalletDTO(success=True, code=200, balance=Decimal(redis_balance))
 
         wallet_dto = self.dao.get_balance(client_id)
         self.redis.set_wallet_balance(client_id, wallet_dto.balance)

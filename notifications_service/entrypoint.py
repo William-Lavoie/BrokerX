@@ -7,6 +7,7 @@ from django.db import OperationalError, connections
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "notifications_service.settings")
 
+
 def wait_for_db(retries=10, delay=3):
     for i in range(retries):
         try:
@@ -16,6 +17,7 @@ def wait_for_db(retries=10, delay=3):
         except OperationalError:
             time.sleep(delay)
     sys.exit(1)
+
 
 if __name__ == "__main__":
     wait_for_db()
