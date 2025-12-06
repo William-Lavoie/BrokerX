@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ALL_SERVICES=("client" "wallet" "stock" "order" "notifications" "portfolio")
+ALL_SERVICES=("client" "wallet" "stock" "order" "portfolio")
 
 if [ "$#" -gt 0 ]; then
     SERVICES=()

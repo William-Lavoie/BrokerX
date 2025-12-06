@@ -1,0 +1,23 @@
+@startuml
+1 : OrderCreated
+2 : OrderExecuted
+3 : OrderPaymentProcessed
+4 : OrderPaymentFailed
+5 : OrderHoldingsExchanged
+6 : OrderHoldingsExchangedFailed
+7 : OrderExecutionCompleted
+
+[*] --> 1
+1 --> 2 : Order executed
+2 --> 3 : Order payment
+2 --> 4 : Order payment failed
+3 --> 5 : Order positions exchanged
+3 --> 6
+4 --> 7
+5 --> 7 : Order processed
+6 --> 7 : OrderCancelled
+7 --> [*] : SagaCompleted
+
+2 --> 7 : Order execution failed
+1 --> 7 : Order creation failed
+@enduml

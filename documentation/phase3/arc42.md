@@ -88,6 +88,11 @@ The central goal of phase 3 was to finish implementing all the use cases and add
 
 ![Context Diagram](images/context.png)
 
+### 3.3 State machine diagram
+![State machine Diagram](images/state_machine.png)
+
+This state machine diagram describes the choregraphed saga of UC07. Note that the diagram represents the planned implementation, in reality some states are missing from the code due to time constraints.
+
 
 ## 4. Solution Strategy
 | Problem | Solution |
@@ -315,7 +320,7 @@ This runbook provides operational procedures and troubleshooting steps for manag
 
 #### Running with `deploy.sh` script
 1. To start the service, begin by cloning the Github repository available at https://github.com/William-Lavoie/log430-a25-labo5 or use the ZIP file with the source code.
-2. Run `BrokerX/deploy.sh` with the name of the services you want to run (i.e `BrokerX/deploy.sh client`) to launch only the client service. By default, the client and the wallet service are launched. Note that these are the only functional services as of now.
+2. Run `BrokerX/deploy.sh` with the name of the services you want to run (i.e `BrokerX/deploy.sh client`) to launch only the client service. If you do not specify parameters, every service will be started. Note that this is what you need to do to follow the demo guide.
 3. The frontend application should now be running on port 3000 (`http://localhost:3000/`)
 4. You can access the Swagger documentation at `http://localhost:8001/api/`
 
@@ -356,7 +361,7 @@ You can run the tests by running the command  in the service's directory:
 2. Click on Sign in.
 3. You will be redirected to `/create_account/validate_passcode`. Note that there might be a delay since you are first redirected to `/`.
 4. A passcode has been sent to you by email, however since no SMTP server is configured at the moment, the passcode is sent through logs.
-   Please look at `BrokerX\client_service\logs/client_logs` to know your passcode. You can also request a new one.
+   Please look at `BrokerX\client_service\logs/client_logs` to know your passcode. You can also request a new one if it doesn't work.
 4. Enter your passcode.
 5. You will be redirected to `/`.
 
@@ -383,7 +388,7 @@ Please note that since the payment system is simulated, you can always withdraw 
 
 Note that if you select Limit and/or GTD in the duration input, additional input fields will appear.
 
-## **6. Modification/Cancellation of orders
+## **6. Modification/Cancellation of orders**
 1. Navigate to`/place_order` if you are not already there from step 5.
 2. Create an order if you do not have one.
 3. Click on Edit.
@@ -403,12 +408,19 @@ Confirm that the information has been updatedin the wallet page, order page and 
 
 ## **8. Notification of execution**
 
-This UC is not yet functional, but Ihope to get it done by the final deadline.
+This UC is not yet functional, but I hope to get it done by the final deadline.
 
 ## **Additional Notes**
 - Your session will remain active until you log out manually or the session expires.
 - If any redirect fails, please manually navigate to the specified page.
 
+
+
+## Phase 3 Retrospective
+
+There are several things that could not be done in time for the end of the project. Next steps would be finishing the sage for UC07, fixing the implementation of UC08 and adding add balancing, which was present before migrating to microservices.
+
+If I were to do this project again, I would do many things differently, for example I would spend less time working on the UI, I would have migrated to microservices earlier and I would split the programs in fewer services since it has proven to be very difficult to coordinate between them, and as a result test coverage has dropped, the CI/CD pipeline is no longer operational and neither is monitoring, even tho all those items were properly set up at one point. Overall, I am satisfied with the result but given additional time there are many improvements I would do. As is, the program is somewhat shaky and there may be several undocumented bugs and issues.
 
 # MoSCoW Prioritization Table – Use Cases
 

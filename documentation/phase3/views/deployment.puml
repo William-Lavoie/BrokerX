@@ -1,6 +1,11 @@
 @startuml
 
 node "Host" {
+
+  node "Frontend" {
+     component "Next.js"
+  }
+
   node "Gateway" #lightblue {
     component "KrakenD"
   }
@@ -49,7 +54,7 @@ node "Host" {
 
 }
 
-' Add arrows between services to show interactions
+Frontend --> Gateway
 KrakenD --> "Client service"
 KrakenD --> "Wallet service"
 KrakenD --> "Order service"
